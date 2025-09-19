@@ -50,6 +50,13 @@ namespace WebIServices.IServices.SystemIServices
         Task<ApiResponse<string>> DeleteUserAsync(List<int> Ids);
 
         /// <summary>
+        /// 获取用户详情
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        Task<ApiResponse<sys_user>> GetUserDetialAsync(long UserId);
+
+        /// <summary>
         /// 更新用户信息
         /// </summary>
         /// <param name="user"></param>

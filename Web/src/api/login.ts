@@ -16,3 +16,7 @@ export function logoutApi() {
 export function getMenuList() {
     return axios.get('/api/User/GetUserMenu')
 }
+
+export function GetUserDetial() {
+    return axios.get('/api/User/GetUserDetial')
+}

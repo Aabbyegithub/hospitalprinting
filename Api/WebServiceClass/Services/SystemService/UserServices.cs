@@ -141,6 +141,11 @@ namespace WebServiceClass.Services.UserService
             } 
         }
 
+        public async  Task<ApiResponse<sys_user>> GetUserDetialAsync(long UserId)
+        {
+            return Success(await _dal.Db.Queryable<sys_user>().Includes(a=>a.user_role,b=>b.role).Includes(a=>a.store).FirstAsync(a=>a.user_id == UserId));
+        }
+
         public async Task<ApiResponse<string>> UpUserAsync(sys_user User)
         {
             try

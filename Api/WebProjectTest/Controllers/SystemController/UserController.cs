@@ -187,5 +187,15 @@ namespace WebProjectTest.Controllers.SystemController
         {
             return await _UserService.DeleteUserAsync(Ids);
         }
+
+        /// <summary>
+        /// 获取个人信息
+        /// </summary>
+        [HttpGet]
+        [OperationLogFilter("系统设置>员工管理", "查看个人信息", ActionType.Search)]
+        public async Task<ApiResponse<sys_user>> GetUserDetialAsync()
+        {
+            return await _UserService.GetUserDetialAsync(UserId);
+        }
     }
 }

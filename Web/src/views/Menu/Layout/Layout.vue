@@ -57,32 +57,12 @@ onMounted(() => {
   // 只在首次进入（没有子路由时）才跳转，刷新时保留当前页面
   const currentPath = router.currentRoute.value.fullPath;
   if (currentPath === '/Layout' || currentPath === '/Layout/') {
-<<<<<<< HEAD
       router.push('/Layout/Backendhome/HomeIndex');
-=======
-    if (orgId == 1) {
-      router.push('/Layout/Backendhome/HomeIndex');
-    } else {
-      router.push('/Layout/Orderhome');
-    }
->>>>>>> 96f58664de39bae2f7a0c7785cbe650642840ad9
   }
   updateCurrentRoute();
 });
 
-<<<<<<< HEAD
-=======
-const handleNavClick = (routeName: string) => {
-  currentRoute.value = routeName;
-  if (routeName === 'Orderhome') {
-    router.push('/Layout/Orderhome');
-  } else if (routeName === 'Backendhome') {
-    router.push('/Layout/Backendhome/HomeIndex');
-  }
-  // router.push(`/Layout/${routeName}`);
-};
 
->>>>>>> 96f58664de39bae2f7a0c7785cbe650642840ad9
 // 处理下拉框命令（退出系统逻辑）
 const handleCommand = async (command: string) => {
   if (command === 'logout') {

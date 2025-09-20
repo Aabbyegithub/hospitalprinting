@@ -89,6 +89,11 @@ namespace ModelClassLibrary.Model
             /// </summary>
             [Description("暂停")]
             Pause = 15,
+            /// <summary>
+            /// 暂停
+            /// </summary>
+            [Description("打印")]
+            Print = 16,
         }
 
         public enum PayChannel

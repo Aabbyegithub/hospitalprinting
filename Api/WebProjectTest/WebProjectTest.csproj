@@ -11,6 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="LogInfos\**" />
+    <Content Remove="LogInfos\**" />
+    <EmbeddedResource Remove="LogInfos\**" />
+    <None Remove="LogInfos\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DevExpress.Xpo" Version="24.2.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.5" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.6" />
@@ -37,7 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="LogInfos\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

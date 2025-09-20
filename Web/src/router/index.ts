@@ -41,6 +41,21 @@ const routes = [
             name: 'OperationLogManagement',
             component: () => import('../views/Menu/BackendHome/System/OperationLogManagement.vue') 
           },
+          { 
+            path: 'PatientManagement', 
+            name: 'PatientManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/PatientManagement.vue') 
+          },
+          { 
+            path: 'ExaminationManagement', 
+            name: 'ExaminationManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/ExaminationManagement.vue') 
+          },
+          { 
+            path: 'PrintRecordManagement', 
+            name: 'PrintRecordManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/PrintRecordManagement.vue') 
+          },
         ]
        },
     ]

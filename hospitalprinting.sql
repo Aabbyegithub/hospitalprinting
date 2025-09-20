@@ -1,21 +1,126 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : MySql测试数据库
+ Source Server         : lu
  Source Server Type    : MySQL
- Source Server Version : 80036 (8.0.36)
- Source Host           : localhost:3306
+ Source Server Version : 80036
+ Source Host           : 192.168.24.35:3306
  Source Schema         : hospitalprinting
 
  Target Server Type    : MySQL
- Target Server Version : 80036 (8.0.36)
+ Target Server Version : 80036
  File Encoding         : 65001
 
- Date: 19/09/2025 17:47:14
+ Date: 20/09/2025 17:24:14
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for hol_examination
+-- ----------------------------
+DROP TABLE IF EXISTS `hol_examination`;
+CREATE TABLE `hol_examination`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `exam_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '检查号（唯一标识）',
+  `patient_id` bigint NOT NULL COMMENT '患者ID',
+  `org_id` bigint NOT NULL COMMENT '所属机构ID',
+  `exam_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '检查类型（CT/MRI/超声等）',
+  `exam_date` datetime NOT NULL COMMENT '检查日期',
+  `report_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '报告文件路径',
+  `image_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '电子胶片路径',
+  `status` tinyint NULL DEFAULT 1 COMMENT '状态：1=有效，0=过期/删除',
+  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_printed` tinyint NULL DEFAULT 0 COMMENT '是否已打印：0=未打印，1=已打印',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_exam_no`(`exam_no` ASC) USING BTREE,
+  INDEX `idx_patient_id`(`patient_id` ASC) USING BTREE,
+  INDEX `idx_org_id`(`org_id` ASC) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '检查数据表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hol_examination
+-- ----------------------------
+INSERT INTO `hol_examination` VALUES (1, '1', 2, 1, 'CT', '2025-09-20 00:32:27', '啊', '1', 1, '2025-09-20 16:32:39', '2025-09-20 16:39:49', 1);
+
+-- ----------------------------
+-- Table structure for hol_patient
+-- ----------------------------
+DROP TABLE IF EXISTS `hol_patient`;
+CREATE TABLE `hol_patient`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '患者姓名',
+  `gender` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '性别',
+  `age` int NULL DEFAULT NULL COMMENT '年龄',
+  `id_card` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '身份证号',
+  `contact` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '联系方式',
+  `medical_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '就诊号',
+  `createtime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updatetime` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `status` tinyint NULL DEFAULT 1 COMMENT '是否有效（0，1）',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `id_card`(`id_card` ASC) USING BTREE,
+  UNIQUE INDEX `medical_no`(`medical_no` ASC) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hol_patient
+-- ----------------------------
+INSERT INTO `hol_patient` VALUES (1, '张三', '女', 25, '111111111111111111', '11111111112', 'bh1111', '2025-09-20 14:53:19', '2025-09-20 15:08:52', 1);
+INSERT INTO `hol_patient` VALUES (2, '李四', '男', 26, '111', '44', '44', '2025-09-20 16:18:27', '2025-09-20 16:18:27', 1);
+
+-- ----------------------------
+-- Table structure for hol_print_record
+-- ----------------------------
+DROP TABLE IF EXISTS `hol_print_record`;
+CREATE TABLE `hol_print_record`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `exam_id` bigint NOT NULL COMMENT '检查数据ID',
+  `patient_id` bigint NOT NULL COMMENT '患者ID',
+  `print_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '打印时间',
+  `printed_by` bigint NOT NULL COMMENT '打印人ID（患者ID本身）',
+  `status` tinyint NOT NULL DEFAULT 1 COMMENT '状态：1=有效，0=过期/删除',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `update_time` datetime NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_exam_id`(`exam_id` ASC) USING BTREE,
+  INDEX `fk_print_patient`(`patient_id` ASC) USING BTREE,
+  CONSTRAINT `fk_print_exam` FOREIGN KEY (`exam_id`) REFERENCES `hol_examination` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_print_patient` FOREIGN KEY (`patient_id`) REFERENCES `hol_patient` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '患者自助打印记录表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hol_print_record
+-- ----------------------------
+INSERT INTO `hol_print_record` VALUES (3, 1, 2, '2025-09-20 16:39:49', 2, 1, '2025-09-20 16:39:49', '2025-09-20 16:39:49');
+
+-- ----------------------------
+-- Table structure for sys_examination
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_examination`;
+CREATE TABLE `sys_examination`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `exam_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '检查号（唯一标识）',
+  `patient_id` bigint NOT NULL COMMENT '患者ID',
+  `org_id` bigint NULL DEFAULT NULL COMMENT '所属机构ID',
+  `exam_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '检查类型（CT/MRI/超声等）',
+  `exam_date` datetime NOT NULL COMMENT '检查日期',
+  `report_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '报告文件路径',
+  `image_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '电子胶片路径',
+  `status` tinyint NULL DEFAULT 1 COMMENT '状态：1=有效，0=过期/删除',
+  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_exam_no`(`exam_no` ASC) USING BTREE,
+  INDEX `idx_patient_id`(`patient_id` ASC) USING BTREE,
+  INDEX `idx_org_id`(`org_id` ASC) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '检查数据表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of sys_examination
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for sys_operationlog
@@ -36,7 +141,7 @@ CREATE TABLE `sys_operationlog`  (
   `UpTime` datetime NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`Id`) USING BTREE,
   INDEX `index`(`UserId` ASC, `ActionType` ASC, `ModuleName` ASC, `OrgId` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7718 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统操作日志' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7736 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统操作日志' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_operationlog
@@ -459,6 +564,253 @@ INSERT INTO `sys_operationlog` VALUES (7714, 1, 4, '系统设置>员工管理', 
 INSERT INTO `sys_operationlog` VALUES (7715, 1, 4, '系统设置>员工管理', '查看个人信息', '2025-09-19 17:26:08', '{}', 1, 1, '2025-09-19 17:26:08', 1, '2025-09-19 17:26:08');
 INSERT INTO `sys_operationlog` VALUES (7716, 1, 10, '系统登陆', '人员登陆', '2025-09-19 17:27:44', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-19 17:27:44', 1, '2025-09-19 17:27:44');
 INSERT INTO `sys_operationlog` VALUES (7717, 1, 4, '系统设置>员工管理', '查看个人信息', '2025-09-19 17:29:15', '{}', 1, 1, '2025-09-19 17:29:15', 1, '2025-09-19 17:29:15');
+INSERT INTO `sys_operationlog` VALUES (7718, 1, 10, '系统登陆', '人员登陆', '2025-09-20 11:33:16', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 11:33:16', 1, '2025-09-20 11:33:16');
+INSERT INTO `sys_operationlog` VALUES (7719, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 11:33:26', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:33:26', 1, '2025-09-20 11:33:26');
+INSERT INTO `sys_operationlog` VALUES (7720, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 11:33:26', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:33:26', 1, '2025-09-20 11:33:26');
+INSERT INTO `sys_operationlog` VALUES (7721, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 11:35:30', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:35:30', 1, '2025-09-20 11:35:30');
+INSERT INTO `sys_operationlog` VALUES (7722, 1, 4, '系统设置>门店设置', '门店设置查询', '2025-09-20 11:35:34', '{\"StoreName\":null,\"phone\":null,\"address\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:35:34', 1, '2025-09-20 11:35:34');
+INSERT INTO `sys_operationlog` VALUES (7723, 1, 4, '系统设置>门店设置', '门店设置查询', '2025-09-20 11:35:34', '{\"StoreName\":null,\"phone\":null,\"address\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:35:34', 1, '2025-09-20 11:35:34');
+INSERT INTO `sys_operationlog` VALUES (7724, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 11:35:35', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:35:35', 1, '2025-09-20 11:35:35');
+INSERT INTO `sys_operationlog` VALUES (7725, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 11:35:35', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:35:35', 1, '2025-09-20 11:35:35');
+INSERT INTO `sys_operationlog` VALUES (7726, 1, 1, '系统设置>角色管理', '修改角色权限', '2025-09-20 11:35:38', '{\"roleId\":1,\"permissionIds\":[12,86,87,88,93,95,96]}', 1, 1, '2025-09-20 11:35:38', 1, '2025-09-20 11:35:38');
+INSERT INTO `sys_operationlog` VALUES (7727, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 11:35:40', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:35:40', 1, '2025-09-20 11:35:40');
+INSERT INTO `sys_operationlog` VALUES (7728, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 11:40:24', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:40:24', 1, '2025-09-20 11:40:24');
+INSERT INTO `sys_operationlog` VALUES (7729, 1, 1, '系统设置>角色管理', '修改角色权限', '2025-09-20 11:40:37', '{\"roleId\":1,\"permissionIds\":[12,86,87,88,93,95,96,103]}', 1, 1, '2025-09-20 11:40:37', 1, '2025-09-20 11:40:37');
+INSERT INTO `sys_operationlog` VALUES (7730, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 11:40:38', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:40:38', 1, '2025-09-20 11:40:38');
+INSERT INTO `sys_operationlog` VALUES (7731, 1, 4, '系统设置>员工管理', '查看个人信息', '2025-09-20 11:41:00', '{}', 1, 1, '2025-09-20 11:41:00', 1, '2025-09-20 11:41:00');
+INSERT INTO `sys_operationlog` VALUES (7732, 1, 10, '系统登陆', '人员登陆', '2025-09-20 11:42:59', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 11:42:59', 1, '2025-09-20 11:42:59');
+INSERT INTO `sys_operationlog` VALUES (7733, 1, 4, '患者管理', '查询患者', '2025-09-20 11:44:46', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:44:46', 1, '2025-09-20 11:44:46');
+INSERT INTO `sys_operationlog` VALUES (7734, 1, 4, '患者管理', '查询患者', '2025-09-20 11:44:49', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:44:49', 1, '2025-09-20 11:44:49');
+INSERT INTO `sys_operationlog` VALUES (7735, 1, 4, '患者管理', '查询患者', '2025-09-20 11:44:53', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 11:44:53', 1, '2025-09-20 11:44:53');
+INSERT INTO `sys_operationlog` VALUES (7736, 1, 10, '系统登陆', '人员登陆', '2025-09-20 14:22:15', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 14:22:15', 1, '2025-09-20 14:22:15');
+INSERT INTO `sys_operationlog` VALUES (7737, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 14:22:21', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:22:21', 1, '2025-09-20 14:22:21');
+INSERT INTO `sys_operationlog` VALUES (7738, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 14:22:21', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:22:21', 1, '2025-09-20 14:22:21');
+INSERT INTO `sys_operationlog` VALUES (7739, 1, 1, '系统设置>角色管理', '修改角色权限', '2025-09-20 14:22:27', '{\"roleId\":1,\"permissionIds\":[12,86,87,88,93,95,96,103,104]}', 1, 1, '2025-09-20 14:22:27', 1, '2025-09-20 14:22:27');
+INSERT INTO `sys_operationlog` VALUES (7740, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 14:22:30', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:22:30', 1, '2025-09-20 14:22:30');
+INSERT INTO `sys_operationlog` VALUES (7741, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 14:22:32', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:22:32', 1, '2025-09-20 14:22:32');
+INSERT INTO `sys_operationlog` VALUES (7742, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 14:22:32', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:22:32', 1, '2025-09-20 14:22:32');
+INSERT INTO `sys_operationlog` VALUES (7743, 1, 4, '系统设置>员工管理', '查看个人信息', '2025-09-20 14:23:01', '{}', 1, 1, '2025-09-20 14:23:01', 1, '2025-09-20 14:23:01');
+INSERT INTO `sys_operationlog` VALUES (7744, 1, 4, '患者管理', '查询患者', '2025-09-20 14:23:37', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:37', 1, '2025-09-20 14:23:37');
+INSERT INTO `sys_operationlog` VALUES (7745, 1, 4, '患者管理', '查询患者', '2025-09-20 14:23:37', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:37', 1, '2025-09-20 14:23:37');
+INSERT INTO `sys_operationlog` VALUES (7746, 1, 4, '患者管理', '查询患者', '2025-09-20 14:23:37', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:37', 1, '2025-09-20 14:23:37');
+INSERT INTO `sys_operationlog` VALUES (7747, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 14:23:39', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:39', 1, '2025-09-20 14:23:39');
+INSERT INTO `sys_operationlog` VALUES (7748, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 14:23:39', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:39', 1, '2025-09-20 14:23:39');
+INSERT INTO `sys_operationlog` VALUES (7749, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 14:23:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:40', 1, '2025-09-20 14:23:40');
+INSERT INTO `sys_operationlog` VALUES (7750, 1, 4, '患者管理', '查询患者', '2025-09-20 14:23:40', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:40', 1, '2025-09-20 14:23:40');
+INSERT INTO `sys_operationlog` VALUES (7751, 1, 4, '患者管理', '查询患者', '2025-09-20 14:23:40', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:40', 1, '2025-09-20 14:23:40');
+INSERT INTO `sys_operationlog` VALUES (7752, 1, 4, '患者管理', '查询患者', '2025-09-20 14:23:40', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:23:40', 1, '2025-09-20 14:23:40');
+INSERT INTO `sys_operationlog` VALUES (7753, 1, 10, '系统登陆', '人员登陆', '2025-09-20 14:46:36', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 14:46:36', 1, '2025-09-20 14:46:36');
+INSERT INTO `sys_operationlog` VALUES (7754, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 14:46:46', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:46:46', 1, '2025-09-20 14:46:46');
+INSERT INTO `sys_operationlog` VALUES (7755, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 14:46:46', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:46:46', 1, '2025-09-20 14:46:46');
+INSERT INTO `sys_operationlog` VALUES (7756, 1, 1, '系统设置>角色管理', '修改角色权限', '2025-09-20 14:46:52', '{\"roleId\":1,\"permissionIds\":[12,86,87,88,93,95,96,103,104,105]}', 1, 1, '2025-09-20 14:46:52', 1, '2025-09-20 14:46:52');
+INSERT INTO `sys_operationlog` VALUES (7757, 1, 4, '系统设置>角色管理', '角色管理查询', '2025-09-20 14:46:56', '{\"RoleName\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:46:56', 1, '2025-09-20 14:46:56');
+INSERT INTO `sys_operationlog` VALUES (7758, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 14:47:00', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:47:00', 1, '2025-09-20 14:47:00');
+INSERT INTO `sys_operationlog` VALUES (7759, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 14:47:00', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:47:00', 1, '2025-09-20 14:47:00');
+INSERT INTO `sys_operationlog` VALUES (7760, 1, 4, '患者管理', '查询患者', '2025-09-20 14:47:08', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:47:08', 1, '2025-09-20 14:47:08');
+INSERT INTO `sys_operationlog` VALUES (7761, 1, 4, '患者管理', '查询患者', '2025-09-20 14:47:08', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:47:08', 1, '2025-09-20 14:47:08');
+INSERT INTO `sys_operationlog` VALUES (7762, 1, 4, '患者管理', '查询患者', '2025-09-20 14:47:08', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:47:08', 1, '2025-09-20 14:47:08');
+INSERT INTO `sys_operationlog` VALUES (7763, 1, 3, '患者管理', '新增患者', '2025-09-20 14:47:43', '{\"patient\":{\"id\":0,\"name\":\"张三\",\"gender\":\"男\",\"age\":25,\"id_card\":\"111111111111111111\",\"contact\":\"11111111111\",\"medical_no\":\"bh1111\",\"createtime\":\"2025-09-20T14:47:42.9481609+08:00\",\"updatetime\":\"2025-09-20T14:47:42.9482325+08:00\",\"status\":1}}', 1, 1, '2025-09-20 14:47:43', 1, '2025-09-20 14:47:43');
+INSERT INTO `sys_operationlog` VALUES (7764, 1, 3, '患者管理', '新增患者', '2025-09-20 14:48:30', '{\"patient\":{\"id\":0,\"name\":\"张三\",\"gender\":\"男\",\"age\":25,\"id_card\":\"111111111111111111\",\"contact\":\"11111111111\",\"medical_no\":\"bh1111\",\"createtime\":\"2025-09-20T14:48:29.8574578+08:00\",\"updatetime\":\"2025-09-20T14:48:29.8574591+08:00\",\"status\":1}}', 1, 1, '2025-09-20 14:48:30', 1, '2025-09-20 14:48:30');
+INSERT INTO `sys_operationlog` VALUES (7765, 1, 3, '患者管理', '新增患者', '2025-09-20 14:51:21', '{\"patient\":{\"id\":0,\"name\":\"张三\",\"gender\":\"男\",\"age\":25,\"id_card\":\"111111111111111111\",\"contact\":\"11111111111\",\"medical_no\":\"bh1111\",\"createtime\":\"2025-09-20T14:50:29.4710374+08:00\",\"updatetime\":\"2025-09-20T14:50:30.5267225+08:00\",\"status\":1}}', 1, 1, '2025-09-20 14:51:21', 1, '2025-09-20 14:51:21');
+INSERT INTO `sys_operationlog` VALUES (7766, 1, 3, '患者管理', '新增患者', '2025-09-20 14:53:22', '{\"patient\":{\"id\":0,\"name\":\"张三\",\"gender\":\"男\",\"age\":25,\"id_card\":\"111111111111111111\",\"contact\":\"11111111111\",\"medical_no\":\"bh1111\",\"createtime\":\"2025-09-20T14:53:19.2568517+08:00\",\"updatetime\":\"2025-09-20T14:53:19.5245303+08:00\",\"status\":1}}', 1, 1, '2025-09-20 14:53:22', 1, '2025-09-20 14:53:22');
+INSERT INTO `sys_operationlog` VALUES (7767, 1, 4, '患者管理', '查询患者', '2025-09-20 14:53:22', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:53:22', 1, '2025-09-20 14:53:22');
+INSERT INTO `sys_operationlog` VALUES (7768, 1, 1, '患者管理', '修改患者', '2025-09-20 14:53:36', '{\"patient\":{\"id\":1,\"name\":\"张三\",\"gender\":\"男\",\"age\":25,\"id_card\":\"111111111111111111\",\"contact\":\"11111111112\",\"medical_no\":\"bh1111\",\"createtime\":\"2025-09-20T14:53:19\",\"updatetime\":\"2025-09-20T14:53:36.2002839+08:00\",\"status\":1}}', 1, 1, '2025-09-20 14:53:36', 1, '2025-09-20 14:53:36');
+INSERT INTO `sys_operationlog` VALUES (7769, 1, 4, '患者管理', '查询患者', '2025-09-20 14:53:36', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:53:36', 1, '2025-09-20 14:53:36');
+INSERT INTO `sys_operationlog` VALUES (7770, 1, 1, '患者管理', '修改患者', '2025-09-20 14:53:40', '{\"patient\":{\"id\":1,\"name\":\"张三\",\"gender\":\"女\",\"age\":25,\"id_card\":\"111111111111111111\",\"contact\":\"11111111112\",\"medical_no\":\"bh1111\",\"createtime\":\"2025-09-20T14:53:19\",\"updatetime\":\"2025-09-20T14:53:40.3562119+08:00\",\"status\":1}}', 1, 1, '2025-09-20 14:53:40', 1, '2025-09-20 14:53:40');
+INSERT INTO `sys_operationlog` VALUES (7771, 1, 4, '患者管理', '查询患者', '2025-09-20 14:53:40', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:53:40', 1, '2025-09-20 14:53:40');
+INSERT INTO `sys_operationlog` VALUES (7772, 1, 2, '患者管理', '删除患者', '2025-09-20 14:53:56', '{\"ids\":[1]}', 1, 1, '2025-09-20 14:53:56', 1, '2025-09-20 14:53:56');
+INSERT INTO `sys_operationlog` VALUES (7773, 1, 4, '患者管理', '查询患者', '2025-09-20 14:53:56', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:53:56', 1, '2025-09-20 14:53:56');
+INSERT INTO `sys_operationlog` VALUES (7774, 1, 4, '患者管理', '查询患者', '2025-09-20 14:54:00', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 14:54:00', 1, '2025-09-20 14:54:00');
+INSERT INTO `sys_operationlog` VALUES (7775, 1, 10, '系统登陆', '人员登陆', '2025-09-20 15:08:32', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 15:08:32', 1, '2025-09-20 15:08:32');
+INSERT INTO `sys_operationlog` VALUES (7776, 1, 4, '患者管理', '查询患者', '2025-09-20 15:08:38', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:08:38', 1, '2025-09-20 15:08:38');
+INSERT INTO `sys_operationlog` VALUES (7777, 1, 4, '患者管理', '查询患者', '2025-09-20 15:08:39', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:08:39', 1, '2025-09-20 15:08:39');
+INSERT INTO `sys_operationlog` VALUES (7778, 1, 4, '患者管理', '查询患者', '2025-09-20 15:08:55', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:08:55', 1, '2025-09-20 15:08:55');
+INSERT INTO `sys_operationlog` VALUES (7779, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:08:59', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:08:59', 1, '2025-09-20 15:08:59');
+INSERT INTO `sys_operationlog` VALUES (7780, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:08:59', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:08:59', 1, '2025-09-20 15:08:59');
+INSERT INTO `sys_operationlog` VALUES (7781, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:08:59', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:08:59', 1, '2025-09-20 15:08:59');
+INSERT INTO `sys_operationlog` VALUES (7782, 1, 4, '患者管理', '查询患者', '2025-09-20 15:09:15', '{\"name\":\"张\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:09:15', 1, '2025-09-20 15:09:15');
+INSERT INTO `sys_operationlog` VALUES (7783, 1, 4, '患者管理', '查询患者', '2025-09-20 15:12:38', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:12:38', 1, '2025-09-20 15:12:38');
+INSERT INTO `sys_operationlog` VALUES (7784, 1, 4, '患者管理', '查询患者', '2025-09-20 15:12:38', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:12:38', 1, '2025-09-20 15:12:38');
+INSERT INTO `sys_operationlog` VALUES (7785, 1, 4, '患者管理', '查询患者', '2025-09-20 15:12:38', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:12:38', 1, '2025-09-20 15:12:38');
+INSERT INTO `sys_operationlog` VALUES (7786, 1, 4, '患者管理', '查询患者', '2025-09-20 15:16:59', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:16:59', 1, '2025-09-20 15:16:59');
+INSERT INTO `sys_operationlog` VALUES (7787, 1, 4, '患者管理', '查询患者', '2025-09-20 15:16:59', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:16:59', 1, '2025-09-20 15:16:59');
+INSERT INTO `sys_operationlog` VALUES (7788, 1, 4, '患者管理', '查询患者', '2025-09-20 15:16:59', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:16:59', 1, '2025-09-20 15:16:59');
+INSERT INTO `sys_operationlog` VALUES (7789, 1, 10, '系统登陆', '人员登陆', '2025-09-20 15:17:59', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 15:17:59', 1, '2025-09-20 15:17:59');
+INSERT INTO `sys_operationlog` VALUES (7790, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 15:18:04', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:18:04', 1, '2025-09-20 15:18:04');
+INSERT INTO `sys_operationlog` VALUES (7791, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 15:18:04', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:18:04', 1, '2025-09-20 15:18:04');
+INSERT INTO `sys_operationlog` VALUES (7792, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:18:06', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:18:06', 1, '2025-09-20 15:18:06');
+INSERT INTO `sys_operationlog` VALUES (7793, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:18:06', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:18:06', 1, '2025-09-20 15:18:06');
+INSERT INTO `sys_operationlog` VALUES (7794, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:18:06', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:18:06', 1, '2025-09-20 15:18:06');
+INSERT INTO `sys_operationlog` VALUES (7795, 1, 4, '患者管理', '查询患者', '2025-09-20 15:18:12', '{\"name\":\"1\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:18:12', 1, '2025-09-20 15:18:12');
+INSERT INTO `sys_operationlog` VALUES (7796, 1, 4, '患者管理', '查询患者', '2025-09-20 15:18:15', '{\"name\":\"张\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:18:15', 1, '2025-09-20 15:18:15');
+INSERT INTO `sys_operationlog` VALUES (7797, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:19:10', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:19:10', 1, '2025-09-20 15:19:10');
+INSERT INTO `sys_operationlog` VALUES (7798, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:19:10', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:19:10', 1, '2025-09-20 15:19:10');
+INSERT INTO `sys_operationlog` VALUES (7799, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:19:10', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:19:10', 1, '2025-09-20 15:19:10');
+INSERT INTO `sys_operationlog` VALUES (7800, 1, 4, '患者管理', '查询患者', '2025-09-20 15:19:18', '{\"name\":\"咋会给你\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:19:18', 1, '2025-09-20 15:19:18');
+INSERT INTO `sys_operationlog` VALUES (7801, 1, 4, '患者管理', '查询患者', '2025-09-20 15:19:20', '{\"name\":\"张\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:19:20', 1, '2025-09-20 15:19:20');
+INSERT INTO `sys_operationlog` VALUES (7802, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:21:34', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:21:34', 1, '2025-09-20 15:21:34');
+INSERT INTO `sys_operationlog` VALUES (7803, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:21:34', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:21:34', 1, '2025-09-20 15:21:34');
+INSERT INTO `sys_operationlog` VALUES (7804, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:21:34', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:21:34', 1, '2025-09-20 15:21:34');
+INSERT INTO `sys_operationlog` VALUES (7805, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:21:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:21:40', 1, '2025-09-20 15:21:40');
+INSERT INTO `sys_operationlog` VALUES (7806, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:21:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:21:40', 1, '2025-09-20 15:21:40');
+INSERT INTO `sys_operationlog` VALUES (7807, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:21:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:21:40', 1, '2025-09-20 15:21:40');
+INSERT INTO `sys_operationlog` VALUES (7808, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:01', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:01', 1, '2025-09-20 15:22:01');
+INSERT INTO `sys_operationlog` VALUES (7809, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:01', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:01', 1, '2025-09-20 15:22:01');
+INSERT INTO `sys_operationlog` VALUES (7810, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:01', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:01', 1, '2025-09-20 15:22:01');
+INSERT INTO `sys_operationlog` VALUES (7811, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:16', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:16', 1, '2025-09-20 15:22:16');
+INSERT INTO `sys_operationlog` VALUES (7812, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:16', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:16', 1, '2025-09-20 15:22:16');
+INSERT INTO `sys_operationlog` VALUES (7813, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:16', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:16', 1, '2025-09-20 15:22:16');
+INSERT INTO `sys_operationlog` VALUES (7814, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:17', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:17', 1, '2025-09-20 15:22:17');
+INSERT INTO `sys_operationlog` VALUES (7815, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:17', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:17', 1, '2025-09-20 15:22:17');
+INSERT INTO `sys_operationlog` VALUES (7816, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:17', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:17', 1, '2025-09-20 15:22:17');
+INSERT INTO `sys_operationlog` VALUES (7817, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:27', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:27', 1, '2025-09-20 15:22:27');
+INSERT INTO `sys_operationlog` VALUES (7818, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:27', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:27', 1, '2025-09-20 15:22:27');
+INSERT INTO `sys_operationlog` VALUES (7819, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:27', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:27', 1, '2025-09-20 15:22:27');
+INSERT INTO `sys_operationlog` VALUES (7820, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:38', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:38', 1, '2025-09-20 15:22:38');
+INSERT INTO `sys_operationlog` VALUES (7821, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:38', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:38', 1, '2025-09-20 15:22:38');
+INSERT INTO `sys_operationlog` VALUES (7822, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:22:38', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:22:38', 1, '2025-09-20 15:22:38');
+INSERT INTO `sys_operationlog` VALUES (7823, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:23:13', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:23:13', 1, '2025-09-20 15:23:13');
+INSERT INTO `sys_operationlog` VALUES (7824, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:23:13', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:23:13', 1, '2025-09-20 15:23:13');
+INSERT INTO `sys_operationlog` VALUES (7825, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:23:13', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:23:13', 1, '2025-09-20 15:23:13');
+INSERT INTO `sys_operationlog` VALUES (7826, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:28:45', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:28:45', 1, '2025-09-20 15:28:45');
+INSERT INTO `sys_operationlog` VALUES (7827, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:28:45', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:28:45', 1, '2025-09-20 15:28:45');
+INSERT INTO `sys_operationlog` VALUES (7828, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:28:45', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:28:45', 1, '2025-09-20 15:28:45');
+INSERT INTO `sys_operationlog` VALUES (7829, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:28:48', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:28:48', 1, '2025-09-20 15:28:48');
+INSERT INTO `sys_operationlog` VALUES (7830, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:28:48', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:28:48', 1, '2025-09-20 15:28:48');
+INSERT INTO `sys_operationlog` VALUES (7831, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:28:48', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:28:48', 1, '2025-09-20 15:28:48');
+INSERT INTO `sys_operationlog` VALUES (7832, 1, 4, '患者管理', '查询患者', '2025-09-20 15:32:49', '{\"name\":\"张\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:32:49', 1, '2025-09-20 15:32:49');
+INSERT INTO `sys_operationlog` VALUES (7833, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:11', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:11', 1, '2025-09-20 15:36:11');
+INSERT INTO `sys_operationlog` VALUES (7834, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:11', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:11', 1, '2025-09-20 15:36:11');
+INSERT INTO `sys_operationlog` VALUES (7835, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:11', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:11', 1, '2025-09-20 15:36:11');
+INSERT INTO `sys_operationlog` VALUES (7836, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:22', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:22', 1, '2025-09-20 15:36:22');
+INSERT INTO `sys_operationlog` VALUES (7837, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:22', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:22', 1, '2025-09-20 15:36:22');
+INSERT INTO `sys_operationlog` VALUES (7838, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:22', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:22', 1, '2025-09-20 15:36:22');
+INSERT INTO `sys_operationlog` VALUES (7839, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:30', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:30', 1, '2025-09-20 15:36:30');
+INSERT INTO `sys_operationlog` VALUES (7840, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:30', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:30', 1, '2025-09-20 15:36:30');
+INSERT INTO `sys_operationlog` VALUES (7841, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:30', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:30', 1, '2025-09-20 15:36:30');
+INSERT INTO `sys_operationlog` VALUES (7842, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:39', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:39', 1, '2025-09-20 15:36:39');
+INSERT INTO `sys_operationlog` VALUES (7843, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:39', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:39', 1, '2025-09-20 15:36:39');
+INSERT INTO `sys_operationlog` VALUES (7844, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:36:39', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:36:39', 1, '2025-09-20 15:36:39');
+INSERT INTO `sys_operationlog` VALUES (7845, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:41:02', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:41:02', 1, '2025-09-20 15:41:02');
+INSERT INTO `sys_operationlog` VALUES (7846, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:42:00', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:42:00', 1, '2025-09-20 15:42:00');
+INSERT INTO `sys_operationlog` VALUES (7847, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:42:00', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:42:00', 1, '2025-09-20 15:42:00');
+INSERT INTO `sys_operationlog` VALUES (7848, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:42:00', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:42:00', 1, '2025-09-20 15:42:00');
+INSERT INTO `sys_operationlog` VALUES (7849, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:42:54', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:42:54', 1, '2025-09-20 15:42:54');
+INSERT INTO `sys_operationlog` VALUES (7850, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:42:54', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:42:54', 1, '2025-09-20 15:42:54');
+INSERT INTO `sys_operationlog` VALUES (7851, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:42:54', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:42:54', 1, '2025-09-20 15:42:54');
+INSERT INTO `sys_operationlog` VALUES (7852, 1, 10, '系统登陆', '人员登陆', '2025-09-20 15:46:38', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 15:46:38', 1, '2025-09-20 15:46:38');
+INSERT INTO `sys_operationlog` VALUES (7853, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:46:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:46:40', 1, '2025-09-20 15:46:40');
+INSERT INTO `sys_operationlog` VALUES (7854, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 15:46:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:46:40', 1, '2025-09-20 15:46:40');
+INSERT INTO `sys_operationlog` VALUES (7855, 1, 4, '患者管理', '查询患者', '2025-09-20 15:46:45', '{\"name\":\"咋会给你\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:46:45', 1, '2025-09-20 15:46:45');
+INSERT INTO `sys_operationlog` VALUES (7856, 1, 4, '患者管理', '查询患者', '2025-09-20 15:46:46', '{\"name\":\"咋会给\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:46:46', 1, '2025-09-20 15:46:46');
+INSERT INTO `sys_operationlog` VALUES (7857, 1, 4, '患者管理', '查询患者', '2025-09-20 15:46:50', '{\"name\":\"张\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 15:46:50', 1, '2025-09-20 15:46:50');
+INSERT INTO `sys_operationlog` VALUES (7858, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 15:54:52', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:54:52', 1, '2025-09-20 15:54:52');
+INSERT INTO `sys_operationlog` VALUES (7859, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 15:54:52', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:54:52', 1, '2025-09-20 15:54:52');
+INSERT INTO `sys_operationlog` VALUES (7860, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 15:54:52', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 15:54:52', 1, '2025-09-20 15:54:52');
+INSERT INTO `sys_operationlog` VALUES (7861, 1, 10, '系统登陆', '人员登陆', '2025-09-20 16:08:08', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 16:08:08', 1, '2025-09-20 16:08:08');
+INSERT INTO `sys_operationlog` VALUES (7862, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:08:56', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:08:56', 1, '2025-09-20 16:08:56');
+INSERT INTO `sys_operationlog` VALUES (7863, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:08:56', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:08:56', 1, '2025-09-20 16:08:56');
+INSERT INTO `sys_operationlog` VALUES (7864, 1, 4, '患者管理', '查询患者', '2025-09-20 16:09:05', '{\"name\":\"张\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 16:09:05', 1, '2025-09-20 16:09:05');
+INSERT INTO `sys_operationlog` VALUES (7865, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:11:04', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:11:04', 1, '2025-09-20 16:11:04');
+INSERT INTO `sys_operationlog` VALUES (7866, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:13:05', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:13:05', 1, '2025-09-20 16:13:05');
+INSERT INTO `sys_operationlog` VALUES (7867, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:13:05', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:13:05', 1, '2025-09-20 16:13:05');
+INSERT INTO `sys_operationlog` VALUES (7868, 1, 10, '系统登陆', '人员登陆', '2025-09-20 16:16:27', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 16:16:27', 1, '2025-09-20 16:16:27');
+INSERT INTO `sys_operationlog` VALUES (7869, 1, 4, '患者管理', '查询患者', '2025-09-20 16:16:32', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:16:32', 1, '2025-09-20 16:16:32');
+INSERT INTO `sys_operationlog` VALUES (7870, 1, 4, '患者管理', '查询患者', '2025-09-20 16:16:32', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:16:32', 1, '2025-09-20 16:16:32');
+INSERT INTO `sys_operationlog` VALUES (7871, 1, 4, '患者管理', '查询患者', '2025-09-20 16:18:09', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:18:09', 1, '2025-09-20 16:18:09');
+INSERT INTO `sys_operationlog` VALUES (7872, 1, 4, '患者管理', '查询患者', '2025-09-20 16:18:09', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:18:09', 1, '2025-09-20 16:18:09');
+INSERT INTO `sys_operationlog` VALUES (7873, 1, 3, '患者管理', '新增患者', '2025-09-20 16:18:27', '{\"patient\":{\"id\":0,\"name\":\"李四\",\"gender\":\"男\",\"age\":26,\"id_card\":\"111\",\"contact\":\"44\",\"medical_no\":\"44\",\"createtime\":\"2025-09-20T16:18:27.0574759+08:00\",\"updatetime\":\"2025-09-20T16:18:27.0574772+08:00\",\"status\":1}}', 1, 1, '2025-09-20 16:18:27', 1, '2025-09-20 16:18:27');
+INSERT INTO `sys_operationlog` VALUES (7874, 1, 4, '患者管理', '查询患者', '2025-09-20 16:18:27', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:18:27', 1, '2025-09-20 16:18:27');
+INSERT INTO `sys_operationlog` VALUES (7875, 1, 10, '系统登陆', '人员登陆', '2025-09-20 16:20:41', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 16:20:41', 1, '2025-09-20 16:20:41');
+INSERT INTO `sys_operationlog` VALUES (7876, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:20:46', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:20:46', 1, '2025-09-20 16:20:46');
+INSERT INTO `sys_operationlog` VALUES (7877, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:20:46', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:20:46', 1, '2025-09-20 16:20:46');
+INSERT INTO `sys_operationlog` VALUES (7878, 1, 4, '患者管理', '查询患者', '2025-09-20 16:20:51', '{\"name\":\"1\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 16:20:51', 1, '2025-09-20 16:20:51');
+INSERT INTO `sys_operationlog` VALUES (7879, 1, 4, '患者管理', '查询患者', '2025-09-20 16:20:54', '{\"name\":\"李四\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 16:20:54', 1, '2025-09-20 16:20:54');
+INSERT INTO `sys_operationlog` VALUES (7880, 1, 10, '系统登陆', '人员登陆', '2025-09-20 16:26:37', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 16:26:37', 1, '2025-09-20 16:26:37');
+INSERT INTO `sys_operationlog` VALUES (7881, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:26:44', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:26:44', 1, '2025-09-20 16:26:44');
+INSERT INTO `sys_operationlog` VALUES (7882, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:26:44', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:26:44', 1, '2025-09-20 16:26:44');
+INSERT INTO `sys_operationlog` VALUES (7883, 1, 4, '患者管理', '查询患者', '2025-09-20 16:26:52', '{\"name\":\"李四\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 16:26:52', 1, '2025-09-20 16:26:52');
+INSERT INTO `sys_operationlog` VALUES (7884, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:28:02', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:28:02', 1, '2025-09-20 16:28:02');
+INSERT INTO `sys_operationlog` VALUES (7885, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:28:02', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:28:02', 1, '2025-09-20 16:28:02');
+INSERT INTO `sys_operationlog` VALUES (7886, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:28:09', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:28:09', 1, '2025-09-20 16:28:09');
+INSERT INTO `sys_operationlog` VALUES (7887, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:28:10', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:28:10', 1, '2025-09-20 16:28:10');
+INSERT INTO `sys_operationlog` VALUES (7888, 1, 4, '患者管理', '查询患者', '2025-09-20 16:28:49', '{\"name\":\"李四\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 16:28:49', 1, '2025-09-20 16:28:49');
+INSERT INTO `sys_operationlog` VALUES (7889, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:30:33', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:30:33', 1, '2025-09-20 16:30:33');
+INSERT INTO `sys_operationlog` VALUES (7890, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:30:33', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:30:33', 1, '2025-09-20 16:30:33');
+INSERT INTO `sys_operationlog` VALUES (7891, 1, 10, '系统登陆', '人员登陆', '2025-09-20 16:32:24', '账号：admin,员工姓名：我是天才', 1, 1, '2025-09-20 16:32:24', 1, '2025-09-20 16:32:24');
+INSERT INTO `sys_operationlog` VALUES (7892, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:32:26', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:32:26', 1, '2025-09-20 16:32:26');
+INSERT INTO `sys_operationlog` VALUES (7893, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:32:26', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:32:26', 1, '2025-09-20 16:32:26');
+INSERT INTO `sys_operationlog` VALUES (7894, 1, 4, '患者管理', '查询患者', '2025-09-20 16:32:32', '{\"name\":\"李四\",\"medicalNo\":null,\"page\":1,\"size\":20}', 1, 1, '2025-09-20 16:32:32', 1, '2025-09-20 16:32:32');
+INSERT INTO `sys_operationlog` VALUES (7895, 1, 3, '检查管理', '新增检查数据', '2025-09-20 16:32:39', '{\"exam\":{\"id\":0,\"exam_no\":\"1\",\"patient_id\":2,\"org_id\":1,\"exam_type\":\"CT\",\"exam_date\":\"2025-09-20T00:32:27Z\",\"report_path\":\"啊\",\"image_path\":\"1\",\"status\":1,\"create_time\":\"2025-09-20T16:32:38.623305+08:00\",\"update_time\":\"2025-09-20T16:32:38.623368+08:00\",\"is_printed\":0,\"patient\":{\"id\":2,\"name\":\"李四\",\"gender\":\"男\",\"age\":26,\"id_card\":\"111\",\"contact\":\"44\",\"medical_no\":\"44\",\"createtime\":\"2025-09-20T16:18:27\",\"updatetime\":\"2025-09-20T16:18:27\",\"status\":1}}}', 1, 1, '2025-09-20 16:32:39', 1, '2025-09-20 16:32:39');
+INSERT INTO `sys_operationlog` VALUES (7896, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:32:39', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:32:39', 1, '2025-09-20 16:32:39');
+INSERT INTO `sys_operationlog` VALUES (7897, 1, 16, '检查管理', '打印报告', '2025-09-20 16:32:49', '{\"examId\":1}', 1, 1, '2025-09-20 16:32:49', 1, '2025-09-20 16:32:49');
+INSERT INTO `sys_operationlog` VALUES (7898, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:32:49', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:32:49', 1, '2025-09-20 16:32:49');
+INSERT INTO `sys_operationlog` VALUES (7899, 1, 1, '检查管理', '解锁打印', '2025-09-20 16:32:51', '{\"examId\":1}', 1, 1, '2025-09-20 16:32:51', 1, '2025-09-20 16:32:51');
+INSERT INTO `sys_operationlog` VALUES (7900, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:32:51', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:32:51', 1, '2025-09-20 16:32:51');
+INSERT INTO `sys_operationlog` VALUES (7901, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:32:54', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:32:54', 1, '2025-09-20 16:32:54');
+INSERT INTO `sys_operationlog` VALUES (7902, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:32:54', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:32:54', 1, '2025-09-20 16:32:54');
+INSERT INTO `sys_operationlog` VALUES (7903, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:32:54', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:32:54', 1, '2025-09-20 16:32:54');
+INSERT INTO `sys_operationlog` VALUES (7904, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:36:55', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:36:55', 1, '2025-09-20 16:36:55');
+INSERT INTO `sys_operationlog` VALUES (7905, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:36:57', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:36:57', 1, '2025-09-20 16:36:57');
+INSERT INTO `sys_operationlog` VALUES (7906, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:37:04', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:37:04', 1, '2025-09-20 16:37:04');
+INSERT INTO `sys_operationlog` VALUES (7907, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:37:04', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:37:04', 1, '2025-09-20 16:37:04');
+INSERT INTO `sys_operationlog` VALUES (7908, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:37:04', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:37:04', 1, '2025-09-20 16:37:04');
+INSERT INTO `sys_operationlog` VALUES (7909, 1, 16, '检查管理', '打印报告', '2025-09-20 16:37:05', '{\"examId\":1}', 1, 1, '2025-09-20 16:37:05', 1, '2025-09-20 16:37:05');
+INSERT INTO `sys_operationlog` VALUES (7910, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:37:05', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:37:05', 1, '2025-09-20 16:37:05');
+INSERT INTO `sys_operationlog` VALUES (7911, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:37:06', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:37:06', 1, '2025-09-20 16:37:06');
+INSERT INTO `sys_operationlog` VALUES (7912, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:37:06', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:37:06', 1, '2025-09-20 16:37:06');
+INSERT INTO `sys_operationlog` VALUES (7913, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:37:06', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:37:06', 1, '2025-09-20 16:37:06');
+INSERT INTO `sys_operationlog` VALUES (7914, 1, 2, '打印记录管理', '删除打印记录', '2025-09-20 16:39:42', '{\"ids\":[2]}', 1, 1, '2025-09-20 16:39:42', 1, '2025-09-20 16:39:42');
+INSERT INTO `sys_operationlog` VALUES (7915, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:39:42', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:42', 1, '2025-09-20 16:39:42');
+INSERT INTO `sys_operationlog` VALUES (7916, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:45', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:45', 1, '2025-09-20 16:39:45');
+INSERT INTO `sys_operationlog` VALUES (7917, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:45', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:45', 1, '2025-09-20 16:39:45');
+INSERT INTO `sys_operationlog` VALUES (7918, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:45', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:45', 1, '2025-09-20 16:39:45');
+INSERT INTO `sys_operationlog` VALUES (7919, 1, 1, '检查管理', '解锁打印', '2025-09-20 16:39:47', '{\"examId\":1}', 1, 1, '2025-09-20 16:39:47', 1, '2025-09-20 16:39:47');
+INSERT INTO `sys_operationlog` VALUES (7920, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:47', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:47', 1, '2025-09-20 16:39:47');
+INSERT INTO `sys_operationlog` VALUES (7921, 1, 16, '检查管理', '打印报告', '2025-09-20 16:39:49', '{\"examId\":1}', 1, 1, '2025-09-20 16:39:49', 1, '2025-09-20 16:39:49');
+INSERT INTO `sys_operationlog` VALUES (7922, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:49', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:49', 1, '2025-09-20 16:39:49');
+INSERT INTO `sys_operationlog` VALUES (7923, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:39:50', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:50', 1, '2025-09-20 16:39:50');
+INSERT INTO `sys_operationlog` VALUES (7924, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:39:50', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:50', 1, '2025-09-20 16:39:50');
+INSERT INTO `sys_operationlog` VALUES (7925, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:39:50', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:50', 1, '2025-09-20 16:39:50');
+INSERT INTO `sys_operationlog` VALUES (7926, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:52', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:52', 1, '2025-09-20 16:39:52');
+INSERT INTO `sys_operationlog` VALUES (7927, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:52', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:52', 1, '2025-09-20 16:39:52');
+INSERT INTO `sys_operationlog` VALUES (7928, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:52', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:52', 1, '2025-09-20 16:39:52');
+INSERT INTO `sys_operationlog` VALUES (7929, 1, 4, '患者管理', '查询患者', '2025-09-20 16:39:52', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:52', 1, '2025-09-20 16:39:52');
+INSERT INTO `sys_operationlog` VALUES (7930, 1, 4, '患者管理', '查询患者', '2025-09-20 16:39:52', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:52', 1, '2025-09-20 16:39:52');
+INSERT INTO `sys_operationlog` VALUES (7931, 1, 4, '患者管理', '查询患者', '2025-09-20 16:39:52', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:52', 1, '2025-09-20 16:39:52');
+INSERT INTO `sys_operationlog` VALUES (7932, 1, 4, '患者管理', '查询患者', '2025-09-20 16:39:52', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:52', 1, '2025-09-20 16:39:52');
+INSERT INTO `sys_operationlog` VALUES (7933, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:53', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:53', 1, '2025-09-20 16:39:53');
+INSERT INTO `sys_operationlog` VALUES (7934, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:54', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:54', 1, '2025-09-20 16:39:54');
+INSERT INTO `sys_operationlog` VALUES (7935, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:54', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:54', 1, '2025-09-20 16:39:54');
+INSERT INTO `sys_operationlog` VALUES (7936, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:39:54', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:39:54', 1, '2025-09-20 16:39:54');
+INSERT INTO `sys_operationlog` VALUES (7937, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:39', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:39', 1, '2025-09-20 16:44:39');
+INSERT INTO `sys_operationlog` VALUES (7938, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:39', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:39', 1, '2025-09-20 16:44:39');
+INSERT INTO `sys_operationlog` VALUES (7939, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:39', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:39', 1, '2025-09-20 16:44:39');
+INSERT INTO `sys_operationlog` VALUES (7940, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:39', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:39', 1, '2025-09-20 16:44:39');
+INSERT INTO `sys_operationlog` VALUES (7941, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:44:39', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:39', 1, '2025-09-20 16:44:39');
+INSERT INTO `sys_operationlog` VALUES (7942, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:44:39', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:39', 1, '2025-09-20 16:44:39');
+INSERT INTO `sys_operationlog` VALUES (7943, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:44:39', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:39', 1, '2025-09-20 16:44:39');
+INSERT INTO `sys_operationlog` VALUES (7944, 1, 4, '打印记录管理', '分页查询打印记录', '2025-09-20 16:44:39', '{\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:39', 1, '2025-09-20 16:44:39');
+INSERT INTO `sys_operationlog` VALUES (7945, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:40', 1, '2025-09-20 16:44:40');
+INSERT INTO `sys_operationlog` VALUES (7946, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:40', 1, '2025-09-20 16:44:40');
+INSERT INTO `sys_operationlog` VALUES (7947, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:40', 1, '2025-09-20 16:44:40');
+INSERT INTO `sys_operationlog` VALUES (7948, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:40', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:40', 1, '2025-09-20 16:44:40');
+INSERT INTO `sys_operationlog` VALUES (7949, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:40', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:40', 1, '2025-09-20 16:44:40');
+INSERT INTO `sys_operationlog` VALUES (7950, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:40', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:40', 1, '2025-09-20 16:44:40');
+INSERT INTO `sys_operationlog` VALUES (7951, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:40', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:40', 1, '2025-09-20 16:44:40');
+INSERT INTO `sys_operationlog` VALUES (7952, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:41', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:41', 1, '2025-09-20 16:44:41');
+INSERT INTO `sys_operationlog` VALUES (7953, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:42', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:42', 1, '2025-09-20 16:44:42');
+INSERT INTO `sys_operationlog` VALUES (7954, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:42', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:42', 1, '2025-09-20 16:44:42');
+INSERT INTO `sys_operationlog` VALUES (7955, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:43', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:43', 1, '2025-09-20 16:44:43');
+INSERT INTO `sys_operationlog` VALUES (7956, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:43', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:43', 1, '2025-09-20 16:44:43');
+INSERT INTO `sys_operationlog` VALUES (7957, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:43', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:43', 1, '2025-09-20 16:44:43');
+INSERT INTO `sys_operationlog` VALUES (7958, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:43', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:43', 1, '2025-09-20 16:44:43');
+INSERT INTO `sys_operationlog` VALUES (7959, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:43', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:43', 1, '2025-09-20 16:44:43');
+INSERT INTO `sys_operationlog` VALUES (7960, 1, 4, '患者管理', '查询患者', '2025-09-20 16:44:43', '{\"name\":null,\"medicalNo\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:43', 1, '2025-09-20 16:44:43');
+INSERT INTO `sys_operationlog` VALUES (7961, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:44', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:44', 1, '2025-09-20 16:44:44');
+INSERT INTO `sys_operationlog` VALUES (7962, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:44', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:44', 1, '2025-09-20 16:44:44');
+INSERT INTO `sys_operationlog` VALUES (7963, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:44', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:44', 1, '2025-09-20 16:44:44');
+INSERT INTO `sys_operationlog` VALUES (7964, 1, 4, '检查管理', '分页查询检查数据', '2025-09-20 16:44:44', '{\"examNo\":null,\"patientName\":null,\"examDate\":null,\"page\":1,\"size\":10}', 1, 1, '2025-09-20 16:44:44', 1, '2025-09-20 16:44:44');
 
 -- ----------------------------
 -- Table structure for sys_orgid
@@ -496,7 +848,7 @@ CREATE TABLE `sys_permission`  (
   PRIMARY KEY (`permission_id`) USING BTREE,
   UNIQUE INDEX `uk_permission_key`(`permission_key` ASC) USING BTREE,
   INDEX `idx_permission_parent`(`parent_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 96 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '权限表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 104 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '权限表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_permission
@@ -507,6 +859,10 @@ INSERT INTO `sys_permission` VALUES (87, '角色权限', 'RolePermission', 'role
 INSERT INTO `sys_permission` VALUES (88, '组织设置', 'OrgSetting', 'store-setting', 12, '/src/assets/门店设置.png');
 INSERT INTO `sys_permission` VALUES (93, '定时任务管理', 'TaskManagement', 'TaskManagement', 12, '/src/assets/套餐管理.png');
 INSERT INTO `sys_permission` VALUES (95, '操作日志', 'OperationLogManagement', 'OperationLogManagement', 12, '/src/assets/损耗记录.png');
+INSERT INTO `sys_permission` VALUES (96, '患者管理', '1', '1', 0, '/src/assets/损耗记录.png');
+INSERT INTO `sys_permission` VALUES (103, '患者信息', 'PatientManagement', 'patient_Management', 96, '/src/assets/损耗记录.png');
+INSERT INTO `sys_permission` VALUES (104, '诊断数据', 'ExaminationManagement', 'ExaminationManagement', 96, '/src/assets/损耗记录.png');
+INSERT INTO `sys_permission` VALUES (105, '打印记录', 'PrintRecordManagement', 'PrintRecordManagement', 96, '/src/assets/损耗记录.png');
 
 -- ----------------------------
 -- Table structure for sys_role
@@ -538,17 +894,21 @@ CREATE TABLE `sys_role_permission`  (
   INDEX `idx_role_permission_permission`(`permission_id` ASC) USING BTREE,
   CONSTRAINT `fk_role_permission_permission` FOREIGN KEY (`permission_id`) REFERENCES `sys_permission` (`permission_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `fk_role_permission_role` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`role_id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1586 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色权限关联表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1601 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色权限关联表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_role_permission
 -- ----------------------------
-INSERT INTO `sys_role_permission` VALUES (1580, 1, 12);
-INSERT INTO `sys_role_permission` VALUES (1581, 1, 86);
-INSERT INTO `sys_role_permission` VALUES (1582, 1, 87);
-INSERT INTO `sys_role_permission` VALUES (1583, 1, 88);
-INSERT INTO `sys_role_permission` VALUES (1584, 1, 93);
-INSERT INTO `sys_role_permission` VALUES (1585, 1, 95);
+INSERT INTO `sys_role_permission` VALUES (1610, 1, 12);
+INSERT INTO `sys_role_permission` VALUES (1611, 1, 86);
+INSERT INTO `sys_role_permission` VALUES (1612, 1, 87);
+INSERT INTO `sys_role_permission` VALUES (1613, 1, 88);
+INSERT INTO `sys_role_permission` VALUES (1614, 1, 93);
+INSERT INTO `sys_role_permission` VALUES (1615, 1, 95);
+INSERT INTO `sys_role_permission` VALUES (1616, 1, 96);
+INSERT INTO `sys_role_permission` VALUES (1617, 1, 103);
+INSERT INTO `sys_role_permission` VALUES (1618, 1, 104);
+INSERT INTO `sys_role_permission` VALUES (1619, 1, 105);
 
 -- ----------------------------
 -- Table structure for sys_timertask
@@ -574,7 +934,7 @@ CREATE TABLE `sys_timertask`  (
 -- ----------------------------
 -- Records of sys_timertask
 -- ----------------------------
-INSERT INTO `sys_timertask` VALUES (4, '定时清理操作日志保留一个月', 'ClearLogsTask', '2025-09-16 14:07:09', '2025-09-16 14:07:09', '2125-09-16 14:07:09', NULL, NULL, 1, 1, '0 0 1 * * ?', 00000000000000000000, NULL);
+INSERT INTO `sys_timertask` VALUES (4, '定时清理操作日志保留一个月', 'ClearLogsTask', '2025-09-16 14:07:09', '2025-09-16 14:07:09', '2125-09-16 14:07:09', NULL, NULL, 1, 1, '0 0 1 * * ?', 00000000000000000001, '2025-09-20 01:00:00');
 
 -- ----------------------------
 -- Table structure for sys_user

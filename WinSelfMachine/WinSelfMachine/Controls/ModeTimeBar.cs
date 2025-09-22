@@ -21,6 +21,12 @@ namespace WinSelfMachine.Controls
         private int switchInnerSize = 12;
         private int switchOffset = 2;
         private int cornerRadius = 12; // 圆角半径（更圆润）
+		
+		// 左侧图标按钮
+		private Image _leftButtonIcon;
+		private int leftButtonSize = 20;
+		private bool leftButtonVisible = true;
+		private Rectangle leftButtonRect = Rectangle.Empty;
         
         // 布局相关参数
         private int padding = 10; // 内边距
@@ -45,7 +51,7 @@ namespace WinSelfMachine.Controls
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            TimeText = DateTime.Now.ToString("HH:mm");
+            TimeText = DateTime.Now.ToString("tt HH:mm");
         }
 
         private Image _icon;
@@ -74,6 +80,42 @@ namespace WinSelfMachine.Controls
                 Invalidate();
             }
         }
+
+		[Category("按钮")]
+		public Image LeftButtonIcon
+		{
+			get => _leftButtonIcon;
+			set
+			{
+				_leftButtonIcon = value;
+				Invalidate();
+			}
+		}
+
+		[Category("按钮")]
+		public int LeftButtonSize
+		{
+			get => leftButtonSize;
+			set
+			{
+				leftButtonSize = Math.Max(12, value);
+				Invalidate();
+			}
+		}
+
+		[Category("按钮")]
+		public bool LeftButtonVisible
+		{
+			get => leftButtonVisible;
+			set
+			{
+				leftButtonVisible = value;
+				Invalidate();
+			}
+		}
+
+		[Category("操作")]
+		public event EventHandler LeftButtonClicked;
 
         [Category("自定义")]
         public string HospitalText
@@ -215,7 +257,7 @@ namespace WinSelfMachine.Controls
             int centerY = this.Height / 2;
             int iconSize = 16;
             
-            // 绘制图标
+			// 绘制图标
             if (_icon != null)
             {
                 int iconY = centerY - iconSize / 2;
@@ -233,7 +275,7 @@ namespace WinSelfMachine.Controls
                 currentX += (int)textSize.Width + spacing;
             }
             
-            // 计算右侧元素的位置（从右往左布局）
+			// 计算右侧元素的位置（从右往左布局）
             var timeFont = new Font("微软雅黑", 10, FontStyle.Regular);
             var timeSize = g.MeasureString(_timeText, timeFont);
             var modeFont = new Font("微软雅黑", 10, FontStyle.Regular);
@@ -247,8 +289,8 @@ namespace WinSelfMachine.Controls
             int modeX = timeX - spacing - (int)modeSize.Width;
             int modeY = centerY - (int)modeSize.Height / 2;
             
-            // 开关位置（模式文字左边）
-            int switchX = modeX - spacing - switchWidth;
+			// 开关位置（紧挨模式文字，位于其左侧）
+			int switchX = modeX - spacing - switchWidth;
             Rectangle switchRect = new Rectangle(switchX, centerY - switchHeight / 2, switchWidth, switchHeight);
             
             // 创建圆角矩形路径
@@ -271,6 +313,29 @@ namespace WinSelfMachine.Controls
             Rectangle switchInnerRect = new Rectangle(innerX, switchRect.Y + switchOffset, switchInnerSize, switchInnerSize);
             using (var innerBrush = new SolidBrush(Color.White))
                 g.FillEllipse(innerBrush, switchInnerRect);
+			
+			// 左侧自定义图标按钮（交换后，位于开关左侧）
+			int leftBtnX = switchX - spacing - leftButtonSize;
+			leftButtonRect = Rectangle.Empty;
+			if (leftButtonVisible)
+			{
+				leftButtonRect = new Rectangle(leftBtnX, centerY - leftButtonSize / 2, leftButtonSize, leftButtonSize);
+				// 背景圆角按钮
+				using (var btnPath = CreateRoundedRectanglePath(leftButtonRect, leftButtonSize / 2))
+				using (var btnBrush = new SolidBrush(Color.FromArgb(40, Color.White)))
+				using (var btnPen = new Pen(Color.FromArgb(100, Color.White), 1))
+				{
+					g.FillPath(btnBrush, btnPath);
+					g.DrawPath(btnPen, btnPath);
+				}
+				// 绘制图标（自适应居中）
+				if (_leftButtonIcon != null)
+				{
+					int pad = Math.Max(2, leftButtonSize / 6);
+					Rectangle iconRect = new Rectangle(leftButtonRect.X + pad, leftButtonRect.Y + pad, leftButtonRect.Width - pad * 2, leftButtonRect.Height - pad * 2);
+					g.DrawImage(_leftButtonIcon, iconRect);
+				}
+			}
             
             // 绘制模式文字
             using (var textBrush = new SolidBrush(Color.White))
@@ -285,7 +350,7 @@ namespace WinSelfMachine.Controls
             }
         }
 
-        // 处理鼠标点击，切换开关状态
+		// 处理鼠标点击，切换开关状态
         protected override void OnMouseClick(MouseEventArgs e)
         {
             base.OnMouseClick(e);
@@ -300,7 +365,8 @@ namespace WinSelfMachine.Controls
                 
                 int timeX = this.Width - padding - (int)timeSize.Width;
                 int modeX = timeX - spacing - (int)modeSize.Width;
-                int switchX = modeX - spacing - switchWidth;
+				int switchX = modeX - spacing - switchWidth;
+				int leftBtnX = switchX - spacing - leftButtonSize;
                 int centerY = this.Height / 2;
                 
                 Rectangle switchRect = new Rectangle(switchX, centerY - switchHeight / 2, switchWidth, switchHeight);
@@ -309,8 +375,44 @@ namespace WinSelfMachine.Controls
                 {
                     IsOn = !IsOn;
                 }
+				else if (leftButtonVisible)
+				{
+					Rectangle lbr = new Rectangle(leftBtnX, centerY - leftButtonSize / 2, leftButtonSize, leftButtonSize);
+					if (lbr.Contains(e.Location))
+					{
+						LeftButtonClicked?.Invoke(this, EventArgs.Empty);
+					}
+				}
             }
         }
+
+		// 根据鼠标位置切换手型光标
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			base.OnMouseMove(e);
+			bool overInteractive = false;
+			if (!leftButtonRect.IsEmpty && leftButtonRect.Contains(e.Location))
+				overInteractive = true;
+			else
+			{
+				// 估算开关区域（与绘制一致的快速计算）
+				using (var g = this.CreateGraphics())
+				{
+					var timeFont = new Font("微软雅黑", 10, FontStyle.Regular);
+					var timeSize = g.MeasureString(_timeText, timeFont);
+					var modeFont = new Font("微软雅黑", 10, FontStyle.Regular);
+					var modeSize = g.MeasureString(_modeText, modeFont);
+					int timeX = this.Width - padding - (int)timeSize.Width;
+					int modeX = timeX - spacing - (int)modeSize.Width;
+					int switchX = modeX - spacing - switchWidth;
+					int leftBtnX = switchX - spacing - leftButtonSize;
+					int centerY = this.Height / 2;
+					Rectangle switchRect = new Rectangle(switchX, centerY - switchHeight / 2, switchWidth, switchHeight);
+					overInteractive = switchRect.Contains(e.Location);
+				}
+			}
+			this.Cursor = overInteractive ? Cursors.Hand : Cursors.Default;
+		}
     }
 }
     

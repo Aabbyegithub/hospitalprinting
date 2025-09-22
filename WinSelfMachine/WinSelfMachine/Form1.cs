@@ -17,5 +17,15 @@ namespace WinSelfMachine
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// 关闭窗体
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void modeTimeBar1_LeftButtonClicked(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }

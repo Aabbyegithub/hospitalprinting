@@ -3,8 +3,8 @@
     <div class="page-header">
       <div class="operation-bar">
         <div class="filter-group">
-          <el-input v-model="searchExamId" placeholder="搜索检查ID" class="search-input" @keyup.enter="fetchPrintRecordList" />
-          <el-button class="search-btn" @click="fetchPrintRecordList">搜索</el-button>
+          <el-input v-model="searchExamId" placeholder="搜索检查ID" class="search-input" @keyup.enter="onSearch" />
+          <el-button class="search-btn" @click="onSearch">搜索</el-button>
         </div>
         <div class="action-buttons">
           <el-button class="primary-btn" @click="openEditModal()">新增打印记录</el-button>
@@ -102,13 +102,16 @@ const formatDateTime = (row: any, column: any, cellValue: any) => {
 };
 
 // 获取打印记录列表
-async function fetchPrintRecordList() {
+async function fetchPrintRecordList(showTip: boolean = false) {
   const examId = searchExamId.value ? parseInt(searchExamId.value) : null;
   await getPrintRecordList(examId, pageIndex.value, pageSize.value)
     .then((res: any) => {
       if (res && res.response) {
         printRecordList.value = res.response;
         total.value = res.count || 0;
+        if (showTip) {
+          ElMessage.success(`查询成功，匹配到 ${total.value} 条记录`);
+        }
       }
     })
     .catch((error) => {
@@ -117,16 +120,31 @@ async function fetchPrintRecordList() {
     });
 }
 
+function onSearch() {
+  pageIndex.value = 1;
+  fetchPrintRecordList(true);
+}
+
 // 保存打印记录
 async function handleSave() {
   try {
+    // 规范化提交数据，确保类型正确，并使用 ISO 日期格式
+    const payload: any = {
+      id: editForm.id || 0,
+      exam_id: Number(editForm.exam_id),
+      patient_id: Number(editForm.patient_id),
+      printed_by: Number(editForm.printed_by)
+    };
+    if (editForm.print_time) {
+      payload.print_time = new Date(editForm.print_time).toISOString();
+    }
     if (editForm.id) {
       // 编辑
-      await editPrintRecordApi(editForm);
+      await editPrintRecordApi(payload);
       ElMessage.success('编辑成功');
     } else {
       // 新增
-      await addPrintRecordApi(editForm);
+      await addPrintRecordApi(payload);
       ElMessage.success('新增成功');
     }
     fetchPrintRecordList();
@@ -190,16 +208,16 @@ function handleSelectionChange(selection: any[]) {
 // 分页处理
 function handleSizeChange(val: number) {
   pageSize.value = val;
-  fetchPrintRecordList();
+  fetchPrintRecordList(false);
 }
 
 function handlePageChange(val: number) {
   pageIndex.value = val;
-  fetchPrintRecordList();
+  fetchPrintRecordList(false);
 }
 
 onMounted(() => {
-  fetchPrintRecordList();
+  fetchPrintRecordList(false);
 });
 </script>
 

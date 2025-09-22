@@ -3,8 +3,8 @@
     <div class="page-header">
       <div class="operation-bar">
         <div class="filter-group">
-          <el-input v-model="searchExamNo" placeholder="搜索检查号" class="search-input" @keyup.enter="fetchExaminationList" />
-          <el-input v-model="searchPatientName" placeholder="搜索患者姓名" class="search-input" @keyup.enter="fetchExaminationList" />
+          <el-input v-model="searchExamNo" placeholder="搜索检查号" class="search-input" @keyup.enter="onSearch" />
+          <el-input v-model="searchPatientName" placeholder="搜索患者姓名" class="search-input" @keyup.enter="onSearch" />
           <el-date-picker
             v-model="searchExamDate"
             type="date"
@@ -12,9 +12,9 @@
             class="search-input"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
-            @change="fetchExaminationList"
+            @change="onSearch"
           />
-          <el-button class="search-btn" @click="fetchExaminationList">搜索</el-button>
+          <el-button class="search-btn" @click="onSearch">搜索</el-button>
         </div>
         <div class="action-buttons">
           <el-button class="primary-btn" @click="openEditModal()">新增检查</el-button>
@@ -266,7 +266,7 @@ const getExamTypeTagType = (examType: string) => {
 };
 
 // 获取检查列表
-async function fetchExaminationList() {
+async function fetchExaminationList(showTip: boolean = false) {
   await getExaminationList(
     searchExamNo.value, 
     searchPatientName.value, 
@@ -278,12 +278,21 @@ async function fetchExaminationList() {
       if (res && res.response) {
         examinationList.value = res.response;
         total.value = res.count || 0;
+        if (showTip) {
+          ElMessage.success(`查询成功，匹配到 ${total.value} 条记录`);
+        }
       }
     })
     .catch((error) => {
       console.error('获取检查列表失败:', error);
       ElMessage.error('获取检查列表失败');
     });
+}
+
+// 主动搜索（重置到第1页并提示）
+function onSearch() {
+  pageIndex.value = 1;
+  fetchExaminationList(true);
 }
 
 // 搜索患者
@@ -398,15 +407,53 @@ async function handleBatchDelete() {
   }
 }
 
-// 查看报告
+// 工具：标准化URL与扩展名判断
+function normalizeUrl(path: string) {
+  if (!path) return '';
+  const url = path.replace(/\\/g, '/');
+  return encodeURI(url);
+}
+function getExt(path: string) {
+  const m = path?.toLowerCase().match(/\.([a-z0-9]+)(?:\?|#|$)/);
+  return m ? m[1] : '';
+}
+function isArchive(ext: string) {
+  return ['zip', 'rar', '7z'].includes(ext);
+}
+
+// 查看报告：压缩包直接下载，否则弹窗预览（如 pdf/html 等）
 function viewReport(row: any) {
-  currentReportPath.value = row.report_path;
+  const url = normalizeUrl(row.report_path);
+  const ext = getExt(url);
+  if (isArchive(ext)) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;
+  }
+  currentReportPath.value = url;
   showReportModal.value = true;
 }
 
-// 查看胶片
+// 查看胶片：压缩包直接下载，否则弹窗预览图片
 function viewImage(row: any) {
-  currentImagePath.value = row.image_path;
+  const url = normalizeUrl(row.image_path);
+  const ext = getExt(url);
+  if (isArchive(ext)) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;
+  }
+  currentImagePath.value = url;
   showImageModal.value = true;
 }
 
@@ -486,16 +533,16 @@ function handleSelectionChange(selection: any[]) {
 // 分页处理
 function handleSizeChange(val: number) {
   pageSize.value = val;
-  fetchExaminationList();
+  fetchExaminationList(false);
 }
 
 function handlePageChange(val: number) {
   pageIndex.value = val;
-  fetchExaminationList();
+  fetchExaminationList(false);
 }
 
 onMounted(() => {
-  fetchExaminationList();
+  fetchExaminationList(false);
 });
 </script>
 

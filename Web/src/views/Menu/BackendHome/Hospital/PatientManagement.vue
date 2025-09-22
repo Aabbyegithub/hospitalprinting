@@ -3,9 +3,9 @@
     <div class="page-header">
       <div class="operation-bar">
         <div class="filter-group">
-          <el-input v-model="searchName" placeholder="搜索姓名" class="search-input" @keyup.enter="fetchPatientList" />
-          <el-input v-model="searchMedicalNo" placeholder="搜索就诊号" class="search-input" @keyup.enter="fetchPatientList" />
-          <el-button class="search-btn" @click="fetchPatientList">搜索</el-button>
+          <el-input v-model="searchName" placeholder="搜索姓名" class="search-input" @keyup.enter="onSearch" />
+          <el-input v-model="searchMedicalNo" placeholder="搜索就诊号" class="search-input" @keyup.enter="onSearch" />
+          <el-button class="search-btn" @click="onSearch">搜索</el-button>
         </div>
         <div class="action-buttons">
           <el-button class="primary-btn" @click="openEditModal()">新增患者</el-button>
@@ -114,18 +114,26 @@ const formatDate = (row: any, column: any, cellValue: any) => {
 };
 
 // 获取患者列表
-async function fetchPatientList() {
+async function fetchPatientList(showTip: boolean = false) {
   await getPatientList(searchName.value, searchMedicalNo.value, pageIndex.value, pageSize.value)
     .then((res: any) => {
       if (res && res.response) {
         patientList.value = res.response;
         total.value = res.count || 0;
+        if (showTip) {
+          ElMessage.success(`查询成功，匹配到 ${total.value} 条记录`);
+        }
       }
     })
     .catch((error) => {
       console.error('获取患者列表失败:', error);
       ElMessage.error('获取患者列表失败');
     });
+}
+
+function onSearch() {
+  pageIndex.value = 1;
+  fetchPatientList(true);
 }
 
 // 保存患者信息
@@ -202,16 +210,16 @@ function handleSelectionChange(selection: any[]) {
 // 分页处理
 function handleSizeChange(val: number) {
   pageSize.value = val;
-  fetchPatientList();
+  fetchPatientList(false);
 }
 
 function handlePageChange(val: number) {
   pageIndex.value = val;
-  fetchPatientList();
+  fetchPatientList(false);
 }
 
 onMounted(() => {
-  fetchPatientList();
+  fetchPatientList(false);
 });
 </script>
 

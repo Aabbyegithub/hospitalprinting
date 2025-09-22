@@ -74,5 +74,60 @@ namespace WebProjectTest.Controllers.SystemController
                 return Error<string>($"上传失败{e.Message}");
             }
         }
+
+        ///<summary>
+        ///文件上传
+        ///</summary>
+        [HttpPost]
+        public async Task<ApiResponse<string>> UpFiles(IFormFile file)
+        {
+            string basePath = OperatingSystem.IsWindows() ? _windowsBasePath : _linuxBasePath;
+            try
+            {
+                // 1. 验证文件是否存在
+                if (file == null || file.Length == 0)
+                {
+                    return Fail<string>("请选择要上传的文件");
+                }
+
+                // 3. 验证文件大小（限制100MB）
+                if (file.Length > 100 * 1024 * 1024)
+                {
+                    return Fail<string>("文件大小不能超过100MB");
+                }
+
+                // 5. 创建日期子目录（按日期分类存储）
+                string dateDir = DateTime.Now.ToString("yyyyMMdd");
+                string savePath = Path.Combine(basePath, dateDir);
+                if (!Directory.Exists(savePath))
+                {
+                    Directory.CreateDirectory(savePath);
+                }
+
+                // 6. 生成唯一文件名（避免重复）
+                string fileExtension = Path.GetExtension(file.FileName);
+                string fileName = $"{Guid.NewGuid()}{fileExtension}";
+                string fullPath = Path.Combine(savePath, fileName);
+
+                // 7. 保存文件
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                string relativePath = Path.GetRelativePath(basePath, fullPath)
+                          .Replace(Path.DirectorySeparatorChar, '/');
+
+                // 7. 拼接正确的URL（确保URL前缀以"/"结尾，避免拼接错误）
+                string fullUrl = $"{_Url.TrimEnd('/')}/{relativePath}";
+                return Success(fullUrl);
+
+            }
+            catch (Exception e)
+            {
+
+                return Error<string>($"上传失败{e.Message}");
+            }
+        }
     }
 }

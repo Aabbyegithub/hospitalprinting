@@ -1,6 +1,6 @@
 ﻿namespace WinSelfMachine.Controls
 {
-    partial class RoundedTextBox
+    partial class _3DButton
     {
         /// <summary> 
         /// 必需的设计器变量。
@@ -15,7 +15,7 @@
         {
             if (disposing && (components != null))
             {
-                components.Dispose();textFont?.Dispose();
+                components.Dispose();
             }
             base.Dispose(disposing);
         }

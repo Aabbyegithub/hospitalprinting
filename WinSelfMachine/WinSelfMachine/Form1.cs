@@ -35,7 +35,7 @@ namespace WinSelfMachine
         /// <param name="e"></param>
         private void BtnQuery_Click(object sender, EventArgs e)
         {
-            PanQueay.Visible = true;
+           
         }
 
 

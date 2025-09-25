@@ -21,8 +21,10 @@ namespace WinSelfMachine.Controls
         private Color fillColor = Color.White;
         private Padding innerPadding = new Padding(10, 6, 10, 6);
         private string placeholderText = "请输入";
-        private Color placeholderColor = Color.FromArgb(150, 150, 150);
+        private Color placeholderColor = Color.FromArgb(120, 120, 120);
         private bool isFocused = false;
+        private Font textFont = new Font("微软雅黑", 9);
+        private int fontSize = 9;
 
         public RoundedTextBox()
         {
@@ -38,6 +40,7 @@ namespace WinSelfMachine.Controls
             innerTextBox.Height = this.Height - innerPadding.Vertical;
             // 注意：WinForms TextBox 不支持透明背景，使用填充色
             innerTextBox.BackColor = fillColor;
+            innerTextBox.Font = textFont; // 设置字体
             innerTextBox.TextChanged += (s, e) => Invalidate();
             innerTextBox.GotFocus += (s, e) => { isFocused = true; Invalidate(); };
             innerTextBox.LostFocus += (s, e) => { isFocused = false; Invalidate(); };
@@ -107,7 +110,39 @@ namespace WinSelfMachine.Controls
             set { placeholderColor = value; Invalidate(); }
         }
 
+        [Category("外观")]
+        public int FontSize
+        {
+            get => fontSize;
+            set 
+            { 
+                fontSize = Math.Max(6, Math.Min(72, value)); // 限制字体大小在6-72之间
+                textFont?.Dispose();
+                textFont = new Font("微软雅黑", fontSize);
+                if (innerTextBox != null) innerTextBox.Font = textFont;
+                Invalidate(); 
+            }
+        }
+
+        [Category("外观")]
+        public Font TextFont
+        {
+            get => textFont;
+            set 
+            { 
+                if (value != null)
+                {
+                    textFont?.Dispose();
+                    textFont = value; 
+                    fontSize = (int)value.Size;
+                    if (innerTextBox != null) innerTextBox.Font = textFont;
+                    Invalidate(); 
+                }
+            }
+        }
+
         public TextBox InnerTextBox => innerTextBox;
+
 
         protected override void OnSizeChanged(EventArgs e)
         {
@@ -166,7 +201,9 @@ namespace WinSelfMachine.Controls
                 using (var brush = new SolidBrush(placeholderColor))
                 {
                     var textRect = new Rectangle(innerPadding.Left, 0, this.Width - innerPadding.Horizontal, this.Height);
-                    g.DrawString(placeholderText, this.Font, brush, textRect, sf);
+                    // 使用抗锯齿绘制提示文字
+                    g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                    g.DrawString(placeholderText, textFont, brush, textRect, sf);
                 }
             }
         }

@@ -55,6 +55,8 @@ namespace WinSelfMachine.Controls
             stringFormat.LineAlignment = StringAlignment.Center;
             penBrush = new SolidBrush(textColor);
         }
+
+
         public int CornerDiameter
         {
             get { return cornerDiameter; }
@@ -82,7 +84,13 @@ namespace WinSelfMachine.Controls
                 Invalidate();
             }
         }
-        Color backFillColor = Color.AntiqueWhite;
+        Color backFillColor = Color.White;
+        private Color borderColor = Color.FromArgb(200, 220, 255);
+        private int borderThickness = 2;
+        private bool showShadow = true;
+        private int shadowOffset = 3;
+        private Color shadowColor = Color.FromArgb(30, 0, 0, 0);
+
         public Color BackFillColor
         {
             get
@@ -94,6 +102,41 @@ namespace WinSelfMachine.Controls
                 backFillColor = value;
                 Invalidate();
             }
+        }
+
+        [Category("3D样式")]
+        public Color BorderColor
+        {
+            get => borderColor;
+            set { borderColor = value; Invalidate(); }
+        }
+
+        [Category("3D样式")]
+        public int BorderThickness
+        {
+            get => borderThickness;
+            set { borderThickness = Math.Max(0, value); Invalidate(); }
+        }
+
+        [Category("3D样式")]
+        public bool ShowShadow
+        {
+            get => showShadow;
+            set { showShadow = value; Invalidate(); }
+        }
+
+        [Category("3D样式")]
+        public int ShadowOffset
+        {
+            get => shadowOffset;
+            set { shadowOffset = Math.Max(0, value); Invalidate(); }
+        }
+
+        [Category("3D样式")]
+        public Color ShadowColor
+        {
+            get => shadowColor;
+            set { shadowColor = value; Invalidate(); }
         }
         private Size GetSizeF(string value)
         {
@@ -205,8 +248,18 @@ namespace WinSelfMachine.Controls
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.CompositingQuality = CompositingQuality.HighQuality;
 
-                graphicsPath.Reset();
+                // 绘制阴影
+                if (showShadow && shadowOffset > 0)
+                {
+                    using (var shadowPath = CreateRoundedPath(new Rectangle(shadowOffset, shadowOffset, this.Width - 1, this.Height - 1), cornerDiameter))
+                    using (var shadowBrush = new SolidBrush(shadowColor))
+                    {
+                        g.FillPath(shadowBrush, shadowPath);
+                    }
+                }
 
+                // 绘制主体
+                graphicsPath.Reset();
                 graphicsPath.AddArc(GetCornerRect1(), 270, 90);
                 var points = GetLine1();
                 graphicsPath.AddLine(points.Item1, points.Item2);
@@ -222,7 +275,18 @@ namespace WinSelfMachine.Controls
                 graphicsPath.AddArc(GetCornerRect4(), 180, 90);
                 points = GetLine4();
                 graphicsPath.AddLine(points.Item1, points.Item2);
+                
+                // 填充背景
                 g.FillPath(new SolidBrush(backFillColor), graphicsPath);
+                
+                // 绘制边框
+                if (borderThickness > 0)
+                {
+                    using (var borderPen = new Pen(borderColor, borderThickness))
+                    {
+                        g.DrawPath(borderPen, graphicsPath);
+                    }
+                }
                 // 绘制图标（在上）
                 if (Icon != null)
                 {
@@ -248,5 +312,27 @@ namespace WinSelfMachine.Controls
                 g.DrawString(labelText, this.Font, penBrush, textRect, stringFormat);
             }
         }
+
+        private GraphicsPath CreateRoundedPath(Rectangle bounds, int radius)
+        {
+            GraphicsPath path = new GraphicsPath();
+            int d = Math.Max(0, radius * 2);
+            
+            if (d <= 0)
+            {
+                path.AddRectangle(bounds);
+                path.CloseFigure();
+                return path;
+            }
+            
+            path.StartFigure();
+            path.AddArc(bounds.X, bounds.Y, d, d, 180, 90);
+            path.AddArc(bounds.Right - d, bounds.Y, d, d, 270, 90);
+            path.AddArc(bounds.Right - d, bounds.Bottom - d, d, d, 0, 90);
+            path.AddArc(bounds.X, bounds.Bottom - d, d, d, 90, 90);
+            path.CloseFigure();
+            return path;
+        }
+
     }
 }

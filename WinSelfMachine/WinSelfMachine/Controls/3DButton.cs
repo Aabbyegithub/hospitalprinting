@@ -29,6 +29,7 @@ namespace WinSelfMachine.Controls
         private int iconTextSpacing = 8;
         private bool isPressed = false;
         private int padding = 12;
+        private float fontSize = 10f;
 
         public _3DButton()
         {
@@ -116,6 +117,28 @@ namespace WinSelfMachine.Controls
             set { padding = Math.Max(0, value); Invalidate(); }
         }
 
+        [Category("外观")]
+        public float FontSize
+        {
+            get => fontSize;
+            set { 
+                fontSize = Math.Max(1f, value); 
+                System.Diagnostics.Debug.WriteLine($"3DButton FontSize 设置为: {fontSize}");
+                Invalidate(); 
+            }
+        }
+
+        /// <summary>
+        /// 强制更新字体大小
+        /// </summary>
+        public void UpdateFontSize(float newSize)
+        {
+            fontSize = Math.Max(1f, newSize);
+            System.Diagnostics.Debug.WriteLine($"强制更新字体大小: {fontSize}");
+            Invalidate();
+            Refresh();
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -161,7 +184,7 @@ namespace WinSelfMachine.Controls
             // 计算文字高度
             if (!string.IsNullOrEmpty(buttonText))
             {
-                using (var font = new Font("微软雅黑", 10, FontStyle.Bold))
+                using (var font = new Font("微软雅黑", fontSize, FontStyle.Bold))
                 {
                     var textSize = g.MeasureString(buttonText, font);
                     totalContentHeight += (int)textSize.Height;
@@ -188,7 +211,7 @@ namespace WinSelfMachine.Controls
             // 绘制文字（在下方）
             if (!string.IsNullOrEmpty(buttonText))
             {
-                using (var font = new Font("微软雅黑", 10, FontStyle.Bold))
+                using (var font = new Font("微软雅黑", fontSize, FontStyle.Bold))
                 using (var textBrush = new SolidBrush(textColor))
                 using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {

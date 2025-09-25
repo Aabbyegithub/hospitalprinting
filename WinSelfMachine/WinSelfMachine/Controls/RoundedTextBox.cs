@@ -33,18 +33,36 @@ namespace WinSelfMachine.Controls
             this.BackColor = Color.Transparent;
             this.Size = new Size(220, 36);
 
-            innerTextBox = new TextBox();
-            innerTextBox.BorderStyle = BorderStyle.None;
-            innerTextBox.Location = new Point(innerPadding.Left, innerPadding.Top);
-            innerTextBox.Width = this.Width - innerPadding.Horizontal;
-            innerTextBox.Height = this.Height - innerPadding.Vertical;
-            // 注意：WinForms TextBox 不支持透明背景，使用填充色
-            innerTextBox.BackColor = fillColor;
-            innerTextBox.Font = textFont; // 设置字体
-            innerTextBox.TextChanged += (s, e) => Invalidate();
-            innerTextBox.GotFocus += (s, e) => { isFocused = true; Invalidate(); };
-            innerTextBox.LostFocus += (s, e) => { isFocused = false; Invalidate(); };
-            this.Controls.Add(innerTextBox);
+            // 添加Load事件处理程序，确保在运行时创建内部TextBox
+            this.Load += RoundedTextBox_Load;
+            
+            // 设置默认属性
+            this.CornerRadius = 12;
+            this.BorderThickness = 1;
+            this.BorderColor = Color.FromArgb(200, 200, 200);
+            this.BorderFocusedColor = Color.FromArgb(41, 123, 244);
+            this.FillColor = Color.White;
+            this.PlaceholderText = "请输入";
+            this.PlaceholderColor = Color.FromArgb(120, 120, 120);
+        }
+
+        private void RoundedTextBox_Load(object sender, EventArgs e)
+        {
+            if (innerTextBox == null)
+            {
+                innerTextBox = new TextBox();
+                innerTextBox.BorderStyle = BorderStyle.None;
+                innerTextBox.BackColor = fillColor;
+                innerTextBox.Font = textFont;
+                innerTextBox.ForeColor = Color.Black;
+                innerTextBox.TextChanged += (s, ev) => Invalidate();
+                innerTextBox.GotFocus += (s, ev) => { isFocused = true; Invalidate(); };
+                innerTextBox.LostFocus += (s, ev) => { isFocused = false; Invalidate(); };
+                innerTextBox.KeyDown += (s, ev) => Invalidate();
+                innerTextBox.KeyUp += (s, ev) => Invalidate();
+                this.Controls.Add(innerTextBox);
+                LayoutInnerTextBox();
+            }
         }
 
         [Category("外观")]
@@ -120,8 +138,24 @@ namespace WinSelfMachine.Controls
                 textFont?.Dispose();
                 textFont = new Font("微软雅黑", fontSize);
                 if (innerTextBox != null) innerTextBox.Font = textFont;
+                System.Diagnostics.Debug.WriteLine($"RoundedTextBox FontSize 设置为: {fontSize}");
                 Invalidate(); 
             }
+        }
+
+        /// <summary>
+        /// 强制更新字体大小
+        /// </summary>
+        public void UpdateFontSize(float newSize)
+        {
+            int newFontSize = Math.Max(6, Math.Min(72, (int)Math.Round(newSize)));
+            fontSize = newFontSize;
+            textFont?.Dispose();
+            textFont = new Font("微软雅黑", fontSize);
+            if (innerTextBox != null) innerTextBox.Font = textFont;
+            System.Diagnostics.Debug.WriteLine($"强制更新RoundedTextBox字体大小: {fontSize}");
+            Invalidate();
+            Refresh();
         }
 
         [Category("外观")]
@@ -154,16 +188,28 @@ namespace WinSelfMachine.Controls
         private void LayoutInnerTextBox()
         {
             if (innerTextBox == null) return;
-            innerTextBox.Location = new Point(innerPadding.Left, innerPadding.Top);
-            innerTextBox.Width = Math.Max(10, this.Width - innerPadding.Horizontal);
-            innerTextBox.Height = Math.Max(10, this.Height - innerPadding.Vertical);
+            
+            int x = innerPadding.Left;
+            int y = innerPadding.Top;
+            int width = Math.Max(10, this.Width - innerPadding.Horizontal);
+            int height = Math.Max(10, this.Height - innerPadding.Vertical);
+            
+            // 确保TextBox不会超出控件边界
+            if (x + width > this.Width) width = this.Width - x;
+            if (y + height > this.Height) height = this.Height - y;
+            
+            innerTextBox.Location = new Point(x, y);
+            innerTextBox.Size = new Size(width, height);
         }
 
         private void UpdateRegion()
         {
-            using (var path = CreateRoundedPath(new Rectangle(0, 0, this.Width - 1, this.Height - 1), cornerRadius))
+            if (this.Width > 0 && this.Height > 0)
             {
-                this.Region = new Region(path);
+                using (var path = CreateRoundedPath(new Rectangle(0, 0, this.Width - 1, this.Height - 1), cornerRadius))
+                {
+                    this.Region = new Region(path);
+                }
             }
         }
 
@@ -172,57 +218,89 @@ namespace WinSelfMachine.Controls
             base.OnPaint(e);
             var g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
             Rectangle rect = new Rectangle(0, 0, this.Width - 1, this.Height - 1);
 
-            // Fill
+            // 创建圆角路径
             using (var fillPath = CreateRoundedPath(rect, cornerRadius))
-            using (var fillBrush = new SolidBrush(fillColor))
             {
-                g.FillPath(fillBrush, fillPath);
-            }
+                // 设置裁剪区域
+                g.SetClip(fillPath, System.Drawing.Drawing2D.CombineMode.Replace);
 
-            // Border
-            if (borderThickness > 0)
-            {
-                int inset = borderThickness / 2;
-                Rectangle borderRect = new Rectangle(inset, inset, this.Width - 1 - borderThickness, this.Height - 1 - borderThickness);
-                using (var borderPath = CreateRoundedPath(borderRect, Math.Max(0, cornerRadius - inset)))
-                using (var pen = new Pen(isFocused ? borderFocusedColor : borderColor, borderThickness))
+                // Fill background
+                using (var fillBrush = new SolidBrush(fillColor))
                 {
-                    g.DrawPath(pen, borderPath);
+                    g.FillPath(fillBrush, fillPath);
                 }
-            }
 
-            // Placeholder
-            if (!isFocused && string.IsNullOrEmpty(innerTextBox.Text) && !string.IsNullOrEmpty(placeholderText))
-            {
-                using (var sf = new StringFormat { LineAlignment = StringAlignment.Center })
-                using (var brush = new SolidBrush(placeholderColor))
+                // Draw border
+                if (borderThickness > 0)
                 {
-                    var textRect = new Rectangle(innerPadding.Left, 0, this.Width - innerPadding.Horizontal, this.Height);
-                    // 使用抗锯齿绘制提示文字
-                    g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-                    g.DrawString(placeholderText, textFont, brush, textRect, sf);
+                    int inset = borderThickness / 2;
+                    Rectangle borderRect = new Rectangle(inset, inset, this.Width - 1 - borderThickness, this.Height - 1 - borderThickness);
+                    using (var borderPath = CreateRoundedPath(borderRect, Math.Max(0, cornerRadius - inset)))
+                    using (var pen = new Pen(isFocused ? borderFocusedColor : borderColor, borderThickness))
+                    {
+                        g.DrawPath(pen, borderPath);
+                    }
                 }
+
+                // Draw placeholder text
+                if (!isFocused && string.IsNullOrEmpty(innerTextBox?.Text) && !string.IsNullOrEmpty(placeholderText))
+                {
+                    using (var sf = new StringFormat { 
+                        LineAlignment = StringAlignment.Center,
+                        Alignment = StringAlignment.Near,
+                        Trimming = StringTrimming.EllipsisCharacter
+                    })
+                    using (var brush = new SolidBrush(placeholderColor))
+                    {
+                        var textRect = new Rectangle(innerPadding.Left, 0, this.Width - innerPadding.Horizontal, this.Height);
+                        g.DrawString(placeholderText, textFont, brush, textRect, sf);
+                    }
+                }
+
+                // Reset clipping region
+                g.ResetClip();
             }
         }
 
         private static GraphicsPath CreateRoundedPath(Rectangle bounds, int radius)
         {
-            int d = Math.Max(0, radius * 2);
             GraphicsPath path = new GraphicsPath();
-            if (d <= 0)
+            
+            if (radius <= 0 || bounds.Width <= 0 || bounds.Height <= 0)
             {
                 path.AddRectangle(bounds);
-                path.CloseFigure();
                 return path;
             }
+            
+            // 确保圆角半径不超过控件尺寸的一半
+            int actualRadius = Math.Min(radius, Math.Min(bounds.Width, bounds.Height) / 2);
+            int diameter = actualRadius * 2;
+            
+            // 如果控件太小，使用矩形
+            if (diameter >= bounds.Width || diameter >= bounds.Height)
+            {
+                path.AddRectangle(bounds);
+                return path;
+            }
+            
             path.StartFigure();
-            path.AddArc(bounds.X, bounds.Y, d, d, 180, 90);
-            path.AddArc(bounds.Right - d, bounds.Y, d, d, 270, 90);
-            path.AddArc(bounds.Right - d, bounds.Bottom - d, d, d, 0, 90);
-            path.AddArc(bounds.X, bounds.Bottom - d, d, d, 90, 90);
+            
+            // 左上角
+            path.AddArc(bounds.X, bounds.Y, diameter, diameter, 180, 90);
+            
+            // 右上角
+            path.AddArc(bounds.Right - diameter, bounds.Y, diameter, diameter, 270, 90);
+            
+            // 右下角
+            path.AddArc(bounds.Right - diameter, bounds.Bottom - diameter, diameter, diameter, 0, 90);
+            
+            // 左下角
+            path.AddArc(bounds.X, bounds.Bottom - diameter, diameter, diameter, 90, 90);
+            
             path.CloseFigure();
             return path;
         }

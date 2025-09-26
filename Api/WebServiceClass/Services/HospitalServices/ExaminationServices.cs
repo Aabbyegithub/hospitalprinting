@@ -44,6 +44,7 @@ namespace WebServiceClass.Services.HospitalServices
         {
             return await _dal.Db.Queryable<HolExamination>()
                 .Includes(a => a.patient)
+                .Includes(a => a.doctor, then=>then.holdepartment)  
                 .Where(a => a.status == 1)
                 //.Where(a => a.org_id == OrgId && a.status == 1)
                 .WhereIF(!string.IsNullOrEmpty(examNo), a => a.exam_no.Contains(examNo))

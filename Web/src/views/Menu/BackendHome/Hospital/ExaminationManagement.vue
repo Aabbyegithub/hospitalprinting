@@ -33,7 +33,32 @@
         >
           <el-table-column type="selection" width="55" />
           <el-table-column label="检查号" prop="exam_no" align="center" />
-          <el-table-column label="患者姓名" prop="patient.name" align="center" />
+          <el-table-column label="患者姓名" align="center">
+            <template #default="scope">
+              <el-button
+                v-if="scope.row.patient && scope.row.patient.name"
+                type="text"
+                style="color:#409eff;"
+                @click="showPatient(scope.row.patient)"
+              >
+                {{ scope.row.patient.name }}
+              </el-button>
+              <span v-else>--</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="诊断医生" align="center">
+            <template #default="scope">
+              <el-button
+                v-if="scope.row.doctor && scope.row.doctor.name"
+                type="text"
+                style="color:#409eff;"
+                @click="showDoctor(scope.row.doctor)"
+              >
+                {{ scope.row.doctor.name }}
+              </el-button>
+              <span v-else>--</span>
+            </template>
+          </el-table-column>
           <el-table-column label="检查类型" prop="exam_type" align="center">
             <template #default="scope">
               <el-tag :type="getExamTypeTagType(scope.row.exam_type)">
@@ -55,6 +80,7 @@
               <span v-else>--</span>
             </template>
           </el-table-column>
+          <el-table-column label="报告编号" prop="report_no" align="center" :formatter="(row)=> row.report_no || '--'" />
           <el-table-column label="电子胶片" prop="image_path" align="center">
             <template #default="scope">
               <el-button 
@@ -68,6 +94,7 @@
               <span v-else>--</span>
             </template>
           </el-table-column>
+          <el-table-column label="胶片检查号" prop="image_no" align="center" :formatter="(row)=> row.image_no || '--'" />
           <el-table-column label="打印状态" prop="is_printed" align="center">
             <template #default="scope">
               <el-tag :type="scope.row.is_printed === 1 ? 'success' : 'info'">
@@ -137,6 +164,11 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="诊断医生" required>
+          <el-select v-model="editForm.doctor_id" placeholder="请选择医生" filterable remote :remote-method="searchDoctors" :loading="doctorLoading" style="width: 100%">
+            <el-option v-for="d in doctorOptions" :key="d.id" :label="d.name" :value="d.id" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="检查类型" required>
           <el-select v-model="editForm.exam_type" placeholder="请选择检查类型">
             <el-option label="CT" value="CT" />
@@ -162,6 +194,12 @@
         </el-form-item>
         <el-form-item label="电子胶片路径">
           <el-input v-model="editForm.image_path" placeholder="请输入电子胶片路径" />
+        </el-form-item>
+        <el-form-item label="报告编号">
+          <el-input v-model="editForm.report_no" placeholder="请输入报告编号" />
+        </el-form-item>
+        <el-form-item label="胶片检查号">
+          <el-input v-model="editForm.image_no" placeholder="请输入胶片检查号" />
         </el-form-item>
         <!-- 隐藏字段，确保数据完整性 -->
         <el-form-item v-show="false">
@@ -208,6 +246,40 @@
         <el-button @click="showImageModal = false">关闭</el-button>
       </template>
     </el-dialog>
+
+    <!-- 医生信息弹窗 -->
+    <el-dialog v-model="showDoctorModal" title="医生信息" width="500px" :close-on-click-modal="false">
+      <div v-if="currentDoctor" class="doctor-info">
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="姓名">{{ currentDoctor.name || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="性别">{{ currentDoctor.gender === 1 ? '男' : (currentDoctor.gender === 2 ? '女' : '未知') }}</el-descriptions-item>
+          <el-descriptions-item label="联系电话">{{ currentDoctor.phone || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="职称">{{ currentDoctor.title || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="简介">{{ currentDoctor.introduction || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="所属科室">{{ currentDoctor.holdepartment?.name || currentDoctor.department_name || '--' }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="showDoctorModal = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 患者信息弹窗 -->
+    <el-dialog v-model="showPatientModal" title="患者信息" width="500px" :close-on-click-modal="false">
+      <div v-if="currentPatient" class="patient-info">
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="姓名">{{ currentPatient.name || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="性别">{{ currentPatient.gender === 1 || currentPatient.gender === '男' ? '男' : (currentPatient.gender === 2 || currentPatient.gender === '女' ? '女' : '未知') }}</el-descriptions-item>
+          <el-descriptions-item label="年龄">{{ currentPatient.age ?? '--' }}</el-descriptions-item>
+          <el-descriptions-item label="身份证号">{{ currentPatient.id_card || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="联系方式">{{ currentPatient.contact || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="就诊号">{{ currentPatient.medical_no || '--' }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="showPatientModal = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -216,6 +288,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { ElSelect, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElTag, ElDialog, ElForm, ElFormItem, ElMessage, ElDatePicker } from 'element-plus';
 import { addExaminationApi, deleteExaminationApi, editExaminationApi, getExaminationList, printExaminationApi, unlockPrintApi } from '../../../../api/examination';
 import { getPatientList } from '../../../../api/patient';
+import { getDoctorList } from '../../../../api/doctor';
 
 const searchExamNo = ref('');
 const searchPatientName = ref('');
@@ -231,12 +304,21 @@ const selectedRows = ref<any[]>([]);
 // 患者选择相关
 const patientOptions = ref<any[]>([]);
 const patientLoading = ref(false);
+// 医生选择相关
+const doctorOptions = ref<any[]>([]);
+const doctorLoading = ref(false);
 
 // 报告和胶片查看
 const showReportModal = ref(false);
 const showImageModal = ref(false);
 const currentReportPath = ref('');
 const currentImagePath = ref('');
+// 医生详情
+const showDoctorModal = ref(false);
+const currentDoctor = ref<any>(null);
+// 患者详情
+const showPatientModal = ref(false);
+const currentPatient = ref<any>(null);
 
 // 格式化日期
 const formatDate = (row: any, column: any, cellValue: any) => {
@@ -329,6 +411,23 @@ async function searchPatients(query: string) {
   }
 }
 
+// 搜索医生
+async function searchDoctors(query: string) {
+  if (!query) {
+    doctorOptions.value = [];
+    return;
+  }
+  doctorLoading.value = true;
+  try {
+    const res: any = await getDoctorList(query, null, 1, 20);
+    if (res && res.response) doctorOptions.value = res.response;
+  } catch (error) {
+    console.error('搜索医生失败:', error);
+  } finally {
+    doctorLoading.value = false;
+  }
+}
+
 // 保存检查记录
 async function handleSave() {
   try {
@@ -345,6 +444,11 @@ async function handleSave() {
     
     if (!editForm.exam_type || editForm.exam_type.trim() === '') {
       ElMessage.error('请选择检查类型');
+      return;
+    }
+    
+    if (!editForm.doctor_id || editForm.doctor_id <= 0) {
+      ElMessage.error('请选择诊断医生');
       return;
     }
     
@@ -366,11 +470,14 @@ async function handleSave() {
       exam_no: editForm.exam_no.trim(),
       patient_id: Number(editForm.patient_id),
       patient: selectedPatient, // 添加完整的患者对象
+      doctor_id: Number(editForm.doctor_id),
       org_id: Number(editForm.org_id) || 1,
       exam_type: editForm.exam_type.trim(),
       exam_date: new Date(editForm.exam_date).toISOString(), // 转换为ISO格式
       report_path: editForm.report_path || null,
       image_path: editForm.image_path || null,
+      report_no: editForm.report_no || null,
+      image_no: editForm.image_no || null,
       status: Number(editForm.status) || 1,
       is_printed: Number(editForm.is_printed) || 0
       // 注意：create_time 和 update_time 由后端设置，不需要前端发送
@@ -506,6 +613,9 @@ function openEditModal(examination?: any) {
     if (examination.patient) {
       patientOptions.value = [examination.patient];
     }
+    if (examination.doctor) {
+      doctorOptions.value = [examination.doctor];
+    }
   } else {
     // 重置表单，设置默认值
     editForm.id = '';
@@ -516,9 +626,13 @@ function openEditModal(examination?: any) {
     editForm.exam_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     editForm.report_path = '';
     editForm.image_path = '';
+    editForm.report_no = '';
+    editForm.image_no = '';
     editForm.status = 1;
     editForm.is_printed = 0;
     patientOptions.value = [];
+    editForm.doctor_id = null;
+    doctorOptions.value = [];
   }
 }
 
@@ -529,14 +643,18 @@ function closeEditModal() {
   editForm.id = '';
   editForm.exam_no = '';
   editForm.patient_id = null;
+  editForm.doctor_id = null;
   editForm.org_id = 1;
   editForm.exam_type = '';
   editForm.exam_date = '';
   editForm.report_path = '';
   editForm.image_path = '';
+  editForm.report_no = '';
+  editForm.image_no = '';
   editForm.status = 1;
   editForm.is_printed = 0;
   patientOptions.value = [];
+  doctorOptions.value = [];
 }
 
 // 处理选择变化
@@ -558,6 +676,18 @@ function handlePageChange(val: number) {
 onMounted(() => {
   fetchExaminationList(false);
 });
+
+// 显示医生信息
+function showDoctor(doctor: any) {
+  currentDoctor.value = doctor;
+  showDoctorModal.value = true;
+}
+
+// 显示患者信息
+function showPatient(patient: any) {
+  currentPatient.value = patient;
+  showPatientModal.value = true;
+}
 </script>
 
 <style scoped>

@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using MyNamespace;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ModelClassLibrary.Model.HolModel
 {
+    /// <summary>
+    /// 打印记录表
+    /// </summary>
     [SugarTable("hol_print_record")]
     public class PrintRecordModel
     {
@@ -47,5 +51,17 @@ namespace ModelClassLibrary.Model.HolModel
         /// 更新时间
         /// </summary>
         public DateTime update_time { get; set; }
+
+        /// <summary>
+        /// 导航属性：对应的诊断信息
+        /// </summary>
+        [Navigate(NavigateType.OneToOne, nameof(exam_id))]
+        public HolExamination holExamination { get; set; }
+
+        /// <summary>
+        /// 导航属性：对应的诊断信息
+        /// </summary>
+        [Navigate(NavigateType.OneToOne, nameof(patient_id))]
+        public HolPatient holPatient { get; set; }
     }
 }

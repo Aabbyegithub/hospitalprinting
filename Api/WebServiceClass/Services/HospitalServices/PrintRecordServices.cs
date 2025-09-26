@@ -60,7 +60,7 @@ namespace WebServiceClass.Services.HospitalServices
 
         public async Task<List<PrintRecordModel>> GetPageAsync(long? examId, int page, int size, RefAsync<int> count)
         {
-            return await _dal.Db.Queryable<PrintRecordModel>().Where(a=>a.status==1)
+            return await _dal.Db.Queryable<PrintRecordModel>().Includes(a=>a.holExamination,then=>then.doctor).Includes(a => a.holPatient).Where(a=>a.status==1)
                 .WhereIF(examId != null, a => a.exam_id == examId)
                 .ToPageListAsync(page, size, count);
         }

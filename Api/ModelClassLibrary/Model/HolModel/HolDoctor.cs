@@ -42,6 +42,12 @@ namespace ModelClassLibrary.Model.HolModel
 
         public DateTime createtime { get; set; }
         public DateTime updatetime { get; set; }
+
+        /// <summary>
+        /// 导航属性：对应的科室信息
+        /// </summary>
+        [Navigate(NavigateType.OneToOne, nameof(department_id))]
+        public HolDepartment holdepartment { get; set; }
     }
 
 }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using ModelClassLibrary.Model.Dto.HolDto;
+using ModelClassLibrary.Model.HolModel;
 using SqlSugar;
 
 namespace MyNamespace
 {
     ///<summary>
-    ///
+    ///检验数据表
     ///</summary>
     [SugarTable("hol_examination")]
     public partial class HolExamination
@@ -26,6 +28,11 @@ namespace MyNamespace
         /// 患者ID（关联 sys_patient 表）
         /// </summary>
         public long patient_id { get; set; }
+
+        /// <summary>
+        /// 诊断医生（关联 HolDoctor 表）
+        /// </summary>
+        public long doctor_id { get; set; }
 
         /// <summary>
         /// 所属机构ID（关联医院/科室）
@@ -53,6 +60,16 @@ namespace MyNamespace
         public string? image_path { get; set; }
 
         /// <summary>
+        /// 报告文件编号
+        /// </summary>
+        public string? report_no { get; set; }
+
+        /// <summary>
+        /// 电子胶片检查号
+        /// </summary>
+        public string? image_no{ get; set; }
+
+        /// <summary>
         /// 状态：1=有效，0=过期/删除
         /// </summary>
         public int status { get; set; } = 1;
@@ -77,6 +94,14 @@ namespace MyNamespace
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(patient_id))]
         public HolPatient patient { get; set; }
+
+        /// <summary>
+        /// 导航属性：对应的医生信息
+        /// </summary>
+        [Navigate(NavigateType.OneToOne, nameof(doctor_id))]
+        public HolDoctor doctor { get; set; }
+
+
 
     }
 }

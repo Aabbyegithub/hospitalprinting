@@ -73,6 +73,7 @@ namespace WebServiceClass.Services.HospitalServices
         public async Task<List<HolDoctorDto>> GetDoctorPageAsync(string? name, long? departmentId, int page, int size, RefAsync<int> count, long orgId)
         {
             return await _dal.Db.Queryable<HolDoctor>()
+                .Includes(doc=>doc.holdepartment)
                 .LeftJoin<HolDepartment>((doc, dep) => doc.department_id == dep.id)
                 .LeftJoin<sys_orgid>((doc, dep, org) => org.orgid_id == doc.orgid_id)
                 .Where((doc, dep) => doc.status == 1 && doc.orgid_id == orgId && dep.status == 1)

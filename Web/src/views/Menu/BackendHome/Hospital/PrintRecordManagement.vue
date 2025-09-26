@@ -23,8 +23,26 @@
         >
           <el-table-column type="selection" width="55" />
           <el-table-column label="记录ID" prop="id" align="center" width="80" />
-          <el-table-column label="检查ID" prop="exam_id" align="center" width="100" />
-          <el-table-column label="患者ID" prop="patient_id" align="center" width="100" />
+          <el-table-column label="检查ID" align="center" width="120">
+            <template #default="scope">
+              <el-button type="text" style="color:#409eff;" @click="showExam(scope.row.holExamination)">
+                {{ scope.row.exam_id }}
+              </el-button>
+            </template>
+          </el-table-column>
+          <el-table-column label="患者姓名" align="center" width="140">
+            <template #default="scope">
+              <el-button
+                v-if="scope.row.holPatient && scope.row.holPatient.name"
+                type="text"
+                style="color:#409eff;"
+                @click="showPatient(scope.row.holPatient)"
+              >
+                {{ scope.row.holPatient.name }}
+              </el-button>
+              <span v-else>--</span>
+            </template>
+          </el-table-column>
           <el-table-column label="打印时间" prop="print_time" align="center" :formatter="formatDateTime" />
           <el-table-column label="打印人ID" prop="printed_by" align="center" width="100" />
           <el-table-column label="操作" align="center" width="180">
@@ -49,13 +67,44 @@
       </div>
     </div>
     <!-- 编辑/新增弹窗 -->
-    <el-dialog v-model="showEditModal" width="500" :title="editForm.id ? '编辑打印记录' : '新增打印记录'">
+    <el-dialog v-model="showEditModal" width="600" :title="editForm.id ? '编辑打印记录' : '新增打印记录'">
       <el-form :model="editForm" label-width="120px">
-        <el-form-item label="检查ID" required>
-          <el-input-number v-model="editForm.exam_id" :min="1" placeholder="请输入检查ID" style="width: 100%" />
+        <el-form-item label="检查记录" required>
+          <el-select
+            v-model="editForm.exam_id"
+            placeholder="搜索并选择检查记录（按检查号/患者名）"
+            filterable
+            remote
+            :remote-method="searchExaminations"
+            :loading="examLoading"
+            style="width:100%"
+          >
+            <el-option
+              v-for="exam in examOptions"
+              :key="exam.id"
+              :label="`${exam.exam_no}（${exam.patient?.name || '--'}，${exam.exam_type || ''}）`
+                "
+              :value="exam.id"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="患者ID" required>
-          <el-input-number v-model="editForm.patient_id" :min="1" placeholder="请输入患者ID" style="width: 100%" />
+        <el-form-item label="患者" required>
+          <el-select
+            v-model="editForm.patient_id"
+            placeholder="搜索并选择患者"
+            filterable
+            remote
+            :remote-method="searchPatients"
+            :loading="patientLoading"
+            style="width:100%"
+          >
+            <el-option
+              v-for="p in patientOptions"
+              :key="p.id"
+              :label="`${p.name}（${p.medical_no || '无就诊号'}）`"
+              :value="p.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="打印人ID" required>
           <el-input-number v-model="editForm.printed_by" :min="1" placeholder="请输入打印人ID" style="width: 100%" />
@@ -76,6 +125,42 @@
         <el-button type="primary" class="Btn-Save" @click="handleSave">保存</el-button>
       </template>
     </el-dialog>
+    <!-- 患者信息弹窗 -->
+    <el-dialog v-model="showPatientModal" title="患者信息" width="500px" :close-on-click-modal="false">
+      <div v-if="currentPatient" class="patient-info">
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="姓名">{{ currentPatient.name || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="性别">{{ currentPatient.gender === 1 || currentPatient.gender === '男' ? '男' : (currentPatient.gender === 2 || currentPatient.gender === '女' ? '女' : '未知') }}</el-descriptions-item>
+          <el-descriptions-item label="年龄">{{ currentPatient.age ?? '--' }}</el-descriptions-item>
+          <el-descriptions-item label="身份证号">{{ currentPatient.id_card || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="联系方式">{{ currentPatient.contact || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="就诊号">{{ currentPatient.medical_no || '--' }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="showPatientModal = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 检查信息弹窗 -->
+    <el-dialog v-model="showExamModal" title="检查信息" width="600px" :close-on-click-modal="false">
+      <div v-if="currentExam" class="exam-info">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="检查号">{{ currentExam.exam_no || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="检查类型">{{ currentExam.exam_type || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="检查日期">{{ formatDateTime({}, {}, currentExam.exam_date) }}</el-descriptions-item>
+          <el-descriptions-item label="打印状态">{{ currentExam.is_printed === 1 ? '已打印' : '未打印' }}</el-descriptions-item>
+          <el-descriptions-item label="报告编号">{{ currentExam.report_no || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="胶片检查号">{{ currentExam.image_no || '--' }}</el-descriptions-item>
+          <el-descriptions-item label="报告文件"><span>{{ currentExam.report_path || '--' }}</span></el-descriptions-item>
+          <el-descriptions-item label="电子胶片"><span>{{ currentExam.image_path || '--' }}</span></el-descriptions-item>
+          <el-descriptions-item label="诊断医生">{{ currentExam.doctor?.name || '--' }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="showExamModal = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -83,6 +168,8 @@
 import { ref, reactive, onMounted } from 'vue';
 import { ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElMessage, ElInputNumber, ElDatePicker } from 'element-plus';
 import { addPrintRecordApi, deletePrintRecordApi, editPrintRecordApi, getPrintRecordList } from '../../../../api/printRecord';
+import { getPatientList } from '../../../../api/patient';
+import { getExaminationList } from '../../../../api/examination';
 
 const searchExamId = ref('');
 const printRecordList = ref<any[]>([]);
@@ -92,6 +179,18 @@ const showEditModal = ref(false);
 const editForm = reactive<any>({});
 const total = ref(0);
 const selectedRows = ref<any[]>([]);
+
+// 弹窗状态
+const showPatientModal = ref(false);
+const currentPatient = ref<any>(null);
+const showExamModal = ref(false);
+const currentExam = ref<any>(null);
+
+// 远程搜索选项
+const patientOptions = ref<any[]>([]);
+const patientLoading = ref(false);
+const examOptions = ref<any[]>([]);
+const examLoading = ref(false);
 
 // 格式化日期时间
 const formatDateTime = (row: any, column: any, cellValue: any) => {
@@ -129,6 +228,41 @@ async function fetchPrintRecordList(showTip: boolean = false) {
 function onSearch() {
   pageIndex.value = 1;
   fetchPrintRecordList(true);
+}
+
+// 远程搜索：患者
+async function searchPatients(query: string) {
+  if (!query) {
+    patientOptions.value = [];
+    return;
+  }
+  patientLoading.value = true;
+  try {
+    const res: any = await getPatientList(query, '', 1, 20);
+    if (res && res.response) patientOptions.value = res.response;
+  } catch (e) {
+    console.error('搜索患者失败:', e);
+  } finally {
+    patientLoading.value = false;
+  }
+}
+
+// 远程搜索：检查（按检查号/患者名）
+async function searchExaminations(query: string) {
+  if (!query) {
+    examOptions.value = [];
+    return;
+  }
+  examLoading.value = true;
+  try {
+    // 这里用后端列表接口进行模糊查询（第三个参数为日期，这里传空字符串）
+    const res: any = await getExaminationList(query, query, '', 1, 20);
+    if (res && res.response) examOptions.value = res.response;
+  } catch (e) {
+    console.error('搜索检查失败:', e);
+  } finally {
+    examLoading.value = false;
+  }
 }
 
 // 保存打印记录
@@ -193,10 +327,19 @@ function openEditModal(record?: any) {
     Object.keys(record).forEach(key => {
       editForm[key] = record[key];
     });
+    // 预填可选项
+    if (record.holPatient) {
+      patientOptions.value = [record.holPatient];
+    }
+    if (record.holExamination) {
+      examOptions.value = [record.holExamination];
+    }
   } else {
     // 重置表单
     Object.keys(editForm).forEach(k => editForm[k] = '');
     editForm.print_time = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    patientOptions.value = [];
+    examOptions.value = [];
   }
 }
 
@@ -225,6 +368,18 @@ function handlePageChange(val: number) {
 onMounted(() => {
   fetchPrintRecordList(false);
 });
+
+// 显示患者信息
+function showPatient(patient: any) {
+  currentPatient.value = patient;
+  showPatientModal.value = true;
+}
+
+// 显示检查信息
+function showExam(exam: any) {
+  currentExam.value = exam;
+  showExamModal.value = true;
+}
 </script>
 
 <style scoped>

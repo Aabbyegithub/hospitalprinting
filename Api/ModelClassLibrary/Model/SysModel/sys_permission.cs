@@ -50,14 +50,21 @@ namespace MyNamespace
         /// Default:
         /// Nullable:False
         /// </summary>  
-        public string permission_icon { get;set;} 
+        public string permission_icon { get;set;}
 
-           /// <summary>
-           /// Desc:父权限ID（用于层级）
-           /// Default:0
-           /// Nullable:False
-           /// </summary>           
-       public long parent_id {get;set;}
+        /// <summary>
+        /// Desc:排序
+        /// Default:
+        /// Nullable:False
+        /// </summary>  
+        public int sort { get; set; }
+
+        /// <summary>
+        /// Desc:父权限ID（用于层级）
+        /// Default:0
+        /// Nullable:False
+        /// </summary>           
+        public long parent_id {get;set;}
 
           [SugarColumn(IsIgnore = true)]
           public bool isSelect{get;set;}

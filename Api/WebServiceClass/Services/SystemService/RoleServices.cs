@@ -44,31 +44,75 @@ namespace WebServiceClass.Services.SystemService
                 .ToListAsync();
         }
 
+        //public async Task<List<UserPermission>> GetUserPermissionsAsync(int role_id)
+        //{
+        //    var menu = await _dal.Db.Queryable<sys_role_permission>()
+        //        .Where(a=>a.role_id == role_id)
+        //        .RightJoin<sys_permission>((a,b)=>a.permission_id == b.permission_id).Select((a,b)=>new sys_permission() {permission_id = b.permission_id, isSelect = string.IsNullOrEmpty(a.id.ToString()) ? false:true},true)
+        //         .ToListAsync();
+        //    return menu.Where(a => a.parent_id == 0).Select(a => new UserPermission
+        //    {
+        //        permissionId = a.permission_id,
+        //        groupKey = a.permission_key,
+        //        groupTitle = a.permission_name,
+        //        icon = a.permission_icon,
+        //        parent_id = a.parent_id.ToString(),
+        //        isselect =a.isSelect, 
+        //        children = menu.Where(b => b.parent_id == a.permission_id).Select(b => new UserPermissionItem
+        //        {
+        //            permissionId = b.permission_id,
+        //            key = b.permission_key,
+        //            name = b.permission_router,
+        //            title = b.permission_name,
+        //            icon = b.permission_icon,
+        //            parent_id = b.parent_id.ToString(),
+        //             isselect =b.isSelect, 
+        //        }).ToList()
+        //    }).ToList();
+        //}
         public async Task<List<UserPermission>> GetUserPermissionsAsync(int role_id)
         {
             var menu = await _dal.Db.Queryable<sys_role_permission>()
-                .Where(a=>a.role_id == role_id)
-                .RightJoin<sys_permission>((a,b)=>a.permission_id == b.permission_id).Select((a,b)=>new sys_permission() {permission_id = b.permission_id, isSelect = string.IsNullOrEmpty(a.id.ToString()) ? false:true},true)
-                 .ToListAsync();
-            return menu.Where(a => a.parent_id == 0).Select(a => new UserPermission
-            {
-                permissionId = a.permission_id,
-                groupKey = a.permission_key,
-                groupTitle = a.permission_name,
-                icon = a.permission_icon,
-                parent_id = a.parent_id.ToString(),
-                isselect =a.isSelect, 
-                children = menu.Where(b => b.parent_id == a.permission_id).Select(b => new UserPermissionItem
+                .Where(a => a.role_id == role_id)
+                .RightJoin<sys_permission>((a, b) => a.permission_id == b.permission_id)
+                // true 表示自动映射 b 的其余字段（包含 sort），仅覆盖显式赋值的字段
+                .Select((a, b) => new sys_permission
                 {
-                    permissionId = b.permission_id,
-                    key = b.permission_key,
-                    name = b.permission_router,
-                    title = b.permission_name,
-                    icon = b.permission_icon,
-                    parent_id = b.parent_id.ToString(),
-                     isselect =b.isSelect, 
-                }).ToList()
-            }).ToList();
+                    permission_id = b.permission_id,
+                    isSelect = a == null ? false : true
+                }, true)
+                // 先按父级，再按排序值（如果需要可加次序）
+                .OrderBy(("b.sort asc"))
+                .ToListAsync();
+
+            // 组装树：顶层和子级都按 sort 排序
+            return menu
+                .Where(a => a.parent_id == 0)
+                .OrderBy(a => a.sort) // 顶层排序
+                .Select(a => new UserPermission
+                {
+                    permissionId = a.permission_id,
+                    groupKey = a.permission_key,
+                    groupTitle = a.permission_name,
+                    icon = a.permission_icon,
+                    parent_id = a.parent_id.ToString(),
+                    isselect = a.isSelect,
+                    children = menu
+                        .Where(b => b.parent_id == a.permission_id)
+                        .OrderBy(b => b.sort) // 子级排序
+                        .Select(b => new UserPermissionItem
+                        {
+                            permissionId = b.permission_id,
+                            key = b.permission_key,
+                            name = b.permission_router,
+                            title = b.permission_name,
+                            icon = b.permission_icon,
+                            parent_id = b.parent_id.ToString(),
+                            isselect = b.isSelect
+                        })
+                        .ToList()
+                })
+                .ToList();
         }
 
         public async Task<bool> UpdateRoleAsync(sys_role sys_Role)

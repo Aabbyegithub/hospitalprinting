@@ -46,16 +46,14 @@
       </div>
       <div class="pagination-bar">
         <el-pagination
-          layout="prev, pager, next, ->, sizes, jumper"
+          style="margin-top:16px;float:right;"
           :total="total"
           :page-size="pageSize"
           :current-page="pageIndex"
-          :prev-text="'<'"
-          :next-text="'>'"
-          :page-sizes="[10, 20, 30, 40, 50]"
-          :display-page-count="5"
           @size-change="handleSizeChange"
           @current-change="handlePageChange"
+          :page-sizes="[10,20,30,50]"
+          layout="prev, pager, next, ->, sizes, jumper"
         />
       </div>
     </div>
@@ -107,10 +105,18 @@ const editForm = reactive<any>({});
 const total = ref(0);
 const selectedRows = ref<any[]>([]);
 
-// 格式化日期
+// 格式化日期（YYYY-M-D HH:mm:ss）
 const formatDate = (row: any, column: any, cellValue: any) => {
   if (!cellValue) return '--';
-  return new Date(cellValue).toLocaleString('zh-CN');
+  const d = new Date(cellValue);
+  if (isNaN(d.getTime())) return '--';
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const ss = String(d.getSeconds()).padStart(2, '0');
+  return `${y}-${m}-${day} ${hh}:${mm}:${ss}`;
 };
 
 // 获取患者列表

@@ -193,14 +193,15 @@ namespace WebServiceClass.Services.UserService
                     permission_name = a.permission.permission_name,
                     permission_icon = a.permission.permission_icon,
                     permission_router = a.permission.permission_router,
-                    parent_id = a.permission.parent_id
+                    parent_id = a.permission.parent_id,
+                    sort = a.permission.sort
                 }).OrderBy(a=>a.permission_id).ToListAsync();
-            return menu.Where(a=>a.parent_id == 0).Select(a=>new UserPermission
+            return menu.Where(a=>a.parent_id == 0).OrderBy(a => a.sort).Select(a=>new UserPermission
             {
                 groupKey = a.permission_key,
                 groupTitle = a.permission_name,
                 icon = a.permission_icon,
-                children = menu.Where(b => b.parent_id == a.permission_id).Select(b => new UserPermissionItem
+                children = menu.Where(b => b.parent_id == a.permission_id).OrderBy(b => b.sort).Select(b => new UserPermissionItem
                 {
                     key = b.permission_key,
                     name = b.permission_router,

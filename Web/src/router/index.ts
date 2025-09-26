@@ -11,6 +11,11 @@ const routes = [
       { path: 'Backendhome',name: 'Backendhome',
         component: () => import('../views/Menu/BackendHome/BackendHome.vue'),
         children: [
+          { 
+            path: 'DataStatistics', 
+            name: 'DataStatistics',
+            component: () => import('../views/Menu/BackendHome/Hospital/DataStatistics.vue') 
+          },
           {
             path: 'HomeIndex', 
             name: 'HomeIndex',
@@ -56,6 +61,17 @@ const routes = [
             name: 'PrintRecordManagement',
             component: () => import('../views/Menu/BackendHome/Hospital/PrintRecordManagement.vue') 
           },
+          { 
+            path: 'DoctorManagement', 
+            name: 'DoctorManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/DoctorManagement.vue') 
+          },
+          { 
+            path: 'DepartmentManagement', 
+            name: 'DepartmentManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/DepartmentManagement.vue') 
+          },
+          
         ]
        },
     ]

@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\3DButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\3DButton.Designer.cs">
+      <DependentUpon>3DButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ArcContainer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -57,6 +63,9 @@
     </Compile>
     <Compile Include="Controls\Carousel.Designer.cs">
       <DependentUpon>Carousel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\HospitalButton.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\ModeTimeBar.cs">
       <SubType>UserControl</SubType>

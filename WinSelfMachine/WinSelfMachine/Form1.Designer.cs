@@ -29,183 +29,211 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.PanQueay = new System.Windows.Forms.Panel();
-            this.roundedContainer1 = new WinSelfMachine.Controls.RoundedContainer();
-            this.roundButton7 = new WinSelfMachine.Controls.RoundButton();
-            this.roundButton2 = new WinSelfMachine.Controls.RoundButton();
-            this.roundButton1 = new WinSelfMachine.Controls.RoundButton();
-            this.carousel1 = new WinSelfMachine.Controls.Carousel();
-            this.modeTimeBar1 = new WinSelfMachine.Controls.ModeTimeBar();
-            this.arcContainer1 = new WinSelfMachine.Controls.ArcContainer();
-            this.PanQueay.SuspendLayout();
+            this.TxtQuery = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.TxtTitle = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.TxtBnr = new WinSelfMachine.Controls.RoundedTextBox();
+            this.BtnReportQuery = new WinSelfMachine.Controls.RoundedButton();
+            this._3DButton3 = new WinSelfMachine.Controls._3DButton();
+            this._3DButton2 = new WinSelfMachine.Controls._3DButton();
+            this._3DButton1 = new WinSelfMachine.Controls._3DButton();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
-            // PanQueay
+            // TxtQuery
             // 
-            this.PanQueay.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("PanQueay.BackgroundImage")));
-            this.PanQueay.Controls.Add(this.roundedContainer1);
-            this.PanQueay.Location = new System.Drawing.Point(-3, 28);
-            this.PanQueay.Name = "PanQueay";
-            this.PanQueay.Size = new System.Drawing.Size(756, 1037);
-            this.PanQueay.TabIndex = 10;
+            this.TxtQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.TxtQuery.AutoSize = true;
+            this.TxtQuery.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TxtQuery.Location = new System.Drawing.Point(240, 383);
+            this.TxtQuery.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.TxtQuery.Name = "TxtQuery";
+            this.TxtQuery.Size = new System.Drawing.Size(87, 35);
+            this.TxtQuery.TabIndex = 3;
+            this.TxtQuery.Text = "查询";
             // 
-            // roundedContainer1
+            // label2
             // 
-            this.roundedContainer1.BackColor = System.Drawing.Color.Transparent;
-            this.roundedContainer1.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-            this.roundedContainer1.BorderThickness = 1;
-            this.roundedContainer1.CornerRadius = 12;
-            this.roundedContainer1.DividerColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(100)))), ((int)(((byte)(140)))), ((int)(((byte)(220)))));
-            this.roundedContainer1.DividerEnabled = true;
-            this.roundedContainer1.DividerHorizontalPadding = 16;
-            this.roundedContainer1.DividerThickness = 1;
-            this.roundedContainer1.DividerTopSpacing = 8;
-            this.roundedContainer1.FillColor = System.Drawing.Color.White;
-            this.roundedContainer1.Location = new System.Drawing.Point(33, 18);
-            this.roundedContainer1.Name = "roundedContainer1";
-            this.roundedContainer1.ShadowOffsetX = 0;
-            this.roundedContainer1.ShadowOffsetY = 2;
-            this.roundedContainer1.ShadowSize = 6;
-            this.roundedContainer1.ShowShadow = true;
-            this.roundedContainer1.Size = new System.Drawing.Size(686, 243);
-            this.roundedContainer1.TabIndex = 0;
-            this.roundedContainer1.TitleColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.roundedContainer1.TitleFont = new System.Drawing.Font("宋体", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.roundedContainer1.TitleText = "身份检索";
-            this.roundedContainer1.TitleTopPadding = 10;
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.BackColor = System.Drawing.Color.Transparent;
+            this.label2.Font = new System.Drawing.Font("黑体", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.Location = new System.Drawing.Point(0, 203);
+            this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(1595, 84);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "在线报告查询";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // roundButton7
+            // TxtTitle
             // 
-            this.roundButton7.BackColor = System.Drawing.Color.Transparent;
-            this.roundButton7.BackFillColor = System.Drawing.Color.Aqua;
-            this.roundButton7.CornerDiameter = 16;
-            this.roundButton7.Icon = ((System.Drawing.Image)(resources.GetObject("roundButton7.Icon")));
-            this.roundButton7.IconSize = new System.Drawing.Size(80, 80);
-            this.roundButton7.IconTextSpacing = 5;
-            this.roundButton7.LabelText = "设置";
-            this.roundButton7.Location = new System.Drawing.Point(102, 673);
-            this.roundButton7.Name = "roundButton7";
-            this.roundButton7.Size = new System.Drawing.Size(232, 228);
-            this.roundButton7.TabIndex = 9;
-            this.roundButton7.TextColor = System.Drawing.Color.Black;
+            this.TxtTitle.AutoSize = true;
+            this.TxtTitle.BackColor = System.Drawing.Color.Transparent;
+            this.TxtTitle.Font = new System.Drawing.Font("宋体", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TxtTitle.Location = new System.Drawing.Point(132, 52);
+            this.TxtTitle.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.TxtTitle.Name = "TxtTitle";
+            this.TxtTitle.Size = new System.Drawing.Size(483, 51);
+            this.TxtTitle.TabIndex = 7;
+            this.TxtTitle.Text = "****医院自助一体机";
             // 
-            // roundButton2
+            // pictureBox1
             // 
-            this.roundButton2.BackColor = System.Drawing.Color.Transparent;
-            this.roundButton2.BackFillColor = System.Drawing.Color.Orchid;
-            this.roundButton2.CornerDiameter = 16;
-            this.roundButton2.Icon = ((System.Drawing.Image)(resources.GetObject("roundButton2.Icon")));
-            this.roundButton2.IconSize = new System.Drawing.Size(80, 80);
-            this.roundButton2.IconTextSpacing = 5;
-            this.roundButton2.LabelText = "报告打印";
-            this.roundButton2.Location = new System.Drawing.Point(369, 449);
-            this.roundButton2.Name = "roundButton2";
-            this.roundButton2.Size = new System.Drawing.Size(251, 452);
-            this.roundButton2.TabIndex = 4;
-            this.roundButton2.TextColor = System.Drawing.Color.Black;
+            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.BackgroundImage")));
+            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.pictureBox1.Location = new System.Drawing.Point(22, 44);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(66, 66);
+            this.pictureBox1.TabIndex = 8;
+            this.pictureBox1.TabStop = false;
             // 
-            // roundButton1
+            // TxtBnr
             // 
-            this.roundButton1.BackColor = System.Drawing.Color.Transparent;
-            this.roundButton1.BackFillColor = System.Drawing.Color.LightGreen;
-            this.roundButton1.CornerDiameter = 16;
-            this.roundButton1.Icon = ((System.Drawing.Image)(resources.GetObject("roundButton1.Icon")));
-            this.roundButton1.IconSize = new System.Drawing.Size(80, 80);
-            this.roundButton1.IconTextSpacing = 5;
-            this.roundButton1.LabelText = "报告查询";
-            this.roundButton1.Location = new System.Drawing.Point(102, 449);
-            this.roundButton1.Name = "roundButton1";
-            this.roundButton1.Size = new System.Drawing.Size(232, 198);
-            this.roundButton1.TabIndex = 3;
-            this.roundButton1.TextColor = System.Drawing.Color.Black;
+            this.TxtBnr.BackColor = System.Drawing.Color.Transparent;
+            this.TxtBnr.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.TxtBnr.BorderFocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(123)))), ((int)(((byte)(244)))));
+            this.TxtBnr.BorderThickness = 1;
+            this.TxtBnr.CornerRadius = 12;
+            this.TxtBnr.FillColor = System.Drawing.Color.White;
+            this.TxtBnr.FontSize = 9;
+            this.TxtBnr.InnerPadding = new System.Windows.Forms.Padding(10, 6, 10, 6);
+            this.TxtBnr.Location = new System.Drawing.Point(348, 369);
+            this.TxtBnr.Name = "TxtBnr";
+            this.TxtBnr.PlaceholderColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(120)))), ((int)(((byte)(120)))));
+            this.TxtBnr.PlaceholderText = "请输入检验号";
+            this.TxtBnr.Size = new System.Drawing.Size(761, 63);
+            this.TxtBnr.TabIndex = 9;
+            this.TxtBnr.TextFont = new System.Drawing.Font("微软雅黑", 9F);
             // 
-            // carousel1
+            // BtnReportQuery
             // 
-            this.carousel1.AutoPlayInterval = 3000;
-            this.carousel1.BackColor = System.Drawing.Color.DarkCyan;
-            this.carousel1.CornerRadius = 15;
-            this.carousel1.CurrentIndex = 4;
-            this.carousel1.EnableAutoPlay = true;
-            this.carousel1.ItemHeight = 340;
-            this.carousel1.ItemSpacing = 20;
-            this.carousel1.ItemWidth = 630;
-            this.carousel1.Location = new System.Drawing.Point(56, 28);
-            this.carousel1.Name = "carousel1";
-            this.carousel1.ShowIndicators = true;
-            this.carousel1.Size = new System.Drawing.Size(631, 345);
-            this.carousel1.TabIndex = 2;
+            this.BtnReportQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnReportQuery.BorderColor = System.Drawing.Color.Transparent;
+            this.BtnReportQuery.BorderThickness = 0;
+            this.BtnReportQuery.ButtonText = "报告查询";
+            this.BtnReportQuery.CornerRadius = 12;
+            this.BtnReportQuery.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnReportQuery.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(123)))), ((int)(((byte)(244)))));
+            this.BtnReportQuery.FillDownColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(113)))), ((int)(((byte)(234)))));
+            this.BtnReportQuery.FillHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(133)))), ((int)(((byte)(254)))));
+            this.BtnReportQuery.Location = new System.Drawing.Point(1142, 369);
+            this.BtnReportQuery.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.BtnReportQuery.Name = "BtnReportQuery";
+            this.BtnReportQuery.Size = new System.Drawing.Size(187, 63);
+            this.BtnReportQuery.TabIndex = 5;
+            this.BtnReportQuery.TextColor = System.Drawing.Color.White;
             // 
-            // modeTimeBar1
+            // _3DButton3
             // 
-            this.modeTimeBar1.BackColor = System.Drawing.Color.DarkCyan;
-            this.modeTimeBar1.CornerRadius = 12;
-            this.modeTimeBar1.HospitalText = "苏州XX医院";
-            this.modeTimeBar1.Icon = ((System.Drawing.Image)(resources.GetObject("modeTimeBar1.Icon")));
-            this.modeTimeBar1.IsOn = true;
-            this.modeTimeBar1.LeftButtonIcon = ((System.Drawing.Image)(resources.GetObject("modeTimeBar1.LeftButtonIcon")));
-            this.modeTimeBar1.LeftButtonSize = 20;
-            this.modeTimeBar1.LeftButtonVisible = true;
-            this.modeTimeBar1.Location = new System.Drawing.Point(-3, -1);
-            this.modeTimeBar1.ModeText = "关爱模式";
-            this.modeTimeBar1.Name = "modeTimeBar1";
-            this.modeTimeBar1.Size = new System.Drawing.Size(756, 32);
-            this.modeTimeBar1.Spacing = 10;
-            this.modeTimeBar1.SwitchBorderColor = System.Drawing.Color.White;
-            this.modeTimeBar1.SwitchOffColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-            this.modeTimeBar1.SwitchOnColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(123)))), ((int)(((byte)(244)))));
-            this.modeTimeBar1.TabIndex = 1;
-            this.modeTimeBar1.TimeText = "下午 17:00";
-            this.modeTimeBar1.LeftButtonClicked += new System.EventHandler(this.modeTimeBar1_LeftButtonClicked);
+            this._3DButton3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._3DButton3.BackColor = System.Drawing.Color.Transparent;
+            this._3DButton3.BottomColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this._3DButton3.ButtonIcon = ((System.Drawing.Image)(resources.GetObject("_3DButton3.ButtonIcon")));
+            this._3DButton3.ButtonText = "设置";
+            this._3DButton3.CornerRadius = 40;
+            this._3DButton3.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._3DButton3.FontSize = 10F;
+            this._3DButton3.IconSize = new System.Drawing.Size(80, 80);
+            this._3DButton3.IconTextSpacing = 8;
+            this._3DButton3.Location = new System.Drawing.Point(1071, 523);
+            this._3DButton3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this._3DButton3.Name = "_3DButton3";
+            this._3DButton3.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this._3DButton3.ShadowOffset = 4;
+            this._3DButton3.Size = new System.Drawing.Size(297, 285);
+            this._3DButton3.TabIndex = 2;
+            this._3DButton3.TextColor = System.Drawing.Color.Black;
+            this._3DButton3.TopColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             // 
-            // arcContainer1
+            // _3DButton2
             // 
-            this.arcContainer1.ArcHeight = 30;
-            this.arcContainer1.BackColor = System.Drawing.Color.Transparent;
-            this.arcContainer1.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
-            this.arcContainer1.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-            this.arcContainer1.BorderWidth = 1;
-            this.arcContainer1.EnableGradient = true;
-            this.arcContainer1.GradientAngle = 90;
-            this.arcContainer1.GradientEndColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.arcContainer1.GradientStartColor = System.Drawing.Color.DarkCyan;
-            this.arcContainer1.Location = new System.Drawing.Point(-3, -1);
-            this.arcContainer1.Name = "arcContainer1";
-            this.arcContainer1.ShowBorder = true;
-            this.arcContainer1.Size = new System.Drawing.Size(756, 325);
-            this.arcContainer1.TabIndex = 0;
+            this._3DButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._3DButton2.BackColor = System.Drawing.Color.Transparent;
+            this._3DButton2.BottomColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this._3DButton2.ButtonIcon = ((System.Drawing.Image)(resources.GetObject("_3DButton2.ButtonIcon")));
+            this._3DButton2.ButtonText = "报告打印";
+            this._3DButton2.CornerRadius = 40;
+            this._3DButton2.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._3DButton2.FontSize = 10F;
+            this._3DButton2.IconSize = new System.Drawing.Size(80, 80);
+            this._3DButton2.IconTextSpacing = 8;
+            this._3DButton2.Location = new System.Drawing.Point(642, 523);
+            this._3DButton2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this._3DButton2.Name = "_3DButton2";
+            this._3DButton2.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this._3DButton2.ShadowOffset = 4;
+            this._3DButton2.Size = new System.Drawing.Size(297, 285);
+            this._3DButton2.TabIndex = 1;
+            this._3DButton2.TextColor = System.Drawing.Color.Black;
+            this._3DButton2.TopColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
+            // 
+            // _3DButton1
+            // 
+            this._3DButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._3DButton1.BackColor = System.Drawing.Color.Transparent;
+            this._3DButton1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this._3DButton1.BottomColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this._3DButton1.ButtonIcon = ((System.Drawing.Image)(resources.GetObject("_3DButton1.ButtonIcon")));
+            this._3DButton1.ButtonText = "报告查询";
+            this._3DButton1.CornerRadius = 40;
+            this._3DButton1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._3DButton1.FontSize = 10F;
+            this._3DButton1.IconSize = new System.Drawing.Size(80, 80);
+            this._3DButton1.IconTextSpacing = 8;
+            this._3DButton1.Location = new System.Drawing.Point(213, 523);
+            this._3DButton1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this._3DButton1.Name = "_3DButton1";
+            this._3DButton1.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this._3DButton1.ShadowOffset = 4;
+            this._3DButton1.Size = new System.Drawing.Size(297, 285);
+            this._3DButton1.TabIndex = 0;
+            this._3DButton1.TextColor = System.Drawing.Color.Black;
+            this._3DButton1.TopColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-            this.ClientSize = new System.Drawing.Size(752, 1061);
-            this.Controls.Add(this.PanQueay);
-            this.Controls.Add(this.roundButton7);
-            this.Controls.Add(this.roundButton2);
-            this.Controls.Add(this.roundButton1);
-            this.Controls.Add(this.carousel1);
-            this.Controls.Add(this.modeTimeBar1);
-            this.Controls.Add(this.arcContainer1);
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ClientSize = new System.Drawing.Size(1595, 1017);
+            this.Controls.Add(this.TxtBnr);
+            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.TxtTitle);
+            this.Controls.Add(this.BtnReportQuery);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.TxtQuery);
+            this.Controls.Add(this._3DButton3);
+            this.Controls.Add(this._3DButton2);
+            this.Controls.Add(this._3DButton1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.PanQueay.ResumeLayout(false);
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private Controls.ArcContainer arcContainer1;
-        private Controls.ModeTimeBar modeTimeBar1;
-        private Controls.Carousel carousel1;
-        private Controls.RoundButton roundButton1;
-        private Controls.RoundButton roundButton2;
-        private Controls.RoundButton roundButton7;
-        private System.Windows.Forms.Panel PanQueay;
-        private Controls.RoundedContainer roundedContainer1;
+        private Controls._3DButton _3DButton1;
+        private Controls._3DButton _3DButton2;
+        private Controls._3DButton _3DButton3;
+        private System.Windows.Forms.Label TxtQuery;
+        private System.Windows.Forms.Label label2;
+        private Controls.RoundedButton BtnReportQuery;
+        private System.Windows.Forms.Label TxtTitle;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private Controls.RoundedTextBox TxtBnr;
     }
 }
 

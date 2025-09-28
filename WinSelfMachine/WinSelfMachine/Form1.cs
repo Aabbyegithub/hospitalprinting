@@ -35,10 +35,10 @@ namespace WinSelfMachine
         {
             // 确保查询页面控件初始状态为隐藏
             BtnQuery(false);
-            TableData();
 
         }
 
+        #region  按钮操作
         /// <summary>
         /// 查询
         /// </summary>
@@ -80,7 +80,7 @@ namespace WinSelfMachine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BtnReturn_Load(object sender, EventArgs e)
+        private void BtnReturn_Click(object sender, EventArgs e)
         {
             // 暂停窗体重绘，提高流畅度
             this.SuspendLayout();
@@ -99,6 +99,37 @@ namespace WinSelfMachine
                 this.ResumeLayout(true);
             }
         }
+
+        /// <summary>
+        /// 查询界面打印
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnPrint_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 查询报告
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnSelect_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 检验报告查询
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnReportQuery_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
         /// <summary>
         /// 界面控件是否显示 - 优化版本，避免闪烁
         /// </summary>
@@ -141,7 +172,9 @@ namespace WinSelfMachine
                 if (label1 != null) label1.Visible = visible;
                 if (BtnReturn != null) BtnReturn.Visible = visible;
                 if (roundedContainer2 != null) roundedContainer2.Visible = visible;
-                //if (Table != null) Table.Visible = visible;
+                if (roundedContainer3 != null) roundedContainer3.Visible = visible;
+                if (Table != null) Table.Visible = visible;
+                if (BtnPrint != null) BtnPrint.Visible = visible;
                 
                 // 确保控件置于最前面
                 if (visible)
@@ -161,44 +194,8 @@ namespace WinSelfMachine
         /// </summary>
         private void TableData()
         {
-            // 示例：使用自定义表格控件
-            if (Table is TableLayoutControl tableControl)
-            {
-                // 设置表头
-                tableControl.SetHeaders("姓名", "年龄", "性别", "科室", "检查项目");
 
-                // 添加示例数据
-                tableControl.AddRow("张三", 35, "男", "内科", "血常规");
-                tableControl.AddRow("李四", 28, "女", "妇科", "B超检查");
-                tableControl.AddRow("王五", 42, "男", "外科", "CT扫描");
-                tableControl.AddRow("赵六", 31, "女", "儿科", "心电图");
-                tableControl.AddRow("钱七", 55, "男", "心内科", "心脏彩超");
-
-                // 订阅选择改变事件
-                tableControl.RowSelectionChanged += TableControl_RowSelectionChanged;
-            }
         }
-
-        /// <summary>
-        /// 表格选择改变事件处理
-        /// </summary>
-        private void TableControl_RowSelectionChanged(object sender, RowSelectionChangedEventArgs e)
-        {
-            // 获取选中的行索引
-            List<int> selectedRows = e.SelectedRowIndices;
-            
-            // 获取选中的数据
-            List<List<object>> selectedData = e.SelectedData;
-            
-            // 可以在这里处理选中的数据
-            System.Diagnostics.Debug.WriteLine($"选中了 {selectedRows.Count} 行数据");
-            foreach (var rowData in selectedData)
-            {
-                System.Diagnostics.Debug.WriteLine($"数据: {string.Join(", ", rowData)}");
-            }
-        }
-
-
         /// <summary>
         /// 确保查询页面控件置于最前面
         /// </summary>
@@ -206,13 +203,15 @@ namespace WinSelfMachine
         {
             // 批量处理控件置前，提高效率
             if (roundedContainer1 != null && roundedContainer1.Visible) roundedContainer1.BringToFront();
+            if (roundedContainer2 != null && roundedContainer2.Visible) roundedContainer2.BringToFront();
+            if (roundedContainer3 != null && roundedContainer3.Visible) roundedContainer3.BringToFront();
             if (label3 != null && label3.Visible) label3.BringToFront();
             if (roundTextBox1 != null && roundTextBox1.Visible) roundTextBox1.BringToFront();
             if (BtnSelect != null && BtnSelect.Visible) BtnSelect.BringToFront();
             if (label1 != null && label1.Visible) label1.BringToFront();
             if (BtnReturn != null && BtnReturn.Visible) BtnReturn.BringToFront();
-            if (roundedContainer2 != null && roundedContainer2.Visible) roundedContainer2.BringToFront();
             if (Table != null && Table.Visible) Table.BringToFront();
+            if (BtnPrint != null && BtnPrint.Visible) BtnPrint.BringToFront();
         }
 
         #region 控制窗体适应不同的分辨率
@@ -341,100 +340,165 @@ namespace WinSelfMachine
                     roundedContainer1.Size = new Size(queryPageWidth, queryPageHeight);
                 }
 
+                // 调整roundedContainer3（左侧身份检索容器）
+                if (roundedContainer3 != null)
+                {
+                    int leftContainerX = queryPageX + (int)(20 * scaleX);
+                    int leftContainerY = queryPageY + (int)(20 * scaleY);
+                    int leftContainerWidth = leftColumnWidth - (int)(0 * scaleX);
+                    int leftContainerHeight = queryPageHeight - (int)(40 * scaleY);
+                    
+                    roundedContainer3.Location = new Point(leftContainerX, leftContainerY);
+                    roundedContainer3.Size = new Size(leftContainerWidth, leftContainerHeight);
+                    roundedContainer3.TitleText = "身份检索";
+                    float titleFontSize = Math.Max(12f, 18f * averageScale);
+                    roundedContainer3.TitleFont = new Font("宋体", titleFontSize, FontStyle.Bold);
+                }
+
                 // 调整label3（身份检索标签）- 左侧标题
                 if (label3 != null)
                 {
-                    int label3X = queryPageX + (int)(20 * scaleX);
-                    int label3Y = queryPageY + (int)(30 * scaleY);
+                    int label3X = queryPageX + (int)(40 * scaleX);
+                    int label3Y = queryPageY + (int)(50 * scaleY);
                     int label3Width = (int)(150 * scaleX);
                     int label3Height = (int)(30 * scaleY);
                     
                     label3.Location = new Point(label3X, label3Y);
                     label3.Size = new Size(label3Width, label3Height);
-                    float label3FontSize = Math.Max(8f, 16f * averageScale);
+                    float label3FontSize = Math.Max(10f, 16f * averageScale);
                     label3.Font = new Font(label3.Font.FontFamily, label3FontSize, FontStyle.Bold);
+                    label3.Text = "身份检索";
                 }
 
                 // 调整roundTextBox1（输入框）- 左侧输入框
                 if (roundTextBox1 != null)
                 {
-                    int textBoxX = queryPageX + (int)(20 * scaleX);
-                    int textBoxY = queryPageY + (int)(80 * scaleY);
-                    int textBoxWidth = leftColumnWidth - (int)(40 * scaleX);
-                    int textBoxHeight = (int)(40 * scaleY);
+                    int textBoxX = queryPageX + (int)(40 * scaleX);
+                    int textBoxY = queryPageY + (int)(600 * scaleY);
+                    int textBoxWidth = leftColumnWidth - (int)(80 * scaleX);
+                    int textBoxHeight = (int)(50 * scaleY);
                     
                     roundTextBox1.Location = new Point(textBoxX, textBoxY);
                     roundTextBox1.Size = new Size(textBoxWidth, textBoxHeight);
-                    float textBoxFontSize = Math.Max(8f, 14f * averageScale);
+                    float textBoxFontSize = Math.Max(10f, 16f * averageScale);
                     roundTextBox1.FontSize = (int)textBoxFontSize;
                 }
 
                 // 调整BtnSelect（查询按钮）- 左侧查询按钮
                 if (BtnSelect != null)
                 {
-                    int btnX = queryPageX + (int)(20 * scaleX);
-                    int btnY = queryPageY + (int)(140 * scaleY);
-                    int btnWidth = leftColumnWidth - (int)(40 * scaleX);
-                    int btnHeight = (int)(40 * scaleY);
+                    int btnX = queryPageX + (int)(40 * scaleX);
+                    int btnY = queryPageY + (int)(700 * scaleY);
+                    int btnWidth = leftColumnWidth - (int)(80 * scaleX);
+                    int btnHeight = (int)(50 * scaleY);
                     
                     BtnSelect.Location = new Point(btnX, btnY);
                     BtnSelect.Size = new Size(btnWidth, btnHeight);
-                    float btnSelectFontSize = Math.Max(8f, 14f * averageScale);
+                    float btnSelectFontSize = Math.Max(10f, 16f * averageScale);
                     BtnSelect.Font = new Font(BtnSelect.Font.FontFamily, btnSelectFontSize, BtnSelect.Font.Style);
+                    BtnSelect.ButtonText = "查询";
                 }
 
-                // 调整label1（检验报告单标签）- 右侧标题
+                // 调整roundedContainer2（右侧查询结果容器）
+                if (roundedContainer2 != null)
+                {
+                    int rightContainerX = rightColumnX + (int)(20 * scaleX);
+                    int rightContainerY = queryPageY + (int)(20 * scaleY);
+                    int rightContainerWidth = rightColumnWidth - (int)(40 * scaleX);
+                    int rightContainerHeight = queryPageHeight - (int)(40 * scaleY);
+                    
+                    roundedContainer2.Location = new Point(rightContainerX, rightContainerY);
+                    roundedContainer2.Size = new Size(rightContainerWidth, rightContainerHeight);
+                    roundedContainer2.TitleText = "查询结果";
+                    float titleFontSize = Math.Max(12f, 18f * averageScale);
+                    roundedContainer2.TitleFont = new Font("宋体", titleFontSize, FontStyle.Bold);
+                }
+
+                // 调整label1（患者信息标签）- 位于查询结果标题下方，左侧
                 if (label1 != null)
                 {
-                    int label1X = rightColumnX + (int)(20 * scaleX);
-                    int label1Y = queryPageY + (int)(30 * scaleY);
-                    int label1Width = (int)(200 * scaleX);
+                    int label1X = rightColumnX + (int)(40 * scaleX);
+                    int label1Y = queryPageY + (int)(90 * scaleY);  // 在查询结果标题下方
+                    int label1Width = (int)(120 * scaleX);
                     int label1Height = (int)(30 * scaleY);
                     
                     label1.Location = new Point(label1X, label1Y);
                     label1.Size = new Size(label1Width, label1Height);
-                    float label1FontSize = Math.Max(8f, 16f * averageScale);
-                    label1.Font = new Font(label1.Font.FontFamily, label1FontSize, FontStyle.Bold);
+                    float label1FontSize = Math.Max(10f, 14f * averageScale);
+                    label1.Font = new Font(label1.Font.FontFamily, label1FontSize, FontStyle.Regular);
+                    label1.Text = "患者信息：";
                 }
+
+                // 调整label3（检验单号标签）- 与患者信息在同一行，右侧
+                if (label3 != null)
+                {
+                    int examInfoX = rightColumnX + (int)(300 * scaleX);  // 在患者信息右侧
+                    int examInfoY = queryPageY + (int)(90 * scaleY);     // 与患者信息同一行
+                    int examInfoWidth = (int)(150 * scaleX);
+                    int examInfoHeight = (int)(30 * scaleY);
+                    
+                    label3.Location = new Point(examInfoX, examInfoY);
+                    label3.Size = new Size(examInfoWidth, examInfoHeight);
+                    float examInfoFontSize = Math.Max(10f, 14f * averageScale);
+                    label3.Font = new Font(label3.Font.FontFamily, examInfoFontSize, FontStyle.Regular);
+                    label3.Text = "检验单号：";
+                }
+
+
 
                 // 调整BtnReturn（返回按钮）- 右上角返回按钮
                 if (BtnReturn != null)
                 {
                     int returnBtnX = rightColumnX + rightColumnWidth - (int)(120 * scaleX);
                     int returnBtnY = queryPageY + (int)(30 * scaleY);
-                    int returnBtnWidth = (int)(100 * scaleX);
-                    int returnBtnHeight = (int)(30 * scaleY);
+                    int returnBtnWidth = (int)(80 * scaleX);
+                    int returnBtnHeight = (int)(40 * scaleY);
                     
                     BtnReturn.Location = new Point(returnBtnX, returnBtnY);
                     BtnReturn.Size = new Size(returnBtnWidth, returnBtnHeight);
-                    float btnReturnFontSize = Math.Max(8f, 14f * averageScale);
+                    float btnReturnFontSize = Math.Max(10f, 14f * averageScale);
                     BtnReturn.Font = new Font(BtnReturn.Font.FontFamily, btnReturnFontSize, BtnReturn.Font.Style);
+                    BtnReturn.ButtonText = "返回";
                 }
 
-                // 调整roundedContainer2（报告显示容器）- 右侧报告区域
-                if (roundedContainer2 != null)
+                // 调整BtnPrint（打印按钮）- 右上角打印按钮
+                if (BtnPrint != null)
                 {
-                    int reportX = rightColumnX + (int)(20 * scaleX);
-                    int reportY = queryPageY + (int)(80 * scaleY);
-                    int reportWidth = rightColumnWidth - (int)(40 * scaleX);
-                    int reportHeight = queryPageHeight - (int)(100 * scaleY);
+                    int printBtnX = rightColumnX + rightColumnWidth - (int)(120 * scaleX);
+                    int printBtnY = queryPageY + (int)(80 * scaleY);
+                    int printBtnWidth = (int)(80 * scaleX);
+                    int printBtnHeight = (int)(40 * scaleY);
                     
-                    roundedContainer2.Location = new Point(reportX, reportY);
-                    roundedContainer2.Size = new Size(reportWidth, reportHeight);
+                    BtnPrint.Location = new Point(printBtnX, printBtnY);
+                    BtnPrint.Size = new Size(printBtnWidth, printBtnHeight);
+                    float btnPrintFontSize = Math.Max(10f, 14f * averageScale);
+                    BtnPrint.Font = new Font(BtnPrint.Font.FontFamily, btnPrintFontSize, BtnPrint.Font.Style);
+                    BtnPrint.ButtonText = "打印";
                 }
+
 
                 // 调整Table（表格控件）- 报告内容区域
                 if (Table != null)
                 {
+                    // 表格位于右侧区域，在患者信息和检验单号标签下方
                     int tableX = rightColumnX + (int)(40 * scaleX);
-                    int tableY = queryPageY + (int)(100 * scaleY);
+                    int tableY = queryPageY + (int)(130 * scaleY);  // 在标签下方
                     int tableWidth = rightColumnWidth - (int)(80 * scaleX);
-                    int tableHeight = queryPageHeight - (int)(140 * scaleY);
-
+                    int tableHeight = queryPageHeight - (int)(170 * scaleY); // 为其他控件留出空间
+                    
                     Table.Location = new Point(tableX, tableY);
                     Table.Size = new Size(tableWidth, tableHeight);
-                    float tableFontSize = Math.Max(8f, 12f * averageScale);
+                    float tableFontSize = Math.Max(10f, 14f * averageScale);
                     Table.Font = new Font(Table.Font.FontFamily, tableFontSize, Table.Font.Style);
+                    
+                    // 调整列宽
+                    if (Table.Columns.Count >= 4)
+                    {
+                        Table.Columns[0].Width = (int)(80 * scaleX);  // 序号列
+                        Table.Columns[1].Width = (int)((tableWidth - 80 * scaleX) * 0.3f);  // 科室列
+                        Table.Columns[2].Width = (int)((tableWidth - 80 * scaleX) * 0.5f);  // 报告名称列
+                        Table.Columns[3].Width = (int)((tableWidth - 80 * scaleX) * 0.2f);  // 操作列
+                    }
                 }
             }
             catch (Exception ex)
@@ -444,5 +508,7 @@ namespace WinSelfMachine
         }
 
         #endregion
+
+
     }
 }

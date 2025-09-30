@@ -259,10 +259,15 @@ async function handleSave() {
   try {
     await editFormRef.value?.validate()
     
+    // 找到选中的科室对象
+    const selectedDepartment = departmentOptions.value.find(d => d.id === editForm.department_id);
+    
     const formData = {
       ...editForm,
       orgid_id: Number(editForm.orgid_id) || 1,
-      status: Number(editForm.status) || 1
+      status: Number(editForm.status) || 1,
+      // 添加完整的科室对象以满足后端验证
+      holdepartment: selectedDepartment || null
     }
 
     if (editForm.id) {

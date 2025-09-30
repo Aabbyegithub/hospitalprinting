@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using Newtonsoft.Json;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,7 @@ namespace ModelClassLibrary.Model.HolModel
         /// 导航属性：对应的科室信息
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(department_id))]
+        [JsonIgnore]
         public HolDepartment holdepartment { get; set; }
     }
 

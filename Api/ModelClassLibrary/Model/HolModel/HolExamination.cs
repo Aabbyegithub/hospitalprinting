@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using ModelClassLibrary.Model.Dto.HolDto;
 using ModelClassLibrary.Model.HolModel;
+using Newtonsoft.Json;
 using SqlSugar;
 
 namespace MyNamespace
@@ -93,12 +94,14 @@ namespace MyNamespace
         /// 导航属性：对应的患者信息
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(patient_id))]
+        [JsonIgnore]
         public HolPatient patient { get; set; }
 
         /// <summary>
         /// 导航属性：对应的医生信息
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(doctor_id))]
+        [JsonIgnore]
         public HolDoctor doctor { get; set; }
 
 

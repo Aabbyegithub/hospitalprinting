@@ -143,22 +143,89 @@
     </el-dialog>
 
     <!-- 检查信息弹窗 -->
-    <el-dialog v-model="showExamModal" title="检查信息" width="600px" :close-on-click-modal="false">
+    <el-dialog v-model="showExamModal" title="检查信息" width="1200px" :close-on-click-modal="false">
       <div v-if="currentExam" class="exam-info">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="检查号">{{ currentExam.exam_no || '--' }}</el-descriptions-item>
-          <el-descriptions-item label="检查类型">{{ currentExam.exam_type || '--' }}</el-descriptions-item>
-          <el-descriptions-item label="检查日期">{{ formatDateTime({}, {}, currentExam.exam_date) }}</el-descriptions-item>
-          <el-descriptions-item label="打印状态">{{ currentExam.is_printed === 1 ? '已打印' : '未打印' }}</el-descriptions-item>
-          <el-descriptions-item label="报告编号">{{ currentExam.report_no || '--' }}</el-descriptions-item>
-          <el-descriptions-item label="胶片检查号">{{ currentExam.image_no || '--' }}</el-descriptions-item>
-          <el-descriptions-item label="报告文件"><span>{{ currentExam.report_path || '--' }}</span></el-descriptions-item>
-          <el-descriptions-item label="电子胶片"><span>{{ currentExam.image_path || '--' }}</span></el-descriptions-item>
-          <el-descriptions-item label="诊断医生">{{ currentExam.doctor?.name || '--' }}</el-descriptions-item>
-        </el-descriptions>
+        <el-table :data="[currentExam]" border style="width: 100%">
+          <el-table-column prop="exam_no" label="检查号" width="120" align="center" />
+          <el-table-column prop="exam_type" label="检查类型" width="100" align="center" />
+          <el-table-column label="检查日期" width="180" align="center">
+            <template #default="scope">
+              {{ formatDateTime({}, {}, scope.row.exam_date) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="打印状态" width="100" align="center">
+            <template #default="scope">
+              <el-tag :type="scope.row.is_printed === 1 ? 'success' : 'info'">
+                {{ scope.row.is_printed === 1 ? '已打印' : '未打印' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="report_no" label="报告编号" width="120" align="center" :formatter="(row) => row.report_no || '--'" />
+          <el-table-column prop="image_no" label="胶片检查号" width="120" align="center" :formatter="(row) => row.image_no || '--'" />
+          <el-table-column label="报告文件" width="200" align="center">
+            <template #default="scope">
+              <el-button 
+                v-if="scope.row.report_path" 
+                type="text" 
+                style="color: #67c23a;" 
+                @click="viewReport(scope.row)"
+              >
+                查看报告
+              </el-button>
+              <span v-else>--</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="电子胶片" width="200" align="center">
+            <template #default="scope">
+              <el-button 
+                v-if="scope.row.image_path" 
+                type="text" 
+                style="color: #67c23a;" 
+                @click="viewImage(scope.row)"
+              >
+                查看胶片
+              </el-button>
+              <span v-else>--</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="doctor.name" label="诊断医生" width="120" align="center" :formatter="(row) => row.doctor?.name || '--'" />
+        </el-table>
       </div>
       <template #footer>
         <el-button type="primary" @click="showExamModal = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 报告查看弹窗 -->
+    <el-dialog v-model="showReportModal" title="检查报告" width="80%" :close-on-click-modal="false">
+      <div class="report-viewer">
+        <iframe 
+          v-if="currentReportPath" 
+          :src="currentReportPath" 
+          width="100%" 
+          height="600px"
+          frameborder="0"
+        ></iframe>
+        <div v-else class="no-content">暂无报告文件</div>
+      </div>
+      <template #footer>
+        <el-button @click="showReportModal = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 胶片查看弹窗 -->
+    <el-dialog v-model="showImageModal" title="电子胶片" width="80%" :close-on-click-modal="false">
+      <div class="image-viewer">
+        <img 
+          v-if="currentImagePath" 
+          :src="currentImagePath" 
+          alt="电子胶片"
+          style="max-width: 100%; height: auto;"
+        />
+        <div v-else class="no-content">暂无胶片文件</div>
+      </div>
+      <template #footer>
+        <el-button @click="showImageModal = false">关闭</el-button>
       </template>
     </el-dialog>
   </div>
@@ -185,6 +252,12 @@ const showPatientModal = ref(false);
 const currentPatient = ref<any>(null);
 const showExamModal = ref(false);
 const currentExam = ref<any>(null);
+
+// 报告和胶片查看
+const showReportModal = ref(false);
+const showImageModal = ref(false);
+const currentReportPath = ref('');
+const currentImagePath = ref('');
 
 // 远程搜索选项
 const patientOptions = ref<any[]>([]);
@@ -380,6 +453,56 @@ function showExam(exam: any) {
   currentExam.value = exam;
   showExamModal.value = true;
 }
+
+// 工具：标准化URL与扩展名判断
+function normalizeUrl(path: string) {
+  if (!path) return '';
+  const url = path.replace(/\\/g, '/');
+  return encodeURI(url);
+}
+function getExt(path: string) {
+  const m = path?.toLowerCase().match(/\.([a-z0-9]+)(?:\?|#|$)/);
+  return m ? m[1] : '';
+}
+function isArchive(ext: string) {
+  return ['zip', 'rar', '7z'].includes(ext);
+}
+
+// 查看报告：压缩包直接下载，否则弹窗预览（如 pdf/html 等）
+function viewReport(row: any) {
+  const url = normalizeUrl(row.report_path);
+  const ext = getExt(url);
+  if (isArchive(ext)) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;
+  }
+  currentReportPath.value = url;
+  showReportModal.value = true;
+}
+
+// 查看胶片：压缩包直接下载，否则弹窗预览图片
+function viewImage(row: any) {
+  const url = normalizeUrl(row.image_path);
+  const ext = getExt(url);
+  if (isArchive(ext)) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;
+  }
+  currentImagePath.value = url;
+  showImageModal.value = true;
+}
 </script>
 
 <style scoped>
@@ -479,5 +602,15 @@ function showExam(exam: any) {
   border-color: #6b5d5d;
   color: #000;
   margin-right: 10px;
+}
+
+.report-viewer, .image-viewer {
+  text-align: center;
+}
+
+.no-content {
+  padding: 40px;
+  color: #999;
+  font-size: 16px;
 }
 </style>

@@ -21,6 +21,12 @@ namespace WinSelfMachine.Controls
         private int shadowSize = 6;
         private int shadowOffsetX = 0;
         private int shadowOffsetY = 2;
+        
+        // 圆角控制
+        private bool topLeft = true;
+        private bool topRight = true;
+        private bool bottomLeft = true;
+        private bool bottomRight = true;
 		
 		// 标题与分割线
 		private string titleText = string.Empty;
@@ -117,6 +123,38 @@ namespace WinSelfMachine.Controls
         }
 
         [Category("圆角容器")]
+        [Description("左上角圆角")]
+        public bool TopLeft
+        {
+            get => topLeft;
+            set { topLeft = value; UpdateRegion(); Invalidate(); }
+        }
+
+        [Category("圆角容器")]
+        [Description("右上角圆角")]
+        public bool TopRight
+        {
+            get => topRight;
+            set { topRight = value; UpdateRegion(); Invalidate(); }
+        }
+
+        [Category("圆角容器")]
+        [Description("左下角圆角")]
+        public bool BottomLeft
+        {
+            get => bottomLeft;
+            set { bottomLeft = value; UpdateRegion(); Invalidate(); }
+        }
+
+        [Category("圆角容器")]
+        [Description("右下角圆角")]
+        public bool BottomRight
+        {
+            get => bottomRight;
+            set { bottomRight = value; UpdateRegion(); Invalidate(); }
+        }
+
+        [Category("圆角容器")]
         public Color BorderColor
         {
             get => borderColor;
@@ -165,6 +203,21 @@ namespace WinSelfMachine.Controls
             set { shadowOffsetY = value; Invalidate(); }
         }
 
+        [Category("外观")]
+        [Description("字体大小")]
+        public int FontSize
+        {
+            get => (int)this.Font.Size;
+            set 
+            { 
+                if (value > 0)
+                {
+                    this.Font = new Font(this.Font.FontFamily, value, this.Font.Style);
+                    Invalidate();
+                }
+            }
+        }
+
         protected override void OnSizeChanged(EventArgs e)
         {
             base.OnSizeChanged(e);
@@ -190,13 +243,13 @@ namespace WinSelfMachine.Controls
             // Shadow (simple spread without blur)
             if (showShadow && shadowSize > 0)
             {
-                using (var shadowPath = CreateRoundedPath(OffsetRect(rect, shadowOffsetX, shadowOffsetY), cornerRadius))
+                using (var shadowPath = CreateRoundedPath(OffsetRect(rect, shadowOffsetX, shadowOffsetY), cornerRadius, topLeft, topRight, bottomLeft, bottomRight))
                 using (var shadowBrush = new SolidBrush(Color.FromArgb(40, Color.Black)))
                 {
                     // Draw multiple expanded paths to simulate a soft edge
                     for (int i = 0; i < shadowSize; i++)
                     {
-                        using (var p = CreateRoundedPath(InflateRect(OffsetRect(rect, shadowOffsetX, shadowOffsetY), i, i), cornerRadius + i))
+                        using (var p = CreateRoundedPath(InflateRect(OffsetRect(rect, shadowOffsetX, shadowOffsetY), i, i), cornerRadius + i, topLeft, topRight, bottomLeft, bottomRight))
                         {
                             g.FillPath(shadowBrush, p);
                         }
@@ -248,7 +301,7 @@ namespace WinSelfMachine.Controls
             {
                 int inset = borderThickness / 2;
                 Rectangle borderRect = new Rectangle(inset, inset, this.Width - 1 - borderThickness, this.Height - 1 - borderThickness);
-                using (var borderPath = CreateRoundedPath(borderRect, Math.Max(0, cornerRadius - inset)))
+                using (var borderPath = CreateRoundedPath(borderRect, Math.Max(0, cornerRadius - inset), topLeft, topRight, bottomLeft, bottomRight))
                 using (var pen = new Pen(borderColor, borderThickness))
                 {
                     g.DrawPath(pen, borderPath);
@@ -266,21 +319,137 @@ namespace WinSelfMachine.Controls
             return new Rectangle(r.X - dw, r.Y - dh, r.Width + dw * 2, r.Height + dh * 2);
         }
 
-        private static GraphicsPath CreateRoundedPath(Rectangle bounds, int radius)
+        private GraphicsPath CreateRoundedPath(Rectangle bounds, int radius)
+        {
+            return CreateRoundedPath(bounds, radius, topLeft, topRight, bottomLeft, bottomRight);
+        }
+
+        private static GraphicsPath CreateRoundedPath(Rectangle bounds, int radius, bool topLeft, bool topRight, bool bottomLeft, bool bottomRight)
         {
             int d = Math.Max(0, radius * 2);
             GraphicsPath path = new GraphicsPath();
+            
             if (d <= 0)
             {
                 path.AddRectangle(bounds);
                 path.CloseFigure();
                 return path;
             }
+            
             path.StartFigure();
-            path.AddArc(bounds.X, bounds.Y, d, d, 180, 90);
-            path.AddArc(bounds.Right - d, bounds.Y, d, d, 270, 90);
-            path.AddArc(bounds.Right - d, bounds.Bottom - d, d, d, 0, 90);
-            path.AddArc(bounds.X, bounds.Bottom - d, d, d, 90, 90);
+            
+            // 左上角
+            if (topLeft)
+            {
+                path.AddArc(bounds.X, bounds.Y, d, d, 180, 90);
+            }
+            else
+            {
+                path.AddLine(bounds.X, bounds.Y, bounds.X + d, bounds.Y);
+            }
+            
+            // 上边
+            if (topLeft && topRight)
+            {
+                path.AddLine(bounds.X + d, bounds.Y, bounds.Right - d, bounds.Y);
+            }
+            else if (topLeft)
+            {
+                path.AddLine(bounds.X + d, bounds.Y, bounds.Right, bounds.Y);
+            }
+            else if (topRight)
+            {
+                path.AddLine(bounds.X, bounds.Y, bounds.Right - d, bounds.Y);
+            }
+            else
+            {
+                path.AddLine(bounds.X, bounds.Y, bounds.Right, bounds.Y);
+            }
+            
+            // 右上角
+            if (topRight)
+            {
+                path.AddArc(bounds.Right - d, bounds.Y, d, d, 270, 90);
+            }
+            else
+            {
+                path.AddLine(bounds.Right, bounds.Y, bounds.Right, bounds.Y + d);
+            }
+            
+            // 右边
+            if (topRight && bottomRight)
+            {
+                path.AddLine(bounds.Right, bounds.Y + d, bounds.Right, bounds.Bottom - d);
+            }
+            else if (topRight)
+            {
+                path.AddLine(bounds.Right, bounds.Y + d, bounds.Right, bounds.Bottom);
+            }
+            else if (bottomRight)
+            {
+                path.AddLine(bounds.Right, bounds.Y, bounds.Right, bounds.Bottom - d);
+            }
+            else
+            {
+                path.AddLine(bounds.Right, bounds.Y, bounds.Right, bounds.Bottom);
+            }
+            
+            // 右下角
+            if (bottomRight)
+            {
+                path.AddArc(bounds.Right - d, bounds.Bottom - d, d, d, 0, 90);
+            }
+            else
+            {
+                path.AddLine(bounds.Right, bounds.Bottom, bounds.Right - d, bounds.Bottom);
+            }
+            
+            // 下边
+            if (bottomRight && bottomLeft)
+            {
+                path.AddLine(bounds.Right - d, bounds.Bottom, bounds.X + d, bounds.Bottom);
+            }
+            else if (bottomRight)
+            {
+                path.AddLine(bounds.Right - d, bounds.Bottom, bounds.X, bounds.Bottom);
+            }
+            else if (bottomLeft)
+            {
+                path.AddLine(bounds.Right, bounds.Bottom, bounds.X + d, bounds.Bottom);
+            }
+            else
+            {
+                path.AddLine(bounds.Right, bounds.Bottom, bounds.X, bounds.Bottom);
+            }
+            
+            // 左下角
+            if (bottomLeft)
+            {
+                path.AddArc(bounds.X, bounds.Bottom - d, d, d, 90, 90);
+            }
+            else
+            {
+                path.AddLine(bounds.X, bounds.Bottom, bounds.X, bounds.Bottom - d);
+            }
+            
+            // 左边
+            if (bottomLeft && topLeft)
+            {
+                path.AddLine(bounds.X, bounds.Bottom - d, bounds.X, bounds.Y + d);
+            }
+            else if (bottomLeft)
+            {
+                path.AddLine(bounds.X, bounds.Bottom - d, bounds.X, bounds.Y);
+            }
+            else if (topLeft)
+            {
+                path.AddLine(bounds.X, bounds.Bottom, bounds.X, bounds.Y + d);
+            }
+            else
+            {
+                path.AddLine(bounds.X, bounds.Bottom, bounds.X, bounds.Y);
+            }
+            
             path.CloseFigure();
             return path;
         }

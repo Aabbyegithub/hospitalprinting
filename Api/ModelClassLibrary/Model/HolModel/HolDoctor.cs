@@ -49,7 +49,7 @@ namespace ModelClassLibrary.Model.HolModel
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(department_id))]
         [JsonIgnore]
-        public HolDepartment holdepartment { get; set; }
+        public HolDepartment? holdepartment { get; set; }
     }
 
 }

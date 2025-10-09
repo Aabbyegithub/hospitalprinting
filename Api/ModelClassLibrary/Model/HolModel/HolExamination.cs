@@ -95,14 +95,14 @@ namespace MyNamespace
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(patient_id))]
         [JsonIgnore]
-        public HolPatient patient { get; set; }
+        public HolPatient? patient { get; set; }
 
         /// <summary>
         /// 导航属性：对应的医生信息
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(doctor_id))]
         [JsonIgnore]
-        public HolDoctor doctor { get; set; }
+        public HolDoctor? doctor { get; set; }
 
 
 

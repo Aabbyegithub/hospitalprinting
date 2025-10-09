@@ -10,6 +10,7 @@ using WebIServices.IBase;
 using WebIServices.IServices.HospitalIServices;
 using MyNamespace;
 using ModelClassLibrary.Model.HolModel;
+using System.Runtime.CompilerServices;
 
 namespace WebServiceClass.Services.HospitalServices
 {
@@ -39,7 +40,7 @@ namespace WebServiceClass.Services.HospitalServices
             }
         }
 
-        public async Task<List<HolExamination>> GetExaminationPageAsync(string? examNo, string? patientName, DateTime? examDate,
+        public async Task<List<HolExamination>> GetExaminationPageAsync(string? examNo, string? patientName, int? isPrinted, DateTime? examDate,
             int page, int size, RefAsync<int> count, long OrgId)
         {
             return await _dal.Db.Queryable<HolExamination>()
@@ -50,6 +51,7 @@ namespace WebServiceClass.Services.HospitalServices
                 .WhereIF(!string.IsNullOrEmpty(examNo), a => a.exam_no.Contains(examNo))
                 .WhereIF(!string.IsNullOrEmpty(patientName), a => a.patient.name.Contains(patientName))
                 .WhereIF(examDate != null, a => a.exam_date.Date == examDate.Value.Date)
+                .WhereIF(isPrinted.HasValue, a => a.is_printed == isPrinted.Value)
                 .ToPageListAsync(page, size, count);
         }
 

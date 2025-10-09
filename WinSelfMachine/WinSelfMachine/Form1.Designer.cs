@@ -46,9 +46,10 @@
             this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBox1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.BackgroundImage")));
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox1.Location = new System.Drawing.Point(12, 25);
+            this.pictureBox1.Location = new System.Drawing.Point(22, 44);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(36, 38);
+            this.pictureBox1.Size = new System.Drawing.Size(66, 66);
             this.pictureBox1.TabIndex = 8;
             this.pictureBox1.TabStop = false;
             // 
@@ -57,9 +58,10 @@
             this.TxtTitle.AutoSize = true;
             this.TxtTitle.BackColor = System.Drawing.Color.Transparent;
             this.TxtTitle.Font = new System.Drawing.Font("宋体", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtTitle.Location = new System.Drawing.Point(72, 30);
+            this.TxtTitle.Location = new System.Drawing.Point(132, 52);
+            this.TxtTitle.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.TxtTitle.Name = "TxtTitle";
-            this.TxtTitle.Size = new System.Drawing.Size(276, 29);
+            this.TxtTitle.Size = new System.Drawing.Size(483, 51);
             this.TxtTitle.TabIndex = 7;
             this.TxtTitle.Text = "****医院自助一体机";
             // 
@@ -75,12 +77,13 @@
             this.BtnPrintSetting.IconSize = new System.Drawing.Size(24, 24);
             this.BtnPrintSetting.IconTextSpacing = 5;
             this.BtnPrintSetting.LabelText = "打印设置";
-            this.BtnPrintSetting.Location = new System.Drawing.Point(28, 545);
+            this.BtnPrintSetting.Location = new System.Drawing.Point(51, 954);
+            this.BtnPrintSetting.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnPrintSetting.Name = "BtnPrintSetting";
             this.BtnPrintSetting.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnPrintSetting.ShadowOffset = 3;
             this.BtnPrintSetting.ShowShadow = true;
-            this.BtnPrintSetting.Size = new System.Drawing.Size(94, 82);
+            this.BtnPrintSetting.Size = new System.Drawing.Size(172, 144);
             this.BtnPrintSetting.TabIndex = 9;
             this.BtnPrintSetting.TextColor = System.Drawing.Color.Black;
             this.BtnPrintSetting.Visible = false;
@@ -98,12 +101,13 @@
             this.BtnWaitTime.IconSize = new System.Drawing.Size(24, 24);
             this.BtnWaitTime.IconTextSpacing = 5;
             this.BtnWaitTime.LabelText = "等待时间";
-            this.BtnWaitTime.Location = new System.Drawing.Point(155, 545);
+            this.BtnWaitTime.Location = new System.Drawing.Point(284, 954);
+            this.BtnWaitTime.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnWaitTime.Name = "BtnWaitTime";
             this.BtnWaitTime.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnWaitTime.ShadowOffset = 3;
             this.BtnWaitTime.ShowShadow = true;
-            this.BtnWaitTime.Size = new System.Drawing.Size(94, 82);
+            this.BtnWaitTime.Size = new System.Drawing.Size(172, 144);
             this.BtnWaitTime.TabIndex = 10;
             this.BtnWaitTime.TextColor = System.Drawing.Color.Black;
             this.BtnWaitTime.Visible = false;
@@ -121,12 +125,13 @@
             this.BtnAvailableFilm.IconSize = new System.Drawing.Size(24, 24);
             this.BtnAvailableFilm.IconTextSpacing = 5;
             this.BtnAvailableFilm.LabelText = "可用胶片";
-            this.BtnAvailableFilm.Location = new System.Drawing.Point(275, 545);
+            this.BtnAvailableFilm.Location = new System.Drawing.Point(504, 954);
+            this.BtnAvailableFilm.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnAvailableFilm.Name = "BtnAvailableFilm";
             this.BtnAvailableFilm.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnAvailableFilm.ShadowOffset = 3;
             this.BtnAvailableFilm.ShowShadow = true;
-            this.BtnAvailableFilm.Size = new System.Drawing.Size(94, 82);
+            this.BtnAvailableFilm.Size = new System.Drawing.Size(172, 144);
             this.BtnAvailableFilm.TabIndex = 11;
             this.BtnAvailableFilm.TextColor = System.Drawing.Color.Black;
             this.BtnAvailableFilm.Visible = false;
@@ -139,15 +144,16 @@
             this.Txtbr.BorderFocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(123)))), ((int)(((byte)(244)))));
             this.Txtbr.BorderWidth = 1;
             this.Txtbr.CornerRadius = 8;
-            this.Txtbr.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Txtbr.Font = new System.Drawing.Font("宋体", 15F);
             this.Txtbr.FontSize = 15;
-            this.Txtbr.Location = new System.Drawing.Point(277, 393);
+            this.Txtbr.Location = new System.Drawing.Point(508, 688);
+            this.Txtbr.Margin = new System.Windows.Forms.Padding(18, 14, 18, 14);
             this.Txtbr.MaxLength = 32767;
             this.Txtbr.Name = "Txtbr";
-            this.Txtbr.Padding = new System.Windows.Forms.Padding(8, 6, 8, 6);
+            this.Txtbr.Padding = new System.Windows.Forms.Padding(15, 10, 15, 10);
             this.Txtbr.PasswordChar = '\0';
             this.Txtbr.ReadOnly = false;
-            this.Txtbr.Size = new System.Drawing.Size(200, 30);
+            this.Txtbr.Size = new System.Drawing.Size(367, 52);
             this.Txtbr.TabIndex = 12;
             this.Txtbr.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
             this.Txtbr.UseSystemPasswordChar = false;
@@ -156,9 +162,10 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(168, 398);
+            this.label1.Location = new System.Drawing.Point(308, 696);
+            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(109, 20);
+            this.label1.Size = new System.Drawing.Size(190, 35);
             this.label1.TabIndex = 13;
             this.label1.Text = "检验单号：";
             // 
@@ -166,9 +173,10 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(149, 453);
+            this.label2.Location = new System.Drawing.Point(273, 793);
+            this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(365, 35);
+            this.label2.Size = new System.Drawing.Size(647, 62);
             this.label2.TabIndex = 14;
             this.label2.Text = "请在左下角刷条码取片";
             // 
@@ -184,12 +192,13 @@
             this.BtnClose.IconSize = new System.Drawing.Size(24, 24);
             this.BtnClose.IconTextSpacing = 5;
             this.BtnClose.LabelText = "关闭";
-            this.BtnClose.Location = new System.Drawing.Point(523, 545);
+            this.BtnClose.Location = new System.Drawing.Point(959, 954);
+            this.BtnClose.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnClose.Name = "BtnClose";
             this.BtnClose.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnClose.ShadowOffset = 3;
             this.BtnClose.ShowShadow = true;
-            this.BtnClose.Size = new System.Drawing.Size(94, 82);
+            this.BtnClose.Size = new System.Drawing.Size(172, 144);
             this.BtnClose.TabIndex = 15;
             this.BtnClose.TextColor = System.Drawing.Color.Black;
             this.BtnClose.Visible = false;
@@ -197,13 +206,13 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(689, 674);
+            this.ClientSize = new System.Drawing.Size(1263, 1180);
             this.Controls.Add(this.BtnClose);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -213,8 +222,10 @@
             this.Controls.Add(this.BtnPrintSetting);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.TxtTitle);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.KeyPreview = true;
+            this.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.Name = "Form1";
             this.Text = "Form1";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;

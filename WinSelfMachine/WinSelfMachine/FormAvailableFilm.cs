@@ -12,9 +12,70 @@ namespace WinSelfMachine
 {
     public partial class FormAvailableFilm : Form
     {
+        /// <summary>
+        /// 胶片管理列表
+        /// </summary>
+        private List<string> FilmSizeList = new List<string>();
         public FormAvailableFilm()
         {
             InitializeComponent();
+        }
+
+        /// <summary>
+        /// 返回
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnReturn_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnDelete_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnEdit_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnAdd_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 点击单元格触发编辑和删除
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Table_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+            BtnDelete.Enabled = true;
+            BtnEdit.Enabled = true;
+            CbmFilmSize.SelectedItem = Table.Rows[e.RowIndex].Cells[0].Value.ToString();
+            TxtSum.Text = Table.Rows[e.RowIndex].Cells[1].Value.ToString();
         }
     }
 }

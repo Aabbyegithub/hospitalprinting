@@ -14,7 +14,7 @@ namespace WebIServices.IServices.HospitalIServices
     {
         Task<ApiResponse<string>> AddExaminationAsync(HolExamination exam, long OrgId, long UserId);
 
-        Task<List<HolExamination>> GetExaminationPageAsync(string? examNo, string? patientName, DateTime? examDate,
+        Task<List<HolExamination>> GetExaminationPageAsync(string? examNo, string? patientName, int? isPrinted, DateTime? examDate,
             int page, int size, RefAsync<int> count, long OrgId);
 
         Task<ApiResponse<string>> UpdateExaminationAsync(HolExamination exam, long UserId);

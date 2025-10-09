@@ -71,6 +71,21 @@ const routes = [
             name: 'DepartmentManagement',
             component: () => import('../views/Menu/BackendHome/Hospital/DepartmentManagement.vue') 
           },
+          { 
+            path: 'SelfServicePrinter', 
+            name: 'SelfServicePrinter',
+            component: () => import('../views/Menu/BackendHome/Hospital/SelfServicePrinter.vue') 
+          },
+          { 
+            path: 'FilmPrinter', 
+            name: 'FilmPrinter',
+            component: () => import('../views/Menu/BackendHome/Hospital/FilmPrinter.vue') 
+          },
+          { 
+            path: 'ReportPrinter', 
+            name: 'ReportPrinter',
+            component: () => import('../views/Menu/BackendHome/Hospital/ReportPrinter.vue') 
+          },
           
         ]
        },

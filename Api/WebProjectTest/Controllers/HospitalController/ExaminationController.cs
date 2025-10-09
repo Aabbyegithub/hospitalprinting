@@ -33,10 +33,10 @@ namespace WebProjectTest.Controllers.HospitalController
         /// </summary>
         [HttpGet]
         [OperationLogFilter("检查管理", "分页查询检查数据", ActionType.Search)]
-        public async Task<ApiPageResponse<List<HolExamination>>> GetPageAsync(string? examNo, string? patientName, DateTime? examDate, int page = 1, int size = 10)
+        public async Task<ApiPageResponse<List<HolExamination>>> GetPageAsync(string? examNo, string? patientName, int? isPrinted, DateTime? examDate, int page = 1, int size = 10)
         {
             RefAsync<int> count = 0;
-            var res = await examService.GetExaminationPageAsync(examNo, patientName, examDate, page, size, count, OrgId);
+            var res = await examService.GetExaminationPageAsync(examNo, patientName, isPrinted, examDate, page, size, count, OrgId);
             return PageSuccess(res, count);
         }
 

@@ -14,7 +14,13 @@
             value-format="YYYY-MM-DD"
             @change="onSearch"
           />
+          <el-select v-model="searchIsPrinted" placeholder="打印状态" class="search-input" @change="onSearch" clearable>
+            <el-option label="全部" value="" />
+            <el-option label="已打印" value="1" />
+            <el-option label="未打印" value="0" />
+          </el-select>
           <el-button class="search-btn" @click="onSearch">搜索</el-button>
+          <el-button class="reset-btn" @click="onReset">重置</el-button>
         </div>
         <div class="action-buttons">
           <el-button class="primary-btn" @click="openEditModal()">新增检查</el-button>
@@ -66,7 +72,7 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="检查日期" prop="exam_date" align="center" :formatter="formatDate" />
+          <el-table-column label="检查日期" prop="exam_date" align="center" width="180" :formatter="formatDate" />
           <el-table-column label="报告文件" prop="report_path" align="center">
             <template #default="scope">
               <el-button 
@@ -102,7 +108,7 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" prop="create_time" align="center" :formatter="formatDateTime" />
+          <el-table-column label="创建时间" prop="create_time" width="180" align="center" :formatter="formatDateTime" />
           <el-table-column label="操作" align="center" width="300">
             <template #default="scope">
               <el-button type="text" style="color: #67c23a;" @click="openEditModal(scope.row)">编辑</el-button>
@@ -293,6 +299,7 @@ import { getDoctorList } from '../../../../api/doctor';
 const searchExamNo = ref('');
 const searchPatientName = ref('');
 const searchExamDate = ref('');
+const searchIsPrinted = ref('');
 const examinationList = ref<any[]>([]);
 const pageIndex = ref(1);
 const pageSize = ref(10);
@@ -368,7 +375,8 @@ async function fetchExaminationList(showTip: boolean = false) {
     searchPatientName.value, 
     searchExamDate.value, 
     pageIndex.value, 
-    pageSize.value
+    pageSize.value,
+    searchIsPrinted.value
   )
     .then((res: any) => {
       if (res && res.response) {
@@ -387,6 +395,16 @@ async function fetchExaminationList(showTip: boolean = false) {
 
 // 主动搜索（重置到第1页并提示）
 function onSearch() {
+  pageIndex.value = 1;
+  fetchExaminationList(true);
+}
+
+// 重置筛选条件
+function onReset() {
+  searchExamNo.value = '';
+  searchPatientName.value = '';
+  searchExamDate.value = '';
+  searchIsPrinted.value = '';
   pageIndex.value = 1;
   fetchExaminationList(true);
 }
@@ -725,6 +743,22 @@ function showPatient(patient: any) {
   padding: 4px 14px;
   font-size: 14px;
   cursor: pointer;
+}
+
+.reset-btn {
+  background-color: #f5f7fa;
+  color: #606266;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  padding: 4px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.reset-btn:hover {
+  background-color: #ecf5ff;
+  color: #409eff;
+  border-color: #c6e2ff;
 }
 
 .action-buttons {

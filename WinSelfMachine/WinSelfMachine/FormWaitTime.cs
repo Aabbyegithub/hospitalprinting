@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinSelfMachine.Common;
 
 namespace WinSelfMachine
 {
@@ -15,6 +16,8 @@ namespace WinSelfMachine
         public FormWaitTime()
         {
             InitializeComponent();
+            CbmFilmSize.Items.AddRange(CommonList.PrintFilmSizes().ToArray());
+            CbmFilmSize.SelectedIndex = 0;
         }
 
         /// <summary>

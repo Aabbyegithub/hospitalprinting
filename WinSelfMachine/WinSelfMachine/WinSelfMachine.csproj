@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CommonList.cs" />
     <Compile Include="Common\SqlSugarClientFactory.cs" />
     <Compile Include="Controls\3DButton.cs">
       <SubType>UserControl</SubType>

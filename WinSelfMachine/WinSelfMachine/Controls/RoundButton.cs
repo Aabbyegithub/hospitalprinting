@@ -276,8 +276,13 @@ namespace WinSelfMachine.Controls
                 points = GetLine4();
                 graphicsPath.AddLine(points.Item1, points.Item2);
                 
-                // 填充背景
-                g.FillPath(new SolidBrush(backFillColor), graphicsPath);
+                // 填充背景（根据按下状态调整颜色）
+                Color fillColor = isPressed ? 
+                    Color.FromArgb(Math.Max(0, backFillColor.R - 30), 
+                                 Math.Max(0, backFillColor.G - 30), 
+                                 Math.Max(0, backFillColor.B - 30)) : 
+                    backFillColor;
+                g.FillPath(new SolidBrush(fillColor), graphicsPath);
                 
                 // 绘制边框
                 if (borderThickness > 0)
@@ -332,6 +337,44 @@ namespace WinSelfMachine.Controls
             path.AddArc(bounds.X, bounds.Bottom - d, d, d, 90, 90);
             path.CloseFigure();
             return path;
+        }
+
+        // 添加鼠标事件处理
+        private bool isPressed = false;
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (e.Button == MouseButtons.Left)
+            {
+                isPressed = true;
+                Invalidate();
+            }
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            if (e.Button == MouseButtons.Left && isPressed)
+            {
+                isPressed = false;
+                Invalidate();
+                // 触发点击事件
+                OnClick(EventArgs.Empty);
+            }
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            isPressed = false;
+            Invalidate();
+        }
+
+        protected override void OnClick(EventArgs e)
+        {
+            base.OnClick(e);
+            // 可以在这里添加自定义点击逻辑
         }
 
     }

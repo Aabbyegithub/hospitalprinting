@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>printer_22801.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="SqlSugar, Version=5.1.4.204, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SqlSugar.5.1.4.204\lib\SqlSugar.dll</HintPath>
@@ -51,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CommonList.cs" />
     <Compile Include="Common\SqlSugarClientFactory.cs" />
     <Compile Include="Controls\3DButton.cs">
       <SubType>UserControl</SubType>
@@ -121,6 +125,24 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormAvailableFilm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAvailableFilm.Designer.cs">
+      <DependentUpon>FormAvailableFilm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormPrintSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormPrintSetting.Designer.cs">
+      <DependentUpon>FormPrintSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormWaitTime.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormWaitTime.Designer.cs">
+      <DependentUpon>FormWaitTime.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\HolExamination.cs" />
     <Compile Include="Model\HolPatient.cs" />
     <Compile Include="Model\PrintRecordModel.cs" />
@@ -137,6 +159,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormAvailableFilm.resx">
+      <DependentUpon>FormAvailableFilm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormPrintSetting.resx">
+      <DependentUpon>FormPrintSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormWaitTime.resx">
+      <DependentUpon>FormWaitTime.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -162,6 +193,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="printer_22801.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="itext7" Version="9.3.0" />
     <PackageReference Include="Quartz" Version="3.9.0" />
     <PackageReference Include="SqlSugarCore" Version="5.1.4.193" />
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+    <PackageReference Include="TesseractOCR" Version="5.5.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -14,10 +14,12 @@ namespace ModelClassLibrary.Model.HolModel
         public long id { get; set; }
 
         public string name { get; set; }
-        public int type { get; set; }                // 1=自助,2=胶片,3=报告
+        public int type { get; set; }                // 1=自助,2=胶片,3=报告,4=激光
         public string? model { get; set; }
         public string? ip_address { get; set; }
         public int? port { get; set; }
+
+        public string? server_url { get; set; }      // 新增：服务器URL
         public string? resolution { get; set; }
         public string? paper_size { get; set; }
         public string? location { get; set; }

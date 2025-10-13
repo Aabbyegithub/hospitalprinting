@@ -32,4 +32,40 @@ export function testPrintApi(id: number) {
   return axios.post('/api/Printer/TestPrint', null, { params: { id } })
 }
 
+// 测试连通性
+export function testConnectivityApi(id: number) {
+  return axios.post('/api/Printer/TestConnectivity', null, { params: { id } })
+}
+
+// 获取胶片尺寸配置
+export function getFilmSizeConfigsApi(printerId: number) {
+  return axios.get('/api/Printer/GetFilmSizeConfigs', { params: { printerId } })
+}
+
+// 保存胶片尺寸配置
+export function saveFilmSizeConfigApi(data: any) {
+  return axios.post('/api/Printer/SaveFilmSizeConfig', data)
+}
+
+// 删除胶片尺寸配置
+export function deleteFilmSizeConfigApi(id: number) {
+  return axios.post('/api/Printer/DeleteFilmSizeConfig', null, { params: { id } })
+}
+
+// 删除打印机的所有胶片尺寸配置
+export function deleteAllFilmSizeConfigsApi(printerId: number) {
+  return axios.post('/api/Printer/DeleteAllFilmSizeConfigs', null, { params: { printerId } })
+}
+
+
+// 获取打印机配置
+export function getPrinterConfigApi(printerId: number) {
+  return axios.get('/api/Printer/GetConfig', { params: { printerId } })
+}
+
+// 保存打印机配置
+export function savePrinterConfigApi(data: any) {
+  return axios.post('/api/Printer/SaveConfig', data)
+}
+
 

@@ -86,6 +86,11 @@ namespace MyNamespace
         public DateTime update_time { get; set; }
 
         /// <summary>
+        /// ocr识别：1.信息准确 2.信息有误
+        /// </summary>
+        public int? ocr_identify_type { get; set; } = 1;
+
+        /// <summary>
         /// 是否已打印：0=未打印，1=已打印
         /// </summary>
         public int is_printed { get; set; } = 0;

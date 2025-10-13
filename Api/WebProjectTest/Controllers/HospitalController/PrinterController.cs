@@ -10,6 +10,7 @@ using WebProjectTest.Common.Filter;
 using WebProjectTest.Controllers.SystemController;
 using ModelClassLibrary.Model.HolModel;
 using WebIServices.IServices.HospitalIServices;
+using ModelClassLibrary.Model.Dto.HolDto;
 
 namespace WebProjectTest.Controllers.HospitalController
 {
@@ -58,5 +59,47 @@ namespace WebProjectTest.Controllers.HospitalController
         [OperationLogFilter("打印管理", "测试打印", ActionType.Print)]
         public async Task<ApiResponse<string>> TestPrintAsync([FromQuery] long id)
             => await printerService.TestPrintAsync(id, UserId);
+
+        /// <summary>获取打印机配置</summary>
+        [HttpGet]
+        [OperationLogFilter("打印管理", "获取打印机配置", ActionType.Search)]
+        public async Task<ApiResponse<HolPrinterConfigDto?>> GetConfig([FromQuery] long printerId)
+        {
+            var cfg = await printerService.GetConfigAsync(printerId, OrgId);
+            return Success(cfg);
+        }
+
+        /// <summary>保存打印机配置</summary>
+        [HttpPost]
+        [OperationLogFilter("打印管理", "保存打印机配置", ActionType.Edit)]
+        public async Task<ApiResponse<string>> SaveConfig([FromBody] HolPrinterConfigDto dto)
+        {
+            return await printerService.SaveConfigAsync(dto, OrgId, UserId);
+        }
+
+        /// <summary>获取胶片尺寸配置</summary>
+        [HttpGet]
+        [OperationLogFilter("打印管理", "获取胶片尺寸配置", ActionType.Search)]
+        public async Task<ApiResponse<List<HolPrinterConfigDto>>> GetFilmSizeConfigs([FromQuery] long printerId)
+        {
+            var configs = await printerService.GetFilmSizeConfigsAsync(printerId, OrgId);
+            return Success(configs);
+        }
+
+        /// <summary>保存胶片尺寸配置</summary>
+        [HttpPost]
+        [OperationLogFilter("打印管理", "保存胶片尺寸配置", ActionType.Edit)]
+        public async Task<ApiResponse<string>> SaveFilmSizeConfig([FromBody] HolPrinterConfigDto dto)
+        {
+            return await printerService.SaveFilmSizeConfigAsync(dto, OrgId, UserId);
+        }
+
+        /// <summary>删除打印机的所有胶片尺寸配置</summary>
+        [HttpPost]
+        [OperationLogFilter("打印管理", "删除胶片尺寸配置", ActionType.Delete)]
+        public async Task<ApiResponse<string>> DeleteAllFilmSizeConfigs([FromQuery] long printerId)
+        {
+            return await printerService.DeleteAllFilmSizeConfigsAsync(printerId, UserId, OrgId);
+        }
     }
 }

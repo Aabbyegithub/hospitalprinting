@@ -86,6 +86,21 @@ const routes = [
             name: 'ReportPrinter',
             component: () => import('../views/Menu/BackendHome/Hospital/ReportPrinter.vue') 
           },
+          { 
+            path: 'LaserPrinter', 
+            name: 'LaserPrinter',
+            component: () => import('../views/Menu/BackendHome/Hospital/LaserPrinter.vue') 
+          },
+          { 
+            path: 'FolderMonitorManagement', 
+            name: 'FolderMonitorManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/FolderMonitorManagement.vue') 
+          },
+          { 
+            path: 'OcrConfigManagement', 
+            name: 'OcrConfigManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/OcrConfigManagement.vue') 
+          },
           
         ]
        },

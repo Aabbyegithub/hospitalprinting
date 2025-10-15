@@ -169,6 +169,13 @@
               <el-table-column prop="todayCount" label="今日检查" align="center" />
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="打印统计" name="print">
+            <el-table :data="printStats" stripe border>
+              <el-table-column prop="examType" label="检查类型" align="center" />
+              <el-table-column prop="printedCount" label="已打印" align="center" />
+              <el-table-column prop="unprintedCount" label="未打印" align="center" />
+            </el-table>
+          </el-tab-pane>
           <el-tab-pane label="医生统计" name="doctor">
             <el-table :data="doctorStats" stripe border>
               <el-table-column prop="department" label="科室" align="center" />
@@ -215,6 +222,7 @@ const statistics = reactive({
 const patientStats = ref<any[]>([])
 const examinationStats = ref<any[]>([])
 const doctorStats = ref<any[]>([])
+const printStats = ref<any[]>([])
 
 // 图表引用
 const genderChart = ref()
@@ -314,6 +322,13 @@ async function fetchExaminationStatistics() {
         printedCount: examinations.filter((e: any) => e.exam_type === examType && e.is_printed === 1).length,
         unprintedCount: examinations.filter((e: any) => e.exam_type === examType && e.is_printed === 0).length,
         todayCount: examinations.filter((e: any) => e.exam_type === examType && isToday(e.exam_date)).length
+      }))
+
+      // 打印统计（按检查类型汇总）
+      printStats.value = examinationStats.value.map(item => ({
+        examType: item.examType,
+        printedCount: item.printedCount,
+        unprintedCount: item.unprintedCount
       }))
     }
   } catch (error) {

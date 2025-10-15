@@ -40,7 +40,7 @@ namespace WebServiceClass.Services.HospitalServices
             }
         }
 
-        public async Task<List<HolExamination>> GetExaminationPageAsync(string? examNo, string? patientName, int? isPrinted, DateTime? examDate,
+        public async Task<List<HolExamination>> GetExaminationPageAsync(string? examNo, string? examType, string? patientName, int? isPrinted, DateTime? examDate,
             int page, int size, RefAsync<int> count, long OrgId)
         {
             return await _dal.Db.Queryable<HolExamination>()
@@ -49,9 +49,10 @@ namespace WebServiceClass.Services.HospitalServices
                 .Where(a => a.status == 1)
                 //.Where(a => a.org_id == OrgId && a.status == 1)
                 .WhereIF(!string.IsNullOrEmpty(examNo), a => a.exam_no.Contains(examNo))
+                .WhereIF(!string.IsNullOrEmpty(examType), a => a.exam_type == examType)
                 .WhereIF(!string.IsNullOrEmpty(patientName), a => a.patient.name.Contains(patientName))
                 .WhereIF(examDate != null, a => a.exam_date.Date == examDate.Value.Date)
-                .WhereIF(isPrinted.HasValue, a => a.is_printed == isPrinted.Value)
+                .WhereIF(isPrinted.HasValue, a => a.is_printed == isPrinted)
                 .ToPageListAsync(page, size, count);
         }
 

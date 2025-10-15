@@ -5,6 +5,15 @@
         <div class="filter-group">
           <el-input v-model="searchExamNo" placeholder="搜索检查号" class="search-input" @keyup.enter="onSearch" />
           <el-input v-model="searchPatientName" placeholder="搜索患者姓名" class="search-input" @keyup.enter="onSearch" />
+          <el-select v-model="searchExamType" placeholder="检查类型" class="search-input" @change="onSearch" clearable>
+            <el-option label="全部" value="" />
+            <el-option label="CT" value="CT" />
+            <el-option label="MRI" value="MRI" />
+            <el-option label="超声" value="超声" />
+            <el-option label="X光" value="X光" />
+            <el-option label="心电图" value="心电图" />
+            <el-option label="其他" value="其他" />
+          </el-select>
           <el-date-picker
             v-model="searchExamDate"
             type="date"
@@ -21,6 +30,7 @@
           </el-select>
           <el-button class="search-btn" @click="onSearch">搜索</el-button>
           <el-button class="reset-btn" @click="onReset">重置</el-button>
+          <el-button class="primary-btn" @click="exportData">导出</el-button>
         </div>
         <div class="action-buttons">
           <el-button class="primary-btn" @click="openEditModal()">新增检查</el-button>
@@ -300,6 +310,7 @@ const searchExamNo = ref('');
 const searchPatientName = ref('');
 const searchExamDate = ref('');
 const searchIsPrinted = ref('');
+const searchExamType = ref('');
 const examinationList = ref<any[]>([]);
 const pageIndex = ref(1);
 const pageSize = ref(10);
@@ -376,7 +387,8 @@ async function fetchExaminationList(showTip: boolean = false) {
     searchExamDate.value, 
     pageIndex.value, 
     pageSize.value,
-    searchIsPrinted.value
+    searchIsPrinted.value,
+    searchExamType.value
   )
     .then((res: any) => {
       if (res && res.response) {
@@ -405,6 +417,7 @@ function onReset() {
   searchPatientName.value = '';
   searchExamDate.value = '';
   searchIsPrinted.value = '';
+  searchExamType.value = '';
   pageIndex.value = 1;
   fetchExaminationList(true);
 }
@@ -689,6 +702,78 @@ function handleSizeChange(val: number) {
 function handlePageChange(val: number) {
   pageIndex.value = val;
   fetchExaminationList(false);
+}
+
+// 导出当前筛选条件下的所有数据（跨页）
+async function exportData() {
+  try {
+    const page = 1;
+    const size = 1000; // 单次最大拉取数量，后端若限制可循环分页
+    const allRows: any[] = [];
+    let hasMore = true;
+    let cur = page;
+    while (hasMore) {
+      // 拉取一页
+      const res: any = await getExaminationList(
+        searchExamNo.value,
+        searchPatientName.value,
+        searchExamDate.value,
+        cur,
+        size,
+        searchIsPrinted.value,
+        searchExamType.value
+      );
+      const list = res?.response || [];
+      const count = res?.count || 0;
+      allRows.push(...list);
+      const fetched = cur * size;
+      hasMore = fetched < count && list.length > 0;
+      cur++;
+      if (cur > 50) break; // 保护：最多导出5万行
+    }
+
+    if (!allRows.length) {
+      ElMessage.warning('没有可导出的数据');
+      return;
+    }
+
+    // 生成CSV
+    const headers = [
+      '检查号','患者姓名','诊断医生','检查类型','检查日期','报告编号','胶片检查号','打印状态'
+    ];
+    const lines = [headers.join(',')];
+    for (const row of allRows) {
+      const cells = [
+        row.exam_no ?? '',
+        row.patient?.name ?? '',
+        row.doctor?.name ?? '',
+        row.exam_type ?? '',
+        formatDate(null as any, null as any, row.exam_date),
+        row.report_no ?? '',
+        row.image_no ?? '',
+        row.is_printed === 1 ? '已打印' : '未打印'
+      ];
+      // CSV 转义
+      const escaped = cells.map(v => {
+        const s = String(v).replace(/"/g, '""');
+        return /[",\n]/.test(s) ? `"${s}"` : s;
+      });
+      lines.push(escaped.join(','));
+    }
+    const csvContent = '\uFEFF' + lines.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `检查数据导出_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error('导出失败', e);
+    ElMessage.error('导出失败');
+  }
 }
 
 onMounted(() => {

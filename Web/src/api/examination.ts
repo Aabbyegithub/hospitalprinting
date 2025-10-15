@@ -1,9 +1,9 @@
 import axios from '../common/axios'
 
 // 获取检查列表
-export function getExaminationList(examNo: string, patientName: string, examDate: string, page = 1, size = 10, isPrinted?: string) {
+export function getExaminationList(examNo: string, patientName: string, examDate: string, page = 1, size = 10, isPrinted?: string, examType?: string) {
     return axios.get('/api/Examination/GetPage', { 
-        params: { examNo, patientName, examDate, page, size, isPrinted } 
+        params: { examNo, patientName, examDate, page, size, isPrinted, examType } 
     })
 }
 

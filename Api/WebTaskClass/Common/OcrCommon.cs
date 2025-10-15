@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Baidu.Aip.Ocr;
+using ModelClassLibrary.Model.Dto.TaskDto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebIServices.IBase;
 
 namespace WebTaskClass.Common
 {
@@ -20,7 +23,7 @@ namespace WebTaskClass.Common
         /// <summary>
         /// 构造函数
         /// </summary>
-        public OcrService(ISqlHelper dal, IConfiguration configuration)
+        public OcrService(ISqlHelper dal)
         {
             _dal = dal;
             
@@ -30,7 +33,7 @@ namespace WebTaskClass.Common
             _secretKey = configuration["BaiduOcr:SecretKey"];
             
             // 初始化百度OCR客户端
-            _baiduOcrClient = new Ocr(_appId, _apiKey, _secretKey);
+            _baiduOcrClient = new Ocr( _apiKey, _secretKey);
         }
 
         /// <summary>

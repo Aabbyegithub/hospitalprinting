@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebIServices.IBase;
+using WebTaskClass.Common;
 
 namespace WebTaskClass.SampleJob
 {
@@ -30,19 +31,119 @@ namespace WebTaskClass.SampleJob
         public async Task Execute(IJobExecutionContext context)
         {
             var IsStartBaiduOCR = await _dal.Db.Queryable<HolOcrConfig>().FirstAsync();
-            MedicalRecordDto result;
+            MedicalRecordDto res;
             if (IsStartBaiduOCR != null && IsStartBaiduOCR.is_enabled == 1 
                 && string.IsNullOrEmpty( IsStartBaiduOCR.api_key) 
                 &&string.IsNullOrEmpty( IsStartBaiduOCR.secret_key)  )//启用百度OCR
             {
+                var baiduOCR = new OcrCommon(_dal, IsStartBaiduOCR.api_key, IsStartBaiduOCR.secret_key);
+                res =await baiduOCR.RecognizeMedicalDocument("");
 
             }
             else//启用本地OCR
             {
-
+                var localhostOCR =new LocalTesseractOCR(_dal,"");
+                res =await localhostOCR.RecognizeMedicalDocument("");
             }
 
+            // 与数据库中已有信息进行交叉校验
+            var validationResult = await ValidateWithDatabase(res);
+            res.ValidationStatus = validationResult.IsValid ? "验证通过" : $"验证失败: {validationResult.Message}";
 
         }
+
+        /// <summary>
+        /// 与数据库中已有信息交叉校验
+        /// </summary>
+        private async Task<(bool IsValid, string Message)> ValidateWithDatabase(MedicalRecordDto record)
+        {
+            try
+            {
+                //if (!string.IsNullOrEmpty(record.FilmCheckNumber))
+                //{
+                //    var dbRecord = await _dal.QueryFirstOrDefaultAsync<MedicalRecordDto>(
+                //        "SELECT * FROM MedicalRecords WHERE FilmCheckNumber = @CheckNumber",
+                //        new { CheckNumber = record.FilmCheckNumber });
+
+                //    if (dbRecord != null)
+                //    {
+                //        var mismatches = new List<string>();
+
+                //        if (!string.Equals(record.PatientName, dbRecord.PatientName, StringComparison.OrdinalIgnoreCase))
+                //        {
+                //            mismatches.Add($"患者姓名不匹配 (OCR: {record.PatientName}, 数据库: {dbRecord.PatientName})");
+                //        }
+
+                //        if (!string.Equals(record.Gender, dbRecord.Gender, StringComparison.OrdinalIgnoreCase))
+                //        {
+                //            mismatches.Add($"性别不匹配 (OCR: {record.Gender}, 数据库: {dbRecord.Gender})");
+                //        }
+
+                //        if (mismatches.Count > 0)
+                //        {
+                //            return (false, string.Join("; ", mismatches));
+                //        }
+
+                //        if (string.IsNullOrEmpty(dbRecord.ReportNumber) && !string.IsNullOrEmpty(record.ReportNumber))
+                //        {
+                //            dbRecord.ReportNumber = record.ReportNumber;
+                //            await _dal.UpdateAsync(dbRecord);
+                //        }
+
+                //        return (true, "验证通过");
+                //    }
+                //}
+
+                return (true, "新记录，无匹配历史数据");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"数据库校验失败: {ex.Message}");
+                return (false, "数据库校验失败");
+            }
+        }
+
+        /// <summary>
+        /// 将识别结果保存到数据库
+        /// </summary>
+        public async Task SaveToDatabase(MedicalRecordDto record)
+        {
+            try
+            {
+                if (record == null)
+                    throw new ArgumentNullException(nameof(record));
+
+                //var existingRecord = await _dal.QueryFirstOrDefaultAsync<MedicalRecordDto>(
+                //    "SELECT * FROM MedicalRecords WHERE FilmCheckNumber = @CheckNumber",
+                //    new { CheckNumber = record.FilmCheckNumber });
+
+                //if (existingRecord != null)
+                //{
+                //    existingRecord.PatientName = record.PatientName ?? existingRecord.PatientName;
+                //    existingRecord.Gender = record.Gender ?? existingRecord.Gender;
+                //    existingRecord.Age = record.Age ?? existingRecord.Age;
+                //    existingRecord.ReportNumber = record.ReportNumber ?? existingRecord.ReportNumber;
+                //    existingRecord.ExamType = record.ExamType ?? existingRecord.ExamType;
+                //    existingRecord.ExamDate = record.ExamDate ?? existingRecord.ExamDate;
+                //    existingRecord.FullOcrText = record.FullOcrText;
+                //    existingRecord.ValidationStatus = record.ValidationStatus;
+                //    existingRecord.UpdateTime = DateTime.Now;
+
+                //    await _dal.UpdateAsync(existingRecord);
+                //}
+                //else
+                //{
+                //    record.CreateTime = DateTime.Now;
+                //    record.UpdateTime = DateTime.Now;
+                //    await _dal.InsertAsync(record);
+                //}
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"保存到数据库失败: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

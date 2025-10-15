@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Baidu.AI" Version="4.15.16" />
     <PackageReference Include="itext7" Version="9.3.0" />
+    <PackageReference Include="Pdfium.NET" Version="1.0.12" />
     <PackageReference Include="Quartz" Version="3.9.0" />
     <PackageReference Include="SqlSugarCore" Version="5.1.4.193" />
     <PackageReference Include="Tesseract" Version="5.2.0" />

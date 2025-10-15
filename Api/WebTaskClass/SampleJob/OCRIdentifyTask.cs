@@ -1,4 +1,6 @@
-﻿using MyNamespace;
+﻿using ModelClassLibrary.Model.Dto.TaskDto;
+using ModelClassLibrary.Model.HolModel;
+using MyNamespace;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -27,7 +29,20 @@ namespace WebTaskClass.SampleJob
         /// <returns></returns>
         public async Task Execute(IJobExecutionContext context)
         {
-           
+            var IsStartBaiduOCR = await _dal.Db.Queryable<HolOcrConfig>().FirstAsync();
+            MedicalRecordDto result;
+            if (IsStartBaiduOCR != null && IsStartBaiduOCR.is_enabled == 1 
+                && string.IsNullOrEmpty( IsStartBaiduOCR.api_key) 
+                &&string.IsNullOrEmpty( IsStartBaiduOCR.secret_key)  )//启用百度OCR
+            {
+
+            }
+            else//启用本地OCR
+            {
+
+            }
+
+
         }
     }
 }

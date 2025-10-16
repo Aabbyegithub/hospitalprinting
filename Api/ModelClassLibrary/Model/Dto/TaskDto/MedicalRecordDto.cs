@@ -37,14 +37,54 @@ namespace ModelClassLibrary.Model.Dto.TaskDto
         public string FilmCheckNumber { get; set; }
 
         /// <summary>
-        /// 报告编号
+        /// 门诊号
         /// </summary>
-        public string ReportNumber { get; set; }
+        public string OutpatientNumber { get; set; }
 
         /// <summary>
-        /// 检查类型
+        /// 住院号
+        /// </summary>
+        public string HospitalAdmissionNumber { get; set; }
+
+        /// <summary>
+        /// 床号
+        /// </summary>
+        public string BedNumber { get; set; }
+        /// <summary>
+        /// 送检医生
+        /// </summary>
+        public string ReferringDoctor { get; set; }
+
+        /// <summary>
+        /// 送检科室
+        /// </summary>
+        public string DepartmentInspection { get; set; }
+
+        /// <summary>
+        /// 检查部位
         /// </summary>
         public string ExamType { get; set; }
+        /// <summary>
+        /// 临床诊断
+        /// </summary>
+        public string ClinicalDiagnosis { get; set; }
+        /// <summary>
+        /// 影像所见
+        /// </summary>
+        public string ImagingFindings { get; set; }
+        /// <summary>
+        /// 诊断结论
+        /// </summary>
+        public string DiagnosisConclusion { get; set; }
+        /// <summary>
+        /// 报告医生
+        /// </summary>
+        public string ReportDoctor { get; set; }
+
+        /// <summary>
+        /// 审核医生
+        /// </summary>
+        public string ReviewingDoctor { get; set; }
 
         /// <summary>
         /// 检查日期

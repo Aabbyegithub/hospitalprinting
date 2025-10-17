@@ -16,15 +16,13 @@ namespace WebTaskClass.Common
     /// </summary>
     public class LocalTesseractOCR
     {
-        private readonly ISqlHelper _dal;
         private readonly string _tesseractDataPath;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public LocalTesseractOCR(ISqlHelper dal, string tesseractDataPath)
+        public LocalTesseractOCR( string tesseractDataPath)
         {
-            _dal = dal;
             _tesseractDataPath = tesseractDataPath;
         }
 

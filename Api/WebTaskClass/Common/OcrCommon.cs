@@ -16,15 +16,12 @@ namespace WebTaskClass.Common
     public class OcrCommon
     {
         private readonly Ocr _baiduOcrClient;
-        private readonly ISqlHelper _dal;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public OcrCommon(ISqlHelper dal, string apiKey, string secretKey)
+        public OcrCommon(string apiKey, string secretKey)
         {
-            _dal = dal;
-
             // 初始化百度OCR客户端
             _baiduOcrClient = new Ocr(apiKey, secretKey);
         }

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="fo-dicom" Version="5.2.4" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
       <PrivateAssets>all</PrivateAssets>
@@ -25,6 +26,10 @@
   <ItemGroup>
     <ProjectReference Include="..\WebIServices\WebIServices.csproj" />
     <ProjectReference Include="..\WebTaskClass\WebTaskClass.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\DICOMServices\" />
   </ItemGroup>
 
 </Project>

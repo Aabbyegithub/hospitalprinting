@@ -37,7 +37,7 @@ namespace WebTaskClass.SampleJob
                 && !string.IsNullOrEmpty( IsStartBaiduOCR.secret_key)  )//启用百度OCR
             {
                 var baiduOCR = new OcrCommon("HabweUEtyhlLjBqLCYMkyuEU","NriXrE1pr6wuxjQUT9XzmkxvuaAOvOHs");
-                res =await baiduOCR.RecognizeMedicalDocument($@"C:\Users\luqiang\xwechat_files\wxid_i2yjz038qi6222_e10b\msg\attach\9e20f478899dc29eb19741386f9343c8\2025-10\Rec\eb2e694444ad1caf\F\0\temp.pdf");
+                //res =await baiduOCR.RecognizeMedicalDocument($@"C:\Users\luqiang\xwechat_files\wxid_i2yjz038qi6222_e10b\msg\attach\9e20f478899dc29eb19741386f9343c8\2025-10\Rec\eb2e694444ad1caf\F\0\temp.pdf");
 
             }
             else//启用本地OCR
@@ -47,8 +47,8 @@ namespace WebTaskClass.SampleJob
             }
 
             // 与数据库中已有信息进行交叉校验
-            var validationResult = await ValidateWithDatabase(res);
-            res.ValidationStatus = validationResult.IsValid ? "验证通过" : $"验证失败: {validationResult.Message}";
+            //var validationResult = await ValidateWithDatabase(res);
+            //res.ValidationStatus = validationResult.IsValid ? "验证通过" : $"验证失败: {validationResult.Message}";
 
         }
 

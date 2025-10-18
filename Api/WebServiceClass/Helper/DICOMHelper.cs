@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebServiceClass.Services.DICOMServices
+namespace WebServiceClass.Helper
 {
-    public  class DICOMHelper
+    public class DICOMHelper
     {
         /// <summary>
         /// 解析 DICOM 文件并获取指定标签的内容
@@ -67,7 +67,7 @@ namespace WebServiceClass.Services.DICOMServices
 
                 DicomFile dicomFile = DicomFile.Open(filePath);
                 DicomImage dicomImage = new DicomImage(dicomFile.Dataset);
-                var bitmap =dicomImage.RenderImage().As<Bitmap>();
+                var bitmap = dicomImage.RenderImage().As<Bitmap>();
 
                 using (MemoryStream ms = new MemoryStream())
                 {

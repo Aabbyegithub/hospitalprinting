@@ -27,7 +27,7 @@ namespace WebProjectTest.Controllers.EquipmentController
         /// <param name="PrinterId"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResponse<List<HolPrinter>>> GetPrintConfigAsync(long PrinterId)
+        public async Task<ApiResponse<List<HolPrinterConfig>>> GetPrintConfigAsync(long PrinterId)
         {
             return await _equipmentServices.GetPrintConfigAsync(PrinterId);
         }

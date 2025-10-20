@@ -339,7 +339,6 @@ namespace WinSelfMachine
         {
             doubleClickCount = 0; // 重置双击计数
             resetDoubleClickTimer.Stop();
-            this.Text = "医院自助一体机"; // 恢复标题
         }
     }
 }

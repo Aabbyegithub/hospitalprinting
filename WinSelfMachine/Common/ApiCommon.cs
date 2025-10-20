@@ -15,10 +15,12 @@ namespace Common
         private IniFileHelper _iniConfig;
         private string _configFilePath;
         private string _Url;
+        private int _PrinterId;
         public ApiCommon() {
             _configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
             _iniConfig = new IniFileHelper(_configFilePath);
             _Url = _iniConfig.Read("EquipmentUrl", "SerUrl", "").TrimEnd('/');
+            _PrinterId =  _iniConfig.ReadInt("Printer", "PrinterId", -1);
             _httpClient = new HttpClient();
             _httpClient.Timeout = TimeSpan.FromSeconds(30);
         }
@@ -49,6 +51,22 @@ namespace Common
         {
             var res = "";
             var Response = await _httpClient.GetAsync($"{_Url}/api/Equipment/UpdatePrintStaus?PrinterId={PrinterId}&status={status}");
+            if (Response.IsSuccessStatusCode)
+            {
+                res = await Response.Content.ReadAsStringAsync();
+            }
+            return res;
+        }
+
+
+        /// <summary>
+        /// 获取打印机配置
+        /// </summary>
+        /// <returns></returns> 
+        public async Task<string> GetPrinterConfig()
+        {
+            var res = "";
+            var Response = await _httpClient.GetAsync($"{_Url}/api/Equipment/GetPrintConfig?PrinterId={_PrinterId}");
             if (Response.IsSuccessStatusCode)
             {
                 res = await Response.Content.ReadAsStringAsync();

@@ -23,7 +23,7 @@ namespace ModelClassLibrary.Model.HolModel
         public string? resolution { get; set; }
         public string? paper_size { get; set; }
         public string? location { get; set; }
-        public int status { get; set; } = 1;         // 1=启用,0=停用
+        public int status { get; set; } = 1; //状态：1=运行中, 0=未运行
         public long org_id { get; set; }
         public string? remark { get; set; }
         public DateTime create_time { get; set; }

@@ -296,7 +296,7 @@ namespace WebServiceClass.Services.HospitalServices
             try
             {
                 var rows = await _dal.Db.Deleteable<HolPrinterConfig>()
-                    .Where(a => a.printer_id == printerId && !string.IsNullOrEmpty(a.film_size))
+                    .Where(a => a.printer_id == printerId )
                     .ExecuteCommandAsync();
 
                 return rows > 0 ? Success("删除成功") : Error<string>("删除失败");

@@ -15,13 +15,19 @@ namespace WebIServices.IServices.EquipmentIServices
         /// </summary>
         /// <returns></returns>
         Task<ApiResponse<List<HolPrinter>>> GetDepartmentAsync();
+        
+        /// <summary>
+        /// 获取激光相机
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResponse<List<HolPrinter>>> GetLaserCameraAsync();
 
         /// <summary>
         /// 获取打印机配置
         /// </summary>
         /// <param name="PrinterId"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<HolPrinter>>> GetPrintConfigAsync(long PrinterId);
+        Task<ApiResponse<List<HolPrinterConfig>>> GetPrintConfigAsync(long PrinterId);
 
         /// <summary>
         /// 更新打印机使用状态
@@ -37,7 +43,7 @@ namespace WebIServices.IServices.EquipmentIServices
         /// <param name="PrinterId"></param>
         /// <param name="holPrinterConfigs"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> SavePrintConfigAsync(long PrinterId ,List<HolPrinterConfig> holPrinterConfigs);
+        Task<ApiResponse<bool>> SavePrintConfigAsync(long PrinterId ,int Type, int Action, HolPrinterConfig holPrinterConfigs);
 
     }
 }

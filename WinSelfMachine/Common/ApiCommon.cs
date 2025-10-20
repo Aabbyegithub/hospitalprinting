@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using WinSelfMachine.Common;
+using Newtonsoft.Json;
 
 namespace Common
 {
@@ -40,6 +41,21 @@ namespace Common
             return res;
         }
 
+        /// <summary>
+        /// 获取所有激光相机
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> GetPrinter()
+        {
+            var res = "";
+            var Response = await _httpClient.GetAsync($"{_Url}/api/Equipment/GetLaserCamera");
+            if (Response.IsSuccessStatusCode)
+            {
+                res = await Response.Content.ReadAsStringAsync();
+            }
+            return res;
+        }
+
 
         /// <summary>
         /// 修改打印机状态
@@ -67,6 +83,54 @@ namespace Common
         {
             var res = "";
             var Response = await _httpClient.GetAsync($"{_Url}/api/Equipment/GetPrintConfig?PrinterId={_PrinterId}");
+            if (Response.IsSuccessStatusCode)
+            {
+                res = await Response.Content.ReadAsStringAsync();
+            }
+            return res;
+        }
+
+
+        public async Task<string> SavePrinterConfig(int type,int action,  HolPrinterConfig holPrinterConfigs)
+        {
+            var res = "";
+            var json = JsonConvert.SerializeObject(holPrinterConfigs ?? new HolPrinterConfig());
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var Response = await _httpClient.PostAsync($"{_Url}/api/Equipment/SavePrintConfig?PrinterId={_PrinterId}&Type={type}&Action={action}", content);
+            if (Response.IsSuccessStatusCode)
+            {
+                res = await Response.Content.ReadAsStringAsync();
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// 根据检查号获取检查数据
+        /// </summary>
+        /// <param name="examNo">检查号</param>
+        /// <returns></returns>
+        public async Task<string> GetExaminationByNo(string examNo)
+        {
+            var res = "";
+            var Response = await _httpClient.GetAsync($"{_Url}/api/Examination/GetByExamNo?examNo={examNo}");
+            if (Response.IsSuccessStatusCode)
+            {
+                res = await Response.Content.ReadAsStringAsync();
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// 保存打印记录
+        /// </summary>
+        /// <param name="printRecord">打印记录</param>
+        /// <returns></returns>
+        public async Task<string> SavePrintRecord(PrintRecordModel printRecord)
+        {
+            var res = "";
+            var json = JsonConvert.SerializeObject(printRecord);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var Response = await _httpClient.PostAsync($"{_Url}/api/Print/SavePrintRecord", content);
             if (Response.IsSuccessStatusCode)
             {
                 res = await Response.Content.ReadAsStringAsync();

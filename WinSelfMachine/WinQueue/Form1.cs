@@ -1,20 +1,30 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinSelfMachine;
+using WinSelfMachine.Common;
 
 namespace WinQueue
 {
     public partial class Form1 : Form
     {
+        private IniFileHelper _iniConfig;
+        private string _configFilePath;
+        private readonly ApiCommon _apiCommon;
         public Form1()
         {
+            _configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
+            _iniConfig = new IniFileHelper(_configFilePath);
             InitializeComponent();
+            _apiCommon = new ApiCommon();
             richTextBox1.SelectionAlignment = HorizontalAlignment.Center;
         }
 
@@ -33,6 +43,13 @@ namespace WinQueue
                 this.Size = targetScreen.WorkingArea.Size;
             }
             // 如果只有一块屏幕，正常显示
+
+            var IsStart = _iniConfig.ReadInt("EquipmentIsStart", "IsStart", 0);
+            if (IsStart == 0)
+            {
+                var Setting = new FormProInitialize();
+                Setting.ShowDialog();
+            }
         }
     }
 }

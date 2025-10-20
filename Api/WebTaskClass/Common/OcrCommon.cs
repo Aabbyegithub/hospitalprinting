@@ -16,15 +16,12 @@ namespace WebTaskClass.Common
     public class OcrCommon
     {
         private readonly Ocr _baiduOcrClient;
-        private readonly ISqlHelper _dal;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public OcrCommon(ISqlHelper dal, string apiKey, string secretKey)
+        public OcrCommon(string apiKey, string secretKey)
         {
-            _dal = dal;
-
             // 初始化百度OCR客户端
             _baiduOcrClient = new Ocr(apiKey, secretKey);
         }
@@ -148,15 +145,27 @@ namespace WebTaskClass.Common
 
             result.Age = ExtractValue(textContent, @"年龄[:：\s]*(\d+岁?)");
 
-            result.FilmCheckNumber = ExtractValue(textContent, @"胶片检查号[:：\s]*([A-Z0-9]+)");
+            result.FilmCheckNumber = ExtractValue(textContent, @"检查号[:：\s]*([A-Z0-9]+)");
             result.FilmCheckNumber ??= ExtractValue(textContent, @"检查编号[:：\s]*([A-Z0-9]+)");
 
-            result.ReportNumber = ExtractValue(textContent, @"报告编号[:：\s]*([A-Z0-9]+)");
+            result.OutpatientNumber = ExtractValue(textContent, @"门诊号[:：\s]*([A-Z0-9]+)");
+            result.HospitalAdmissionNumber = ExtractValue(textContent, @"住院号[:：\s]*([A-Z0-9]+)");
+            result.BedNumber = ExtractValue(textContent, @"床号[:：\s]*([A-Z0-9]+)");
+            result.ReferringDoctor = ExtractValue(textContent, @"送检医生[:：\s]*([^\n]+)");
+            result.DepartmentInspection = ExtractValue(textContent, @"送检科室[:：\s]*([^\n]+)");
+            result.ClinicalDiagnosis = ExtractValue(textContent, @"临床诊断[:：\s]*([^\n]+)");
+            // 影像所见（匹配到“诊断结论”前的所有内容）
+            result.ImagingFindings = ExtractValue(textContent, @"影像所见[:：\s]*([\s\S]+?)(?=诊断结论|$)");
+
+            // 诊断结论（匹配到“报告日期”前的所有内容）
+            result.DiagnosisConclusion = ExtractValue(textContent, @"诊断结论[:：\s]*([\s\S]+?)(?=报告日期|$)");
+            result.ReportDoctor = ExtractValue(textContent, @"报告医生[:：\s]*([^\n]+)");
+            result.ReviewingDoctor = ExtractValue(textContent, @"审核医生[:：\s]*([^\n]+)");
 
             result.ExamType = ExtractValue(textContent, @"检查类型[:：\s]*([^\n]+)");
-            result.ExamType ??= ExtractValue(textContent, @"检查项目[:：\s]*([^\n]+)");
+            result.ExamType ??= ExtractValue(textContent, @"检查部位[:：\s]*([^\n]+)");
 
-            if (DateTime.TryParse(ExtractValue(textContent, @"检查日期[:：\s]*(\d{4}[年/-]\d{1,2}[月/-]\d{1,2}[日]?)"), out DateTime examDate))
+            if (DateTime.TryParse(ExtractValue(textContent, @"报告日期[:：\s]*(\d{4}[年/-]\d{1,2}[月/-]\d{1,2}[日]?)"), out DateTime examDate))
             {
                 result.ExamDate = examDate;
             }

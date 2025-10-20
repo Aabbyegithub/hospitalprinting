@@ -43,6 +43,11 @@ namespace WinSelfMachine.Controls
                 tbContent.MouseEnter += (s, e) => { isHovered = true; Invalidate(); };
                 tbContent.MouseLeave += (s, e) => { isHovered = false; Invalidate(); };
                 
+                // 转发键盘事件
+                tbContent.KeyPress += (s, e) => OnKeyPress(e);
+                tbContent.KeyDown += (s, e) => OnKeyDown(e);
+                tbContent.KeyUp += (s, e) => OnKeyUp(e);
+                
                 // 初始布局
                 LayoutTextBox();
             }

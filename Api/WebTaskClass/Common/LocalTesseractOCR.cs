@@ -16,15 +16,13 @@ namespace WebTaskClass.Common
     /// </summary>
     public class LocalTesseractOCR
     {
-        private readonly ISqlHelper _dal;
         private readonly string _tesseractDataPath;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public LocalTesseractOCR(ISqlHelper dal, string tesseractDataPath)
+        public LocalTesseractOCR( string tesseractDataPath)
         {
-            _dal = dal;
             _tesseractDataPath = tesseractDataPath;
         }
 
@@ -149,15 +147,24 @@ namespace WebTaskClass.Common
 
             result.Age = ExtractValue(ocrText, @"年龄[:：\s]*(\d+岁?)");
 
-            result.FilmCheckNumber = ExtractValue(ocrText, @"胶片检查号[:：\s]*([A-Z0-9]+)");
+            result.FilmCheckNumber = ExtractValue(ocrText, @"检查号[:：\s]*([A-Z0-9]+)");
             result.FilmCheckNumber ??= ExtractValue(ocrText, @"检查编号[:：\s]*([A-Z0-9]+)");
 
-            result.ReportNumber = ExtractValue(ocrText, @"报告编号[:：\s]*([A-Z0-9]+)");
+            result.OutpatientNumber = ExtractValue(ocrText, @"门诊号[:：\s]*([A-Z0-9]+)");
+            result.HospitalAdmissionNumber = ExtractValue(ocrText, @"住院号[:：\s]*([A-Z0-9]+)");
+            result.BedNumber = ExtractValue(ocrText, @"床号[:：\s]*([A-Z0-9]+)");
+            result.ReferringDoctor = ExtractValue(ocrText, @"送检医生[:：\s]*([^\n]+)");
+            result.DepartmentInspection = ExtractValue(ocrText, @"送检科室[:：\s]*([^\n]+)");
+            result.ClinicalDiagnosis = ExtractValue(ocrText, @"临床诊断[:：\s]*([^\n]+)");
+            result.ImagingFindings = ExtractValue(ocrText, @"影像所见[:：\s]*([^\n]+)");
+            result.DiagnosisConclusion = ExtractValue(ocrText, @"诊断结论[:：\s]*([^\n]+)");
+            result.ReportDoctor = ExtractValue(ocrText, @"报告医生[:：\s]*([^\n]+)");
+            result.ReviewingDoctor = ExtractValue(ocrText, @"审核医生[:：\s]*([^\n]+)");
 
             result.ExamType = ExtractValue(ocrText, @"检查类型[:：\s]*([^\n]+)");
-            result.ExamType ??= ExtractValue(ocrText, @"检查项目[:：\s]*([^\n]+)");
+            result.ExamType ??= ExtractValue(ocrText, @"检查部位[:：\s]*([^\n]+)");
 
-            if (DateTime.TryParse(ExtractValue(ocrText, @"检查日期[:：\s]*(\d{4}[年/-]\d{1,2}[月/-]\d{1,2}[日]?)"), out DateTime examDate))
+            if (DateTime.TryParse(ExtractValue(ocrText, @"报告日期[:：\s]*(\d{4}[年/-]\d{1,2}[月/-]\d{1,2}[日]?)"), out DateTime examDate))
             {
                 result.ExamDate = examDate;
             }

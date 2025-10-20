@@ -33,22 +33,22 @@ namespace WebTaskClass.SampleJob
             var IsStartBaiduOCR = await _dal.Db.Queryable<HolOcrConfig>().FirstAsync();
             MedicalRecordDto res;
             if (IsStartBaiduOCR != null && IsStartBaiduOCR.is_enabled == 1 
-                && string.IsNullOrEmpty( IsStartBaiduOCR.api_key) 
-                &&string.IsNullOrEmpty( IsStartBaiduOCR.secret_key)  )//启用百度OCR
+                && !string.IsNullOrEmpty( IsStartBaiduOCR.api_key) 
+                && !string.IsNullOrEmpty( IsStartBaiduOCR.secret_key)  )//启用百度OCR
             {
-                var baiduOCR = new OcrCommon(_dal, IsStartBaiduOCR.api_key, IsStartBaiduOCR.secret_key);
-                res =await baiduOCR.RecognizeMedicalDocument("");
+                var baiduOCR = new OcrCommon("HabweUEtyhlLjBqLCYMkyuEU","NriXrE1pr6wuxjQUT9XzmkxvuaAOvOHs");
+                //res =await baiduOCR.RecognizeMedicalDocument($@"C:\Users\luqiang\xwechat_files\wxid_i2yjz038qi6222_e10b\msg\attach\9e20f478899dc29eb19741386f9343c8\2025-10\Rec\eb2e694444ad1caf\F\0\temp.pdf");
 
             }
             else//启用本地OCR
             {
-                var localhostOCR =new LocalTesseractOCR(_dal,"");
+                var localhostOCR =new LocalTesseractOCR("");
                 res =await localhostOCR.RecognizeMedicalDocument("");
             }
 
             // 与数据库中已有信息进行交叉校验
-            var validationResult = await ValidateWithDatabase(res);
-            res.ValidationStatus = validationResult.IsValid ? "验证通过" : $"验证失败: {validationResult.Message}";
+            //var validationResult = await ValidateWithDatabase(res);
+            //res.ValidationStatus = validationResult.IsValid ? "验证通过" : $"验证失败: {validationResult.Message}";
 
         }
 

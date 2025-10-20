@@ -36,6 +36,9 @@
     <ApplicationIcon>printer_22801.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="SqlSugar, Version=5.1.4.204, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SqlSugar.5.1.4.204\lib\SqlSugar.dll</HintPath>
     </Reference>
@@ -55,7 +58,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\CommonList.cs" />
-    <Compile Include="Common\SqlSugarClientFactory.cs" />
     <Compile Include="Controls\3DButton.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -137,6 +139,12 @@
     <Compile Include="FormPrintSetting.Designer.cs">
       <DependentUpon>FormPrintSetting.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormProInitialize.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormProInitialize.Designer.cs">
+      <DependentUpon>FormProInitialize.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormWaitTime.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -145,6 +153,7 @@
     </Compile>
     <Compile Include="Model\HolExamination.cs" />
     <Compile Include="Model\HolPatient.cs" />
+    <Compile Include="Model\HolPrinter.cs" />
     <Compile Include="Model\PrintRecordModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -165,6 +174,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormPrintSetting.resx">
       <DependentUpon>FormPrintSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormProInitialize.resx">
+      <DependentUpon>FormProInitialize.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormWaitTime.resx">
       <DependentUpon>FormWaitTime.cs</DependentUpon>
@@ -195,6 +207,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="printer_22801.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{D5054155-0535-463A-A3E6-E6790AF7C0C4}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

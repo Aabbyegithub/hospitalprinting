@@ -1,13 +1,16 @@
-﻿using Microsoft.SqlServer.Server;
+﻿using Common;
+using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinSelfMachine.Common;
 using WinSelfMachine.Controls;
 
 namespace WinSelfMachine
@@ -23,9 +26,22 @@ namespace WinSelfMachine
 		private float _roundTextBox1FontSize;
 		private float _label2FontSize;
 
+        private IniFileHelper _iniConfig;
+        private string _configFilePath;
+        private readonly ApiCommon _apiCommon;
+        
+        // 防误触机制：需要双击五次才能触发
+        private int doubleClickCount = 0;
+        private const int requiredDoubleClicks = 5;
+        private Timer resetDoubleClickTimer;
+        private const int resetDoubleClickInterval = 10000; // 3秒后重置计数
+
         public Form1()
         {
             InitializeComponent();
+            _configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
+            _iniConfig = new IniFileHelper(_configFilePath);
+             _apiCommon = new ApiCommon();
             this.Resize += Form1_Resize;
            
 
@@ -44,9 +60,30 @@ namespace WinSelfMachine
 			_captureDesignMetrics();
 			ApplyResponsiveLayout();
             Txtbr.Focus();
+            
+            // 初始化双击防误触计时器
+            resetDoubleClickTimer = new Timer();
+            resetDoubleClickTimer.Interval = resetDoubleClickInterval;
+            resetDoubleClickTimer.Tick += ResetDoubleClickTimer_Tick;
         }
 
+        private async void Form1_Load(object sender, EventArgs e)
+        {
+            var IsStart = _iniConfig.ReadInt("EquipmentIsStart", "IsStart", 0);
+            if (IsStart == 0)
+            {
+                var Setting = new FormProInitialize();
+                Setting.ShowDialog();
+            }
+            var SerUrl = _iniConfig.Read("EquipmentUrl", "SerUrl", "");
+            var PrinterId = _iniConfig.ReadInt("Printer", "PrinterId", -1);
 
+            if (!string.IsNullOrEmpty(SerUrl) && PrinterId != -1)
+            {
+                await _apiCommon.UpdatePrinterStatus(PrinterId, 1);
+            }
+
+        }
         /// <summary>
         ///主界面控件
         /// </summary>
@@ -62,6 +99,7 @@ namespace WinSelfMachine
                 BtnWaitTime.Visible = visible;
                 BtnAvailableFilm.Visible = visible;
                 BtnClose.Visible = visible;
+                BtnSetting.Visible = visible;
             }
             finally
             {
@@ -90,6 +128,27 @@ namespace WinSelfMachine
         /// </summary>
         private void Form1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+            // 增加双击计数
+            doubleClickCount++;
+            
+            // 重置计时器
+            resetDoubleClickTimer.Stop();
+            resetDoubleClickTimer.Start();
+            
+            // 显示当前点击进度
+            this.Text = $"医院自助一体机 - 双击进度: {doubleClickCount}/{requiredDoubleClicks}";
+            
+            // 只有达到要求的双击次数才执行操作
+            if (doubleClickCount < requiredDoubleClicks)
+            {
+                return; // 未达到要求次数，直接返回
+            }
+            
+            // 重置计数
+            doubleClickCount = 0;
+            resetDoubleClickTimer.Stop();
+            this.Text = "医院自助一体机"; // 恢复标题
+            
             // 仅响应靠近顶部的双击（阈值像素）
             const int topThreshold = 40; // 可根据实际 UI 调整
             const int leftThreshold = 40; // 左侧阈值
@@ -155,6 +214,17 @@ namespace WinSelfMachine
         }
 
         /// <summary>
+        /// 启动设置
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnSetting_Click(object sender, EventArgs e)
+        {
+            var ProInitialize = new FormProInitialize();
+            ProInitialize.ShowDialog();
+        }
+
+        /// <summary>
         /// 用户按下F11后显示设置
         /// </summary>
         /// <param name="sender"></param>
@@ -173,8 +243,15 @@ namespace WinSelfMachine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BtnClose_Click(object sender, EventArgs e)
+        private async void BtnClose_Click(object sender, EventArgs e)
         {
+            var SerUrl = _iniConfig.Read("EquipmentUrl", "SerUrl", "");
+            var PrinterId =  _iniConfig.ReadInt("Printer", "PrinterId", -1);
+
+            if (!string.IsNullOrEmpty(SerUrl) && PrinterId != -1)
+            {
+                await _apiCommon.UpdatePrinterStatus(PrinterId,0);
+            }
             Close();
         }
 
@@ -240,5 +317,29 @@ namespace WinSelfMachine
 			// 始终水平居中
 			label2.Left = Math.Max(0, (this.ClientSize.Width - label2.Width) / 2);
 		}
+
+        /// <summary>
+        /// 触发打印
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+         private void Txtbr_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar != '\r' || Txtbr.Text.Trim() == "") return;
+
+            Txtbr.Text = "";
+        }
+        
+        /// <summary>
+        /// 重置双击计数计时器事件处理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ResetDoubleClickTimer_Tick(object sender, EventArgs e)
+        {
+            doubleClickCount = 0; // 重置双击计数
+            resetDoubleClickTimer.Stop();
+            this.Text = "医院自助一体机"; // 恢复标题
+        }
     }
 }

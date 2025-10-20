@@ -28,9 +28,9 @@
       <el-table-column v-if="props.type !== 2" prop="resolution" label="胶片尺寸" align="center" />
       <!-- <el-table-column v-if="props.type === 2" prop="available_count" label="可用数量" align="center" /> -->
       <el-table-column v-if="props.type !== 2" prop="paper_size" label="纸张" align="center" />
-      <el-table-column label="状态" align="center" width="100">
+      <el-table-column label="运行状态" align="center" width="100">
         <template #default="scope">
-          <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">{{ scope.row.status === 1 ? '启用' : '停用' }}</el-tag>
+          <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">{{ scope.row.status === 1 ? '运行中' : '未运行' }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="location" label="位置" align="center" />
@@ -39,7 +39,7 @@
         <template #default="scope">
           <el-button type="text" style="color:#67c23a" @click="openEdit(scope.row)">编辑</el-button>
           <el-button type="text" style="color:#67c23a" @click="openConfig(scope.row)">配置</el-button>
-          <el-button type="text" style="color:#409eff" @click="toggleStatus(scope.row)">{{ scope.row.status === 1 ? '停用' : '启用' }}</el-button>
+          <!-- <el-button type="text" style="color:#409eff" @click="toggleStatus(scope.row)">{{ scope.row.status === 1 ? '停用' : '启用' }}</el-button> -->
           <!-- <el-button type="text" style="color:#409eff" @click="testPrint(scope.row)">测试打印</el-button> -->
           <el-button v-if="props.type === 4" type="text" style="color:#e6a23c" @click="testConnectivity(scope.row)">测试连通</el-button>
           <el-button type="text" style="color:#f56c6c" @click="handleDelete(scope.row)">删除</el-button>

@@ -146,7 +146,7 @@ namespace WinSelfMachine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async Task BtnSave_Click(object sender, EventArgs e)
+        private async void BtnSave_Click(object sender, EventArgs e)
         {
             try
             {

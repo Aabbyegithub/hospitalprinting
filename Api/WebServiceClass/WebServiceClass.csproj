@@ -29,8 +29,4 @@
     <ProjectReference Include="..\WebTaskClass\WebTaskClass.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\DICOMServices\" />
-  </ItemGroup>
-
 </Project>

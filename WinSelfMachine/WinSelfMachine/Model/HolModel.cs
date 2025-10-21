@@ -21,5 +21,16 @@ namespace WinSelfMachine.Model
             public string Size { get; set; }
             public int PageSum { get; set; }
         }
+
+
+        /// <summary>
+        /// 打印机配置类
+        /// </summary>
+        public class PrinterConfiguration
+        {
+            public string PrinterName { get; set; }
+            public string PaperSize { get; set; }
+            public List<HolPrinterConfig> Configs { get; set; }
+        }
     }
 }

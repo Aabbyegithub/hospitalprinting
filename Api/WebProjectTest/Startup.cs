@@ -52,6 +52,9 @@ namespace WebProjectTest
                 options.InstanceName = "RedisInstance";
             });
 
+            //注册获取配置文件
+            services.AddScoped<IAppSettinghelper, WebAppConfig>();
+
             //注入Service
             services.Scan(scan =>
             scan.FromAssemblies(Assembly.Load("WebIServices"),Assembly.Load("WebServiceClass"),Assembly.Load("ModelClassLibrary"), typeof(Class1).Assembly) // 添加更多程序集

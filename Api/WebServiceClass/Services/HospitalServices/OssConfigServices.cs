@@ -5,6 +5,7 @@ using System.Text;
 using WebIServices.IBase;
 using WebIServices.IServices.HospitalIServices;
 using Aliyun.OSS;
+using MyNamespace;
 
 namespace WebServiceClass.Services.HospitalServices
 {
@@ -179,19 +180,22 @@ namespace WebServiceClass.Services.HospitalServices
                 if (config.is_enabled != 1)
                     return Error<string>("OSS功能未启用");
 
-                if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
-                    return Error<string>("文件不存在");
+                // 处理文件路径 - 从URL转换为本地路径
+                string actualFilePath = ConvertUrlToLocalPath(filePath);
+
+                if (string.IsNullOrEmpty(actualFilePath) || !File.Exists(actualFilePath))
+                    return Error<string>($"文件不存在: {actualFilePath}");
 
                 // 创建OSS客户端
                 var client = new OssClient(config.endpoint, config.access_key_id, config.access_key_secret);
 
-                // 生成OSS对象键
-                var objectKey = $"{config.folder_prefix ?? "examinations"}/{examId}/{fileName}";
+                // 生成OSS对象键，使用患者姓名和日期
+                var objectKey = await GenerateObjectKeyWithPatientName(examId, fileName, config.folder_prefix);
 
                 // 上传文件
                 var result = await Task.Run(() =>
                 {
-                    return client.PutObject(config.bucket_name, objectKey, filePath);
+                    return client.PutObject(config.bucket_name, objectKey, actualFilePath);
                 });
 
                 if (result != null)
@@ -210,5 +214,79 @@ namespace WebServiceClass.Services.HospitalServices
                 return Error<string>($"文件上传失败：{e.Message}");
             }
         }
+        /// <summary>
+        /// 从URL路径转换为本地文件路径
+        /// </summary>
+        private string ConvertUrlToLocalPath(string filePath)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(filePath))
+                    return string.Empty;
+
+                // 如果已经是本地路径，直接返回
+                if (File.Exists(filePath))
+                    return filePath;
+
+                // 如果是URL路径，转换为本地路径
+                if (filePath.StartsWith("http://") || filePath.StartsWith("https://"))
+                {
+                    var uri = new Uri(filePath);
+                    var pathSegments = uri.AbsolutePath.TrimStart('/').Split('/');
+
+                    // 尝试Windows路径
+                    var windowsPath = Path.Combine("D:/uploads/images", string.Join("/", pathSegments));
+                    if (File.Exists(windowsPath))
+                        return windowsPath;
+
+                    // 尝试Linux路径
+                    var linuxPath = Path.Combine("/var/uploads/images", string.Join("/", pathSegments));
+                    if (File.Exists(linuxPath))
+                        return linuxPath;
+                }
+
+                return string.Empty;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+        /// <summary>
+        /// 生成OSS对象键（使用患者姓名和日期）
+        /// </summary>
+        private async Task<string> GenerateObjectKeyWithPatientName(long examId, string originalFileName, string folderPrefix)
+        {
+            try
+            {
+                // 获取检查记录信息
+                var exam = await _dal.Db.Queryable<HolExamination>()
+                    .Includes(x => x.patient)
+                    .Where(x => x.id == examId)
+                    .FirstAsync();
+
+                if (exam?.patient != null)
+                {
+                    // 使用患者姓名和日期生成文件名
+                    var patientName = exam.patient.name ?? "Unknown";
+                    var examDate = exam.exam_date.ToString("yyyyMMdd");
+                    var fileExtension = Path.GetExtension(originalFileName);
+                    var newFileName = $"{patientName}_{examDate}_{examId}{fileExtension}";
+
+                    return $"{folderPrefix ?? "examinations"}/{patientName}/{newFileName}";
+                }
+                else
+                {
+                    // 如果无法获取患者信息，使用原始文件名
+                    return $"{folderPrefix ?? "examinations"}/{examId}/{originalFileName}";
+                }
+            }
+            catch (Exception)
+            {
+                // 出错时使用原始文件名
+                return $"{folderPrefix ?? "examinations"}/{examId}/{originalFileName}";
+            }
+        }
+        
     }
 }

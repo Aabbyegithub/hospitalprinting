@@ -22,12 +22,22 @@ namespace WebProjectTest.Controllers.EquipmentController
         }
 
         /// <summary>
+        /// 获取激光相机
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResponse<List<HolPrinter>>> GetLaserCameraAsync()
+        {
+            return await _equipmentServices.GetLaserCameraAsync();
+        }
+
+        /// <summary>
         /// 获取打印机配置
         /// </summary>
         /// <param name="PrinterId"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResponse<List<HolPrinter>>> GetPrintConfigAsync(long PrinterId)
+        public async Task<ApiResponse<List<HolPrinterConfig>>> GetPrintConfigAsync(long PrinterId)
         {
             return await _equipmentServices.GetPrintConfigAsync(PrinterId);
         }
@@ -51,9 +61,9 @@ namespace WebProjectTest.Controllers.EquipmentController
         /// <param name="holPrinterConfigs"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResponse<bool>> SavePrintConfigAsync(long PrinterId ,List<HolPrinterConfig> holPrinterConfigs)
+        public async Task<ApiResponse<bool>> SavePrintConfigAsync(long PrinterId,int Type, int Action, HolPrinterConfig holPrinterConfigs)
         {
-            return await _equipmentServices.SavePrintConfigAsync(PrinterId,holPrinterConfigs);
+            return await _equipmentServices.SavePrintConfigAsync(PrinterId,Type, Action, holPrinterConfigs);
         }
     }
 }

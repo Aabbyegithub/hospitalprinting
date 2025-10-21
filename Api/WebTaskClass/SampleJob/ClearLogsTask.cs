@@ -12,6 +12,7 @@ namespace WebTaskClass.SampleJob
     public class ClearLogsTask:IJob
     {
         private readonly ISqlHelper _dal;
+
         public ClearLogsTask(ISqlHelper dal)
         {
             _dal = dal;

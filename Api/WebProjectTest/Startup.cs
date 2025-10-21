@@ -15,7 +15,6 @@ using WebProjectTest.Common;
 using WebServiceClass.Base;
 using WebServiceClass.Helper;
 using WebServiceClass.QuartzTask;
-using WebTaskClass.SampleJob;
 
 namespace WebProjectTest
 {
@@ -76,6 +75,7 @@ namespace WebProjectTest
                     services.AddTransient(jobType);
                 }
             }
+
 
             // 配置JWT认证
             var key = Encoding.UTF8.GetBytes(SecureKeyGenerator.GenerateSecureKey()); // 请替换为安全的密钥

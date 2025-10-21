@@ -23,7 +23,7 @@
       <el-table-column prop="model" label="型号" align="center" />
       <el-table-column prop="ip_address" label="IP/主机名" align="center" />
       <el-table-column prop="port" label="端口" width="80" align="center" />
-      <el-table-column prop="server_url" label="服务器URL" align="center" width="180" />
+      <el-table-column v-if="props.type !== 4"prop="server_url" label="服务器URL" align="center" width="180" />
       <!-- <el-table-column v-if="props.type === 2" prop="film_size" label="胶片尺寸" align="center" /> -->
       <el-table-column v-if="props.type !== 2" prop="resolution" label="胶片尺寸" align="center" />
       <!-- <el-table-column v-if="props.type === 2" prop="available_count" label="可用数量" align="center" /> -->

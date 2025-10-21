@@ -17,6 +17,7 @@ using ModelClassLibrary.Model.HolModel;
 using Newtonsoft.Json;
 using static Common.Response;
 using MyNamespace;
+using static WinSelfMachine.Model.HolModel;
 
 namespace WinSelfMachine
 {
@@ -1223,18 +1224,9 @@ namespace WinSelfMachine
             catch (Exception ex)
             {
                 // 打印记录保存失败不影响打印流程，只记录错误
-                System.Diagnostics.Debug.WriteLine($"保存打印记录失败：{ex.Message}");
+                Debug.WriteLine($"保存打印记录失败：{ex.Message}");
             }
         }
 
-        /// <summary>
-        /// 打印机配置类
-        /// </summary>
-        public class PrinterConfiguration
-        {
-            public string PrinterName { get; set; }
-            public string PaperSize { get; set; }
-            public List<HolPrinterConfig> Configs { get; set; }
-        }
     }
 }

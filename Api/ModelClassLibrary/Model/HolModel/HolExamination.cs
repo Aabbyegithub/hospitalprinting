@@ -96,6 +96,11 @@ namespace MyNamespace
         public int is_printed { get; set; } = 0;
 
         /// <summary>
+        /// 是否已上传云端 0未上传1已上传
+        /// </summary>
+        public int is_upload { get; set; } = 0;
+
+        /// <summary>
         /// 导航属性：对应的患者信息
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(patient_id))]

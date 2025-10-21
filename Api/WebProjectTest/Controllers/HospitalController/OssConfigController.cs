@@ -13,7 +13,7 @@ namespace WebProjectTest.Controllers.HospitalController
     [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
-    public class AliyunOssConfigController(IOssConfigServices ossConfigService, IRedisCacheService redisCacheService) : AutherController(redisCacheService)
+    public class OssConfigController(IOssConfigServices ossConfigService, IRedisCacheService redisCacheService) : AutherController(redisCacheService)
     {
         /// <summary>
         /// 获取OSS配置

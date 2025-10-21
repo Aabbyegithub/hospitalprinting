@@ -14,8 +14,4 @@
     <ProjectReference Include="..\ModelClassLibrary\ModelClassLibrary.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="IServices\DICOMIServices\" />
-  </ItemGroup>
-
 </Project>

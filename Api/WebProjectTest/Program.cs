@@ -6,8 +6,8 @@ using WebProjectTest;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.Configure<AppSettingsSection>(builder.Configuration.GetSection("SqlServer"));
-// ÊÖ¶¯Ä£ÄâStartupµÄÅäÖÃÂß¼­
-// ×¢Òâ£ºÒÔÏÂ´úÂë½ö×÷ÎªÑİÊ¾ÈçºÎÄ£Äâ¾ÉÁ÷³Ì£¬Êµ¼ÊÓ¦ÓÃÖĞÓ¦ÓÅÏÈ¿¼ÂÇÖ±½ÓÔÚProgram.csÖĞÅäÖÃ
+// ï¿½Ö¶ï¿½Ä£ï¿½ï¿½Startupï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½
+// ×¢ï¿½â£ºï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì£ï¿½Êµï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½È¿ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Program.csï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 var startup = new Startup(builder.Configuration);
 
 startup.ConfigureServices(builder.Services);
@@ -22,7 +22,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-startup.Configure(app,builder.Environment);
+startup.Configure(app,builder.Environment,app.Services);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

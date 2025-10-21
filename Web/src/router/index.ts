@@ -106,6 +106,11 @@ const routes = [
             name: 'OssConfigManagement',
             component: () => import('../views/Menu/BackendHome/Hospital/OssConfigManagement.vue') 
           },
+          { 
+            path: 'DbConnectionManagement', 
+            name: 'DbConnectionManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/DbConnectionManagement.vue') 
+          },
           
         ]
        },

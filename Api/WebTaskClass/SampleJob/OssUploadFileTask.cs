@@ -1,7 +1,9 @@
 ﻿using Aliyun.OSS;
+using Microsoft.Identity.Client;
 using ModelClassLibrary.Model.HolModel;
 using MyNamespace;
 using Quartz;
+using SqlSugar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +17,12 @@ namespace WebTaskClass.SampleJob
     public class OssUploadFileTask : IJob
     {
         private readonly ISqlHelper _dal;
-        public OssUploadFileTask(ISqlHelper dal)
+        private readonly IAppSettinghelper _appconfig;
+
+        public OssUploadFileTask(ISqlHelper dal, IAppSettinghelper appconfig)
         {
             _dal = dal;
+            _appconfig = appconfig;
         }
         /// <summary>
         /// 获取OSS配置
@@ -68,6 +73,7 @@ namespace WebTaskClass.SampleJob
         {
             try
             {
+                var Bathcount = _appconfig.Get("Bathcount:Bathcount");
                 // 获取OSS配置
                 var configResponse = await GetConfigAsync(1);
                 if (!configResponse.success || configResponse.Response == null)
@@ -92,7 +98,7 @@ namespace WebTaskClass.SampleJob
                     .Where(x => x.org_id == 1 && x.is_upload == 0 && x.status == 1)
                     .OrderBy(x => x.create_time)
                     .ToListAsync();
-
+                
                 result.TotalCount = unuploadedExams.Count;
 
                 if (result.TotalCount == 0)
@@ -104,9 +110,9 @@ namespace WebTaskClass.SampleJob
                 var client = new OssClient(config.endpoint, config.access_key_id, config.access_key_secret);
 
                 // 分批处理
-                for (int i = 0; i < unuploadedExams.Count; i += 10)
+                for (int i = 0; i < unuploadedExams.Count; i += Bathcount.ObjToInt())
                 {
-                    var batch = unuploadedExams.Skip(i).Take(10).ToList();
+                    var batch = unuploadedExams.Skip(i).Take(Bathcount.ObjToInt()).ToList();
 
                     foreach (var exam in batch)
                     {

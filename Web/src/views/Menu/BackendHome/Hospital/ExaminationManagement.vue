@@ -139,6 +139,7 @@
                 解锁
               </el-button>
               <el-button type="text" style="color: #f56c6c;" @click="handleDelete(scope.row)">删除</el-button>
+              <el-button type="text" style="color: #67c23a;" @click="handleUploadToCloud(scope.row)">上传云端</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -305,6 +306,7 @@ import { ElSelect, ElInput, ElButton, ElTable, ElTableColumn, ElPagination, ElTa
 import { addExaminationApi, deleteExaminationApi, editExaminationApi, getExaminationList, printExaminationApi, unlockPrintApi } from '../../../../api/examination';
 import { getPatientList } from '../../../../api/patient';
 import { getDoctorList } from '../../../../api/doctor';
+import { uploadFileToOssApi } from '../../../../api/OssConfig';
 
 const searchExamNo = ref('');
 const searchPatientName = ref('');
@@ -790,6 +792,47 @@ function showDoctor(doctor: any) {
 function showPatient(patient: any) {
   currentPatient.value = patient;
   showPatientModal.value = true;
+}
+
+// 上传到云端
+async function handleUploadToCloud(examination: any) {
+  try {
+    if (!examination.report_path && !examination.image_path) {
+      ElMessage.warning('该检查记录没有可上传的文件');
+      return;
+    }
+
+    const filesToUpload = [];
+    if (examination.report_path) {
+      filesToUpload.push({
+        path: examination.report_path,
+        name: `report_${examination.exam_no}.pdf`
+      });
+    }
+    if (examination.image_path) {
+      filesToUpload.push({
+        path: examination.image_path,
+        name: `image_${examination.exam_no}.jpg`
+      });
+    }
+
+    for (const file of filesToUpload) {
+      try {
+        const res: any = await uploadFileToOssApi(examination.id, file.path, file.name);
+        if (res && res.response) {
+          ElMessage.success(`文件 ${file.name} 上传成功`);
+        } else {
+          ElMessage.error(`文件 ${file.name} 上传失败: ${res.message || '未知错误'}`);
+        }
+      } catch (error) {
+        console.error(`上传文件 ${file.name} 失败:`, error);
+        ElMessage.error(`文件 ${file.name} 上传失败`);
+      }
+    }
+  } catch (error) {
+    console.error('上传到云端失败:', error);
+    ElMessage.error('上传到云端失败');
+  }
 }
 </script>
 

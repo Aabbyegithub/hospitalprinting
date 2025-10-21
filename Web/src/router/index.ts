@@ -101,6 +101,11 @@ const routes = [
             name: 'OcrConfigManagement',
             component: () => import('../views/Menu/BackendHome/Hospital/OcrConfigManagement.vue') 
           },
+          { 
+            path: 'OssConfigManagement', 
+            name: 'OssConfigManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/OssConfigManagement.vue') 
+          },
           
         ]
        },

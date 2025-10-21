@@ -96,7 +96,7 @@
             <el-option label="A4" value="A4" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="props.type === 2" label="可用数量" required>
+        <!-- <el-form-item v-if="props.type === 2" label="可用数量" required>
           <el-input-number v-model="editForm.available_count" :min="0" />
         </el-form-item>
         <el-form-item v-if="props.type === 2" label="打印时间(秒)" required>
@@ -107,7 +107,7 @@
         </el-form-item>
         <el-form-item v-if="props.type !== 2" label="纸张">
           <el-input v-model="editForm.paper_size" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="位置">
           <el-input v-model="editForm.location" />
         </el-form-item>
@@ -159,8 +159,8 @@
    <div class="film-size-configs">
      <div v-for="(config, index) in filmSizeConfigs" :key="index" class="config-item">
        <el-row :gutter="8">
-         <el-col :span="6">
-           <el-select v-model="config.film_size" placeholder="胶片尺寸" style="width: 100%">
+         <el-col :span="5">
+           <el-select v-model="config.film_size" placeholder="胶片尺寸" style="width: 100%" @change="onFilmSizeChange(config, index)">
              <el-option label="14IN×17IN" value="14IN×17IN" />
              <el-option label="14IN×14IN" value="14IN×14IN" />
              <el-option label="11IN×14IN" value="11IN×14IN" />
@@ -170,13 +170,24 @@
              <el-option label="A4" value="A4" />
            </el-select>
          </el-col>
-         <el-col :span="4">
+         <el-col :span="5">
+          <el-select v-model="config.output_file_size" placeholder="输出胶片尺寸" style="width: 100%">
+             <el-option label="14IN×17IN" value="14IN×17IN" />
+             <el-option label="14IN×14IN" value="14IN×14IN" />
+             <el-option label="11IN×14IN" value="11IN×14IN" />
+             <el-option label="10IN×12IN" value="10IN×12IN" />
+             <el-option label="8IN×10IN" value="8IN×10IN" />
+             <el-option label="A3" value="A3" />
+             <el-option label="A4" value="A4" />
+           </el-select>
+         </el-col>
+         <el-col :span="3">
            <el-input-number v-model="config.available_count" :min="0" placeholder="数量" style="width: 100%" />
          </el-col>
-         <el-col :span="4">
+         <el-col :span="3">
            <el-input-number v-model="config.print_time_seconds" :min="0" placeholder="打印时间" style="width: 100%" />
          </el-col>
-         <el-col :span="6">
+         <el-col :span="5">
            <el-select v-model="config.laser_printer_id" placeholder="激光打印机" clearable style="width: 100%">
              <el-option
                v-for="printer in laserPrinterOptions"
@@ -186,7 +197,7 @@
              />
            </el-select>
          </el-col>
-         <el-col :span="4">
+         <el-col :span="3">
            <el-button type="danger" size="small" @click="removeFilmSizeConfig(index)" style="width: 100%">删除</el-button>
          </el-col>
        </el-row>
@@ -196,7 +207,7 @@
      </div>
      <div class="config-tip">
        <el-text type="info" size="small">
-         提示：同一胶片尺寸可以配置多个激光打印机
+         提示：一台打印机的一种胶片尺寸只能添加一条记录
        </el-text>
      </div>
    </div>
@@ -389,6 +400,7 @@ function addFilmSizeConfig() {
   filmSizeConfigs.value.push({
     id: 0,
     film_size: '',
+    output_file_size: '',
     available_count: 0,
     print_time_seconds: 0,
     laser_printer_id: null
@@ -399,6 +411,22 @@ function removeFilmSizeConfig(index: number) {
   filmSizeConfigs.value.splice(index, 1)
 }
 
+// 检查胶片尺寸是否重复
+function onFilmSizeChange(config: any, currentIndex: number) {
+  if (!config.film_size) return
+  
+  // 检查是否有重复的胶片尺寸
+  const duplicateIndex = filmSizeConfigs.value.findIndex((item, index) => 
+    index !== currentIndex && item.film_size === config.film_size
+  )
+  
+  if (duplicateIndex !== -1) {
+    ElMessage.warning('该胶片尺寸已存在，请选择其他尺寸')
+    config.film_size = ''
+    return
+  }
+}
+
 async function fetchFilmSizeConfigs(printerId: number) {
   try {
     const res: any = await getFilmSizeConfigsApi(printerId)
@@ -406,6 +434,7 @@ async function fetchFilmSizeConfigs(printerId: number) {
       filmSizeConfigs.value = res.response.map((item: any) => ({
         id: item.id,
         film_size: item.film_size,
+        output_file_size: item.output_file_size || '',
         available_count: item.available_count,
         print_time_seconds: item.print_time_seconds,
         laser_printer_id: item.laser_printer_id
@@ -421,6 +450,15 @@ async function fetchFilmSizeConfigs(printerId: number) {
 
 async function saveFilmSizeConfigs() {
   try {
+    // 检查是否有重复的胶片尺寸
+    const filmSizes = filmSizeConfigs.value.map(config => config.film_size).filter(size => size)
+    const uniqueFilmSizes = [...new Set(filmSizes)]
+    
+    if (filmSizes.length !== uniqueFilmSizes.length) {
+      ElMessage.error('存在重复的胶片尺寸，请检查后重试')
+      return
+    }
+    
     // 先删除该打印机的所有胶片尺寸配置
     await deleteAllFilmSizeConfigsApi(configForm.printer_id)
     
@@ -440,6 +478,7 @@ async function saveFilmSizeConfigs() {
         only_unprinted: configForm.only_unprinted,
         laser_printer_id: config.laser_printer_id,
         film_size: config.film_size,
+        output_file_size: config.output_file_size || '',
         available_count: config.available_count,
         print_time_seconds: config.print_time_seconds,
         remark: configForm.remark

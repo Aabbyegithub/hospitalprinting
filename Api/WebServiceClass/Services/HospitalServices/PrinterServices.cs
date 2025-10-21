@@ -154,6 +154,15 @@ namespace WebServiceClass.Services.HospitalServices
                 var now = DateTime.Now;
                 var json = System.Text.Json.JsonSerializer.Serialize(dto.allowed_exam_types ?? new List<string>());
 
+                // 检查同一打印机的同一胶片尺寸是否已存在
+                var existingConfig = await _dal.Db.Queryable<HolPrinterConfig>()
+                    .Where(x => x.printer_id == dto.printer_id && x.film_size == dto.film_size)
+                    .FirstAsync();
+
+                if (existingConfig != null && existingConfig.id != dto.id)
+                {
+                    return Error<string>("该打印机的此胶片尺寸已存在，一台打印机的一种胶片尺寸只能添加一条记录");
+                }
                 // UPSERT by printer_id
                 var exists = await _dal.Db.Queryable<HolPrinterConfig>()
                     .AnyAsync(a => a.printer_id == dto.printer_id /* && a.org_id == OrgId */);
@@ -274,6 +283,7 @@ namespace WebServiceClass.Services.HospitalServices
                         only_unprinted = dto.only_unprinted,
                         laser_printer_id = dto.laser_printer_id,
                         film_size = dto.film_size,
+                        output_file_size= dto.output_file_size,
                         available_count = dto.available_count,
                         print_time_seconds = dto.print_time_seconds,
                         remark = dto.remark,

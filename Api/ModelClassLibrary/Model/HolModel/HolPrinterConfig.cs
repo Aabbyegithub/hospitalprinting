@@ -81,7 +81,12 @@ namespace ModelClassLibrary.Model.HolModel
         /// Default:
         /// Nullable:True
         /// </summary>
-        public string? film_size { get; set; }  
+        public string? film_size { get; set; }
+
+        /// <summary>
+        /// 输出胶片尺寸
+        /// </summary>
+        public string? output_file_size { get; set; }
         /// <summary>
         /// Desc:可用数量
         /// Default:

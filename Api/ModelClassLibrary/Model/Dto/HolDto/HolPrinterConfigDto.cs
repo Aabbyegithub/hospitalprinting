@@ -16,6 +16,11 @@ namespace ModelClassLibrary.Model.Dto.HolDto
         public int only_unprinted { get; set; }
         public int? laser_printer_id { get; set; }   // 连接的激光打印机ID
         public string? film_size { get; set; }        // 新增：胶片尺寸
+
+        /// <summary>
+        /// 输出胶片尺寸
+        /// </summary>
+        public string? output_file_size { get; set; }
         public int available_count { get; set; }     // 新增：可用数量
         public int print_time_seconds { get; set; }  // 新增：打印时间（秒）
         public string? remark { get; set; }

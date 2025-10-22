@@ -2,6 +2,7 @@ using FellowOakDicom.Network;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ModelClassLibrary.Model;
 
 namespace WebServiceClass.Services.DICOMServices
 {

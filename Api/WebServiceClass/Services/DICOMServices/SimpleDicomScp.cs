@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace WebServiceClass.Services.DICOMServices
 {
-    public class SimpleDicomScp : DicomService, IDicomServiceProvider, IDicomCStoreProvider,IDicomCEchoProvider
+    public class SimpleDicomScp : DicomService, IDicomServiceProvider, IDicomCStoreProvider
 
     {
         private readonly string _saveDirectory;
@@ -117,11 +117,6 @@ namespace WebServiceClass.Services.DICOMServices
             Console.ReadLine();
 
             server.Dispose();
-        }
-
-        public Task<DicomCEchoResponse> OnCEchoRequestAsync(DicomCEchoRequest request)
-        {
-            Console.WriteLine(); return (Task<DicomCEchoResponse>)Task.CompletedTask;
         }
     }
 }

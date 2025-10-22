@@ -282,6 +282,14 @@ namespace WebServiceClass.QuartzTask
 
         public async Task<ApiResponse<bool>> UpdateTimerTaskAsync(sys_timertask task)
         {
+            var taskJob = await _dal.Db.Queryable<sys_timertask>().FirstAsync();
+            if (taskJob !=null)
+            {
+                if (taskJob.IsStart !=0)
+                {
+                     return Fail<bool>("请先停止任务");
+                }
+            }
             var result = await _dal.Db.Updateable(task).ExecuteCommandAsync() > 0;
             return Success(result, result ? "修改成功" : "修改失败");
         }

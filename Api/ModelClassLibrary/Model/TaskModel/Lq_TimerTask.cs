@@ -98,7 +98,7 @@ namespace MyNamespace
         /// Default:
         /// Nullable:True
         /// </summary>           
-        public long? StartNumber { get; set; }
+        public long? StartNumber { get; set; } = 0;
         public DateTime? lastRunTime { get; set; }
 
     }

@@ -1,0 +1,22 @@
+{
+  "DatabaseConnections": {
+    "ExternalDB1": {
+      "ConnectionString": "Server=192.168.1.100;Database=ExternalDB1;User Id=user;Password=pass;",
+      "DatabaseType": "1",
+      "IsEnabled": true,
+      "Description": "外部数据库1"
+    },
+    "ExternalDB2": {
+      "ConnectionString": "Server=192.168.1.101;Database=ExternalDB2;User Id=user;Password=pass;",
+      "DatabaseType": "0",
+      "IsEnabled": true,
+      "Description": "外部数据库2"
+    },
+    "TestDB": {
+      "ConnectionString": "Server=localhost;Database=TestDB;User Id=test;Password=test;",
+      "DatabaseType": "1",
+      "IsEnabled": false,
+      "Description": "测试数据库"
+    }
+  }
+}

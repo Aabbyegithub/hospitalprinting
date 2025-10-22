@@ -1,0 +1,17 @@
+{
+  "OCR": {
+    "TessDataPath": "tessdata",
+    "DefaultLanguage": "chi_sim+eng",
+    "MaxFileSize": 10485760,
+    "SupportedFormats": [".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"],
+    "ConfidenceThreshold": 60.0,
+    "EnablePreprocessing": true,
+    "PreprocessingOptions": {
+      "Resize": true,
+      "MaxWidth": 2000,
+      "MaxHeight": 2000,
+      "EnhanceContrast": true,
+      "Denoise": true
+    }
+  }
+}

@@ -331,7 +331,7 @@ namespace WebTaskClass.SampleJob
                     var fileExtension = Path.GetExtension(exam.report_path ?? exam.image_path ?? ".jpg");
                     var newFileName = $"{patientName}_{examDate}_{exam.id}_{fileType}{fileExtension}";
 
-                    return $"{folderPrefix ?? "examinations"}/{exam.id}/{newFileName}";
+                    return $"{folderPrefix ?? "examinations"}/{patientName}/{newFileName}";
                 }
                 else
                 {

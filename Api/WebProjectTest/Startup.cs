@@ -15,6 +15,9 @@ using WebProjectTest.Common;
 using WebServiceClass.Base;
 using WebServiceClass.Helper;
 using WebServiceClass.QuartzTask;
+using FellowOakDicom;
+using WebServiceClass.Services.DICOMServices;
+
 
 namespace WebProjectTest
 {
@@ -40,6 +43,13 @@ namespace WebProjectTest
             //配置数据库链接
             services.AddSingleton(new AppSettings(Configuration));
             SqlsugarSetup.AddSqlsugarSetup(services);
+
+            // 配置DICOM服务
+            services.Configure<DicomServiceConfig>(Configuration.GetSection("DicomService"));
+            services.AddFellowOakDicom();
+            
+            // 注册DICOM托管服务
+            services.AddHostedService<DicomHostedService>();
 
             // 确保注册依赖服务
             services.AddHttpContextAccessor();
@@ -186,8 +196,11 @@ namespace WebProjectTest
         }
 
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
+            // 配置DICOM服务提供者
+            DicomSetupBuilder.UseServiceProvider(serviceProvider);
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

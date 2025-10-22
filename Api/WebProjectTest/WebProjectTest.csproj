@@ -45,7 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\DICOMController\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

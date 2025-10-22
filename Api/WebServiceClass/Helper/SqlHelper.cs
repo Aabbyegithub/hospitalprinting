@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Aliyun.OSS;
+using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
+using System.Data;
 using WebIServices.IBase;
 
 namespace WebServiceClass.Helper
@@ -85,6 +87,32 @@ namespace WebServiceClass.Helper
 
                 return client;
             }
+        }
+
+
+        /// <summary>
+        /// 创建数据库连接
+        /// </summary>
+        public ISqlSugarClient CreateConnection(ConnectionConfig config)
+        {
+            var connectionConfig = new ConnectionConfig
+            {
+                ConnectionString = config.ConnectionString,
+                DbType = config.DbType,
+                IsAutoCloseConnection = true,
+                InitKeyType = InitKeyType.Attribute
+            };
+
+            var client = new SqlSugarClient(connectionConfig);
+
+            // 配置日志
+            client.Aop.OnLogExecuting = (sql, pars) =>
+            {
+                string sqlQuery = UtilMethods.GetSqlString(config.DbType, sql, pars);
+                Console.WriteLine(sqlQuery);
+                Console.WriteLine();
+            };
+            return client;
         }
 
     }

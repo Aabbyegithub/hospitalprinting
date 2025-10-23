@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using static Common.Response;
 using MyNamespace;
 using static WinSelfMachine.Model.HolModel;
+using System.Diagnostics;
 
 namespace WinSelfMachine
 {

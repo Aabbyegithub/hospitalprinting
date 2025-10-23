@@ -27,8 +27,8 @@ namespace WebServiceClass.Helper
             customLogger.LogError("This is an error message for custom_module.");
         }
          */
-        private readonly string _baseLogDirectory;
-        private readonly string _moduleName;
+        private readonly string _baseLogDirectory = "LogInfos";
+        private string _moduleName;
         private readonly string _logFileName;
         private readonly string _fileExtension;
         private StreamWriter _infoLogWriter;
@@ -68,13 +68,14 @@ namespace WebServiceClass.Helper
             };
         }
 
-        public async Task LogInfo(string message)
+        public async Task LogInfo(string message,string moduleName = "INFO")
         {
-            using (_infoLogWriter = CreateLogWriter("INFO", _logFileName))
+            using (_infoLogWriter = CreateLogWriter(moduleName, _logFileName))
             {
-                 Log("INFO", message, _infoLogWriter);
-            }           
+                 Log(moduleName, message, _infoLogWriter);
+            }
         }
+
 
         public async Task LogWarning(string message)
         {

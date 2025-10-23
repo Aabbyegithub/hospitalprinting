@@ -8,7 +8,7 @@ namespace WebIServices.IBase
 {
     public interface ILoggerHelper
     {
-        Task LogInfo(string message);
+        Task LogInfo(string message,string moduleName = "INFO");
         Task LogWarning(string message);
         Task LogError(string message);
     }

@@ -15,7 +15,7 @@ namespace WebIServices.IServices.FTPIServices
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<FTPConfigDto> GetConfigAsync(long orgId);
+        Task<FTPConfigDto> GetConfigAsync();
 
         /// <summary>
         /// 测试FTP连接
@@ -38,7 +38,7 @@ namespace WebIServices.IServices.FTPIServices
         /// <param name="remotePath">远程路径</param>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<FTPUploadResultDto> UploadSingleFileAsync(string filePath, string remotePath, long orgId);
+        Task<FTPUploadResultDto> UploadSingleFileAsync(string filePath, string remotePath);
 
         /// <summary>
         /// 上传文件夹
@@ -48,7 +48,7 @@ namespace WebIServices.IServices.FTPIServices
         /// <param name="orgId">组织ID</param>
         /// <param name="recursive">是否递归上传子文件夹</param>
         /// <returns></returns>
-        Task<FTPBatchUploadResultDto> UploadFolderAsync(string localFolderPath, string remoteFolderPath, long orgId, bool recursive = true);
+        Task<FTPBatchUploadResultDto> UploadFolderAsync(string localFolderPath, string remoteFolderPath, bool recursive = true);
 
         /// <summary>
         /// 检查远程文件是否存在
@@ -56,7 +56,7 @@ namespace WebIServices.IServices.FTPIServices
         /// <param name="remotePath">远程文件路径</param>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<bool> FileExistsAsync(string remotePath, long orgId);
+        Task<bool> FileExistsAsync(string remotePath);
 
         /// <summary>
         /// 删除远程文件
@@ -64,7 +64,7 @@ namespace WebIServices.IServices.FTPIServices
         /// <param name="remotePath">远程文件路径</param>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<bool> DeleteFileAsync(string remotePath, long orgId);
+        Task<bool> DeleteFileAsync(string remotePath);
 
         /// <summary>
         /// 列出远程目录内容
@@ -72,7 +72,7 @@ namespace WebIServices.IServices.FTPIServices
         /// <param name="remotePath">远程目录路径</param>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<List<string>> ListDirectoryAsync(string remotePath, long orgId);
+        Task<List<string>> ListDirectoryAsync(string remotePath);
 
         /// <summary>
         /// 创建远程目录
@@ -80,6 +80,6 @@ namespace WebIServices.IServices.FTPIServices
         /// <param name="remotePath">远程目录路径</param>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<bool> CreateDirectoryAsync(string remotePath, long orgId);
+        Task<bool> CreateDirectoryAsync(string remotePath);
     }
 }

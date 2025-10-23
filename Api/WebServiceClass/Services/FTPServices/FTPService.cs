@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using ModelClassLibrary.Model.Dto;
 using WebIServices.IServices.FTPIServices;
 using WebIServices.IBase;
+using SqlSugar.Extensions;
 
 namespace WebServiceClass.Services.FTPServices
 {
@@ -18,55 +19,42 @@ namespace WebServiceClass.Services.FTPServices
     /// </summary>
     public class FTPService : IFTPService, IBaseService
     {
-        private readonly ILogger<FTPService> _logger;
+        private readonly ILoggerHelper _logger;
         private readonly ISqlHelper _dal;
-        private readonly IConfiguration _configuration;
+        private readonly IAppSettinghelper _appsetting;
 
-        public FTPService(ILogger<FTPService> logger, ISqlHelper dal, IConfiguration configuration)
+        public FTPService(ILoggerHelper logger, ISqlHelper dal, IAppSettinghelper appsetting)
         {
             _logger = logger;
             _dal = dal;
-            _configuration = configuration;
+            _appsetting = appsetting;
         }
 
         /// <summary>
         /// 获取FTP配置
         /// </summary>
-        public async Task<FTPConfigDto> GetConfigAsync(long orgId)
+        public async Task<FTPConfigDto> GetConfigAsync()
         {
             try
             {
-                //// 从数据库获取FTP配置
-                //var sql = @"
-                //    SELECT Host, Port, Username, Password, UsePassive, UseSsl, 
-                //           RemoteDirectory, Timeout, IsEnabled
-                //    FROM HolFTPConfig 
-                //    WHERE OrgId = @OrgId AND IsEnabled = 1";
+                // 返回默认配置
+                return new FTPConfigDto
+                {
+                    Host = _appsetting.Get("FTP:Host") ?? "localhost",
+                    Port = _appsetting.Get("FTP:Port").ObjToInt(),
+                    Username =_appsetting.Get("FTP:Username")  ?? "",
+                    Password =_appsetting.Get("FTP:Password") ?? "",
+                    UsePassive =_appsetting.Get("FTP:UsePassive").ObjToBool(),
+                    UseSsl =_appsetting.Get("FTP:UseSsl").ObjToBool(),
+                    RemoteDirectory =_appsetting.Get("FTP:RemoteDirectory") ?? "/",
+                    Timeout =_appsetting.Get("FTP:Timeout").ObjToInt(),
+                    IsEnabled = true
+                };
 
-                //var config = await _dal.QueryFirstOrDefaultAsync<FTPConfigDto>(sql, new { OrgId = orgId });
-
-                //if (config == null)
-                //{
-                //    // 返回默认配置
-                //    return new FTPConfigDto
-                //    {
-                //        Host = _configuration["FTP:Host"] ?? "localhost",
-                //        Port = _configuration.GetValue<int>("FTP:Port", 21),
-                //        Username = _configuration["FTP:Username"] ?? "",
-                //        Password = _configuration["FTP:Password"] ?? "",
-                //        UsePassive = _configuration.GetValue<bool>("FTP:UsePassive", true),
-                //        UseSsl = _configuration.GetValue<bool>("FTP:UseSsl", false),
-                //        RemoteDirectory = _configuration["FTP:RemoteDirectory"] ?? "/",
-                //        Timeout = _configuration.GetValue<int>("FTP:Timeout", 30),
-                //        IsEnabled = true
-                //    };
-                //}
-
-                return null;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"获取FTP配置失败: OrgId={orgId}");
+               await _logger.LogError($"获取FTP配置失败-{ex.Message}");
                 throw;
             }
         }
@@ -95,7 +83,7 @@ namespace WebServiceClass.Services.FTPServices
                     result.ConnectionTimeMs = stopwatch.ElapsedMilliseconds;
                     result.TestTime = DateTime.Now;
 
-                    _logger.LogInformation($"FTP连接测试成功: {config.Host}:{config.Port}, 耗时: {result.ConnectionTimeMs}ms");
+                   await  _logger.LogInfo($"FTP连接测试成功: {config.Host}:{config.Port}, 耗时: {result.ConnectionTimeMs}ms","FTP上传");
                 }
             }
             catch (Exception ex)
@@ -106,7 +94,7 @@ namespace WebServiceClass.Services.FTPServices
                 result.ErrorMessage = ex.Message;
                 result.TestTime = DateTime.Now;
 
-                _logger.LogError(ex, $"FTP连接测试失败: {config.Host}:{config.Port}");
+               await _logger.LogError($"FTP连接测试失败: {config.Host}:{config.Port}--{ex.Message}");
             }
 
             return result;
@@ -127,7 +115,7 @@ namespace WebServiceClass.Services.FTPServices
             try
             {
                 // 获取FTP配置
-                var config = await GetConfigAsync(request.OrgId);
+                var config = await GetConfigAsync();
                 if (!config.IsEnabled)
                 {
                     throw new InvalidOperationException("FTP服务未启用");
@@ -140,7 +128,7 @@ namespace WebServiceClass.Services.FTPServices
                     throw new FileNotFoundException("没有找到有效的文件");
                 }
 
-                _logger.LogInformation($"开始批量上传 {validFiles.Count} 个文件到FTP服务器");
+                await _logger.LogInfo($"开始批量上传 {validFiles.Count} 个文件到FTP服务器","FTP上传");
 
                 // 使用信号量控制并发数量
                 using var semaphore = new SemaphoreSlim(request.MaxConcurrentUploads, request.MaxConcurrentUploads);
@@ -171,13 +159,13 @@ namespace WebServiceClass.Services.FTPServices
                     result.AverageSpeedKbps = totalSize / (result.TotalDurationMs / 1000.0) / 1024.0;
                 }
 
-                _logger.LogInformation($"批量上传完成: 成功 {result.SuccessCount}/{result.TotalFiles}, 耗时: {result.TotalDurationMs}ms");
+                await _logger.LogInfo($"批量上传完成: 成功 {result.SuccessCount}/{result.TotalFiles}, 耗时: {result.TotalDurationMs}ms", "FTP上传");
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
                 result.TotalDurationMs = stopwatch.ElapsedMilliseconds;
-                _logger.LogError(ex, "批量上传失败");
+                await _logger.LogError($"批量上传失败-{ex.Message}");
                 throw;
             }
 
@@ -187,14 +175,13 @@ namespace WebServiceClass.Services.FTPServices
         /// <summary>
         /// 上传单个文件
         /// </summary>
-        public async Task<FTPUploadResultDto> UploadSingleFileAsync(string filePath, string remotePath, long orgId)
+        public async Task<FTPUploadResultDto> UploadSingleFileAsync(string filePath, string remotePath)
         {
-            var config = await GetConfigAsync(orgId);
+            var config = await GetConfigAsync();
             var request = new FTPUploadRequestDto
             {
                 FilePaths = new List<string> { filePath },
                 RemoteRootDirectory = remotePath,
-                OrgId = orgId
             };
 
             var results = await BatchUploadAsync(request);
@@ -209,7 +196,7 @@ namespace WebServiceClass.Services.FTPServices
         /// <summary>
         /// 上传文件夹
         /// </summary>
-        public async Task<FTPBatchUploadResultDto> UploadFolderAsync(string localFolderPath, string remoteFolderPath, long orgId, bool recursive = true)
+        public async Task<FTPBatchUploadResultDto> UploadFolderAsync(string localFolderPath, string remoteFolderPath, bool recursive = true)
         {
             if (!Directory.Exists(localFolderPath))
             {
@@ -222,8 +209,7 @@ namespace WebServiceClass.Services.FTPServices
                 FilePaths = files,
                 LocalRootDirectory = localFolderPath,
                 RemoteRootDirectory = remoteFolderPath,
-                KeepDirectoryStructure = true,
-                OrgId = orgId
+                KeepDirectoryStructure = true
             };
 
             return await BatchUploadAsync(request);
@@ -232,18 +218,18 @@ namespace WebServiceClass.Services.FTPServices
         /// <summary>
         /// 检查远程文件是否存在
         /// </summary>
-        public async Task<bool> FileExistsAsync(string remotePath, long orgId)
+        public async Task<bool> FileExistsAsync(string remotePath)
         {
             try
             {
-                var config = await GetConfigAsync(orgId);
+                var config = await GetConfigAsync();
                 using var client = CreateFtpClient(config);
                 await Task.Run(() => client.Connect());
                 return await Task.Run(() => client.FileExists(remotePath));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"检查远程文件是否存在失败: {remotePath}");
+               await _logger.LogError($"检查远程文件是否存在失败: {remotePath}--{ex.Message}");
                 return false;
             }
         }
@@ -251,11 +237,11 @@ namespace WebServiceClass.Services.FTPServices
         /// <summary>
         /// 删除远程文件
         /// </summary>
-        public async Task<bool> DeleteFileAsync(string remotePath, long orgId)
+        public async Task<bool> DeleteFileAsync(string remotePath)
         {
             try
             {
-                var config = await GetConfigAsync(orgId);
+                var config = await GetConfigAsync();
                 using var client = CreateFtpClient(config);
                 await Task.Run(() => client.Connect());
                 await Task.Run(() => client.DeleteFile(remotePath));
@@ -263,7 +249,7 @@ namespace WebServiceClass.Services.FTPServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"删除远程文件失败: {remotePath}");
+               await _logger.LogError($"删除远程文件失败: {remotePath}--{ex.Message}");
                 return false;
             }
         }
@@ -271,11 +257,11 @@ namespace WebServiceClass.Services.FTPServices
         /// <summary>
         /// 列出远程目录内容
         /// </summary>
-        public async Task<List<string>> ListDirectoryAsync(string remotePath, long orgId)
+        public async Task<List<string>> ListDirectoryAsync(string remotePath)
         {
             try
             {
-                var config = await GetConfigAsync(orgId);
+                var config = await GetConfigAsync();
                 using var client = CreateFtpClient(config);
                 await Task.Run(() => client.Connect());
                 var items = await Task.Run(() => client.GetListing(remotePath));
@@ -283,7 +269,7 @@ namespace WebServiceClass.Services.FTPServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"列出远程目录失败: {remotePath}");
+                await _logger.LogError($"列出远程目录失败: {remotePath}--{ex.Message}");
                 return new List<string>();
             }
         }
@@ -291,11 +277,11 @@ namespace WebServiceClass.Services.FTPServices
         /// <summary>
         /// 创建远程目录
         /// </summary>
-        public async Task<bool> CreateDirectoryAsync(string remotePath, long orgId)
+        public async Task<bool> CreateDirectoryAsync(string remotePath)
         {
             try
             {
-                var config = await GetConfigAsync(orgId);
+                var config = await GetConfigAsync();
                 using var client = CreateFtpClient(config);
                 await Task.Run(() => client.Connect());
                 await Task.Run(() => client.CreateDirectory(remotePath));
@@ -303,7 +289,7 @@ namespace WebServiceClass.Services.FTPServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"创建远程目录失败: {remotePath}");
+                await _logger.LogError($"创建远程目录失败: {remotePath}--{ex.Message}");
                 return false;
             }
         }
@@ -376,13 +362,13 @@ namespace WebServiceClass.Services.FTPServices
                 {
                     result.Success = true;
                     result.UploadSpeedKbps = result.FileSize / (result.DurationMs / 1000.0) / 1024.0;
-                    _logger.LogInformation($"文件上传成功: {filePath} -> {remotePath}, 耗时: {result.DurationMs}ms");
+                    await _logger.LogInfo($"文件上传成功: {filePath} -> {remotePath}, 耗时: {result.DurationMs}ms","FTP上传");
                 }
                 else
                 {
                     result.Success = false;
                     result.ErrorMessage = $"上传失败: {uploadResult}";
-                    _logger.LogWarning($"文件上传失败: {filePath}, 状态: {uploadResult}");
+                    await _logger.LogWarning($"文件上传失败: {filePath}, 状态: {uploadResult}");
                 }
             }
             catch (Exception ex)
@@ -391,7 +377,7 @@ namespace WebServiceClass.Services.FTPServices
                 result.Success = false;
                 result.ErrorMessage = ex.Message;
                 result.DurationMs = stopwatch.ElapsedMilliseconds;
-                _logger.LogError(ex, $"上传文件异常: {filePath}");
+                await  _logger.LogError($"上传文件异常: {filePath}-{ex.Message}");
             }
 
             return result;
@@ -438,7 +424,7 @@ namespace WebServiceClass.Services.FTPServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"获取文件夹文件失败: {folderPath}");
+                _logger.LogError($"获取文件夹文件失败: {folderPath}-{ex.Message}");
             }
 
             return files;

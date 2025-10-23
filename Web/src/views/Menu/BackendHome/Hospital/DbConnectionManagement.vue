@@ -11,7 +11,7 @@
         </div>
       </div>
   
-      <el-table :data="configList" v-loading="loading" @selection-change="handleSelectionChange" stripe border>
+      <el-table :data="configList" v-loading="loading" @selection-change="handleSelectionChange" stripe border style="width: 100%;height: 65vh;">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="ID" prop="id" width="90" align="center" />
         <el-table-column label="配置名称" prop="config_name" align="center" />
@@ -32,17 +32,17 @@
       </el-table>
   
       <div class="pagination-container">
-        <el-pagination
-          style="margin-top:16px;float:right;"
-          :total="total"
-          :page-size="pageSize"
-          :current-page="pageIndex"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :page-sizes="[10,20,30,50]"
-          layout="prev, pager, next, ->, sizes, jumper"
-        />
-      </div>
+      <el-pagination
+        style="margin-top:16px;float:right;"
+        :total="total"
+        :page-size="pageSize"
+        :current-page="pageIndex"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :page-sizes="[10,20,30,50]"
+        layout="prev, pager, next, ->, sizes, jumper"
+      />
+    </div>
   
       <el-dialog v-model="showEditModal" :title="editForm.id ? '编辑配置' : '新增配置'" width="650px" @close="closeEditModal">
         <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="130px">

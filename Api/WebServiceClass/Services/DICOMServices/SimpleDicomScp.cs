@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using WebServiceClass.Services.DICOMServices;
 using Microsoft.Extensions.Options;
 using WebIServices.IServices.DICOMIServices;
+using ModelClassLibrary.Model;
 
 namespace WebServiceClass.Services.DICOMServices
 {

@@ -17,6 +17,8 @@ using WebServiceClass.Helper;
 using WebServiceClass.QuartzTask;
 using FellowOakDicom;
 using WebServiceClass.Services.DICOMServices;
+using ModelClassLibrary.Model;
+
 
 
 namespace WebProjectTest

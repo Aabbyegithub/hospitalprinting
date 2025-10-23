@@ -4,6 +4,31 @@ using System.Collections.Generic;
 namespace ModelClassLibrary.Model.Dto
 {
     /// <summary>
+    /// 重复文件处理策略
+    /// </summary>
+    public enum DuplicateFileStrategy
+    {
+        /// <summary>
+        /// 覆盖已存在的文件
+        /// </summary>
+        Overwrite = 0,
+
+        /// <summary>
+        /// 跳过已存在的文件
+        /// </summary>
+        Skip = 1,
+
+        /// <summary>
+        /// 重命名文件（添加时间戳）
+        /// </summary>
+        Rename = 2,
+
+        /// <summary>
+        /// 重命名文件（添加序号）
+        /// </summary>
+        RenameWithNumber = 3
+    }
+    /// <summary>
     /// FTP上传配置DTO
     /// </summary>
     public class FTPConfigDto
@@ -83,6 +108,11 @@ namespace ModelClassLibrary.Model.Dto
         /// 是否覆盖已存在的文件
         /// </summary>
         public bool OverwriteExisting { get; set; } = true;
+
+        /// <summary>
+        /// 重复文件处理策略
+        /// </summary>
+        public DuplicateFileStrategy DuplicateStrategy { get; set; } = DuplicateFileStrategy.Overwrite;
 
         /// <summary>
         /// 并发上传数量

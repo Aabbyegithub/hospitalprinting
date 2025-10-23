@@ -72,7 +72,11 @@ namespace WebServiceClass.Services.EquipmentServices
                 {
                     if (data != null)
                     {
-                        await _dal.Db.Deleteable<HolPrinterConfig>().Where(a => a.id == data.id).ExecuteCommandAsync();
+                        if (Type == 1)
+                            data.print_time_seconds = 0;
+                        if (Type == 2)
+                            data.available_count = 0;
+                        await _dal.Db.Updateable(data).ExecuteCommandAsync();
                     }
                     return Success(true);
                 }

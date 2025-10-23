@@ -10,7 +10,7 @@ const API_BASE_URL =
 const APP_CONFIG = {
   env: ENV,
   apiBaseUrl: API_BASE_URL,
-  appName: '九天阁餐厅收银系统',
+  appName: 'XXXXX医院',
   version: '1.0.0',
 }
 

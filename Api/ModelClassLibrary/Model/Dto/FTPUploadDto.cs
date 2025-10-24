@@ -247,4 +247,35 @@ namespace ModelClassLibrary.Model.Dto
         /// </summary>
         public DateTime TestTime { get; set; } = DateTime.Now;
     }
+
+    /// <summary>
+    /// 文件夹上传信息
+    /// </summary>
+    public class FolderUploadInfo
+    {
+        /// <summary>
+        /// 本地文件夹路径
+        /// </summary>
+        public string LocalPath { get; set; }
+
+        /// <summary>
+        /// 远程文件夹路径
+        /// </summary>
+        public string RemotePath { get; set; }
+
+        /// <summary>
+        /// 文件夹名称
+        /// </summary>
+        public string FolderName { get; set; }
+
+        /// <summary>
+        /// 文件数量
+        /// </summary>
+        public int FileCount { get; set; }
+
+        /// <summary>
+        /// 最后修改时间
+        /// </summary>
+        public DateTime LastModified { get; set; }
+    }
 }

@@ -136,13 +136,6 @@ namespace WebServiceClass.Services.DICOMServices
                                 //_logger.LogInformation($"解析患者信息: {patientInfo.patient_name}");
                             }
 
-                            // 解析检查信息
-                            var examInfo = await _dicomFileParser.ParseExaminationInfoAsync(filePath);
-                            if (examInfo != null)
-                            {
-                                //_logger.LogInformation($"解析检查信息: {examInfo.study_description}");
-                            }
-
                             // 获取元数据
                             var metadata = await _dicomFileParser.GetDicomMetadataAsync(filePath);
                             _logger.LogInformation($"DICOM元数据字段数: {metadata.Count}");

@@ -1,4 +1,5 @@
 ﻿using ModelClassLibrary.Model.HolModel;
+using MyNamespace;
 using Quartz;
 using SqlSugar;
 using System;
@@ -78,7 +79,7 @@ namespace WebTaskClass.SampleJob
                     DbType = GetDbType(holDbConfig.database_type),
                 });
 
-                // 5. 执行同步逻辑（示例：同步患者表）
+                // 执行同步逻辑（示例：同步患者表）
                 await SyncPatientDataAsync(db);
             }
             catch (Exception ex)
@@ -158,10 +159,47 @@ namespace WebTaskClass.SampleJob
         }
 
         /// <summary>
-        /// 同步患者数据的具体逻辑（示例）
+        /// 同步患者数据的具体逻辑
         /// </summary>
         private async Task SyncPatientDataAsync(ISqlSugarClient db)
         {
+            var Time = DateTime.Now.AddDays(-1);
+            var ThisSysPatient = await _dal.Db.Queryable<HolPatient>().Where(a => a.createtime > Time.AddHours(-5)).ToListAsync();
+            var PatientInfo = await db.Queryable<HolMedicalRecord>("VIEW_FOR_PATIENTINFO")
+                .Where(a => a.CreateTime >= Time).ToListAsync();
+             var Data =  PatientInfo.Select(a=>new HolPatient
+                {
+                    name = a.Name,
+                    gender = a.Sex,
+                    age = a.Age,
+                    id_card = a.IdNumber,
+                    contact = a.Phone,
+                    medical_no = a.OutPatientNo,
+                    createtime = a.CreateTime,
+                    updatetime = a.UpdateTime,
+                    status = 1
+                }).DistinctBy(a=>a.medical_no).ToList();
+
+            foreach (var item in Data)
+            {
+                var IsHas = ThisSysPatient.FirstOrDefault(a => a.medical_no == item.medical_no);
+                if (IsHas != null)
+                {
+                    item.id = IsHas.id;
+                    await _dal.Db.Updateable(item).ExecuteCommandAsync();
+
+                }
+                else
+                {
+                    var InSertId = await _dal.Db.Insertable(item).ExecuteReturnBigIdentityAsync();
+                    var ItemList = PatientInfo.Where(a => a.OutPatientNo == item.medical_no)
+                        .Select(a => new HolExamination
+                        {
+
+                        }).ToList();
+                }
+            }
+
 
         }
     }

@@ -1,0 +1,37 @@
+### 测试项目根目录映射
+
+### 访问项目根目录下的文件
+GET http://localhost:5000/project/README.md
+
+### 访问项目配置文件
+GET http://localhost:5000/project/appsettings.json
+
+### 访问项目源代码文件
+GET http://localhost:5000/project/WebProjectTest/Startup.cs
+
+### 访问项目文档
+GET http://localhost:5000/project/WebProjectTest/DICOM_DATABASE_GUIDE.md
+
+### 访问项目SQL文件
+GET http://localhost:5000/project/WebProjectTest/DICOM_DATABASE_SCHEMA.sql
+
+### 访问项目模型文件
+GET http://localhost:5000/project/ModelClassLibrary/Model/Entity/DicomParsedData.cs
+
+### 访问项目服务文件
+GET http://localhost:5000/project/WebServiceClass/Services/DICOMServices/DicomFileParserService.cs
+
+### 访问项目控制器
+GET http://localhost:5000/project/WebProjectTest/Controllers/DICOMDataController/DICOMDataController.cs
+
+### 测试访问不存在的文件
+GET http://localhost:5000/project/nonexistent.txt
+
+### 测试访问子目录
+GET http://localhost:5000/project/WebProjectTest/Controllers/
+
+### 测试访问上级目录（应该被阻止）
+GET http://localhost:5000/project/../
+
+### 测试访问隐藏文件
+GET http://localhost:5000/project/.gitignore

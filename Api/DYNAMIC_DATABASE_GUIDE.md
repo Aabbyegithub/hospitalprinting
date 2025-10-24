@@ -344,3 +344,4 @@ _logger.LogInformation($"获取连接耗时: {stopwatch.ElapsedMilliseconds}ms")
 - v1.2.0 - 支持配置文件方式
 - v1.3.0 - 添加连接测试和监控
 - v1.4.0 - 优化性能和错误处理
+

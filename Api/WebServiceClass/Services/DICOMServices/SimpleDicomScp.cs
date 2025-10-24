@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using WebServiceClass.Services.DICOMServices;
 using Microsoft.Extensions.Options;
 using WebIServices.IServices.DICOMIServices;
+using ModelClassLibrary.Model;
 
 namespace WebServiceClass.Services.DICOMServices
 {
@@ -133,13 +134,6 @@ namespace WebServiceClass.Services.DICOMServices
                             if (patientInfo != null)
                             {
                                 //_logger.LogInformation($"解析患者信息: {patientInfo.patient_name}");
-                            }
-
-                            // 解析检查信息
-                            var examInfo = await _dicomFileParser.ParseExaminationInfoAsync(filePath);
-                            if (examInfo != null)
-                            {
-                                //_logger.LogInformation($"解析检查信息: {examInfo.study_description}");
                             }
 
                             // 获取元数据

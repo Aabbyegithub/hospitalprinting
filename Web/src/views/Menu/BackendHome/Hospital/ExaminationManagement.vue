@@ -118,6 +118,13 @@
               </el-tag>
             </template>
           </el-table-column>
+          <el-table-column label="胶片打印" prop="isfees" align="center">
+            <template #default="scope">
+              <el-tag :type="scope.row.isfees === 1 ? 'success' : 'danger'">
+                {{ scope.row.isfees === 1 ? '可打印' : '不可打印' }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column label="创建时间" prop="create_time" width="180" align="center" :formatter="formatDateTime" />
           <el-table-column label="操作" align="center" width="300">
             <template #default="scope">
@@ -217,6 +224,12 @@
         </el-form-item>
         <el-form-item label="胶片检查号">
           <el-input v-model="editForm.image_no" placeholder="请输入胶片检查号" />
+        </el-form-item>
+        <el-form-item label="胶片打印">
+          <el-select v-model="editForm.isfees" placeholder="请选择胶片打印状态">
+            <el-option label="可打印" :value="1" />
+            <el-option label="不可打印" :value="0" />
+          </el-select>
         </el-form-item>
         <!-- 隐藏字段，确保数据完整性 -->
         <el-form-item v-show="false">
@@ -512,7 +525,8 @@ async function handleSave() {
       report_no: editForm.report_no || null,
       image_no: editForm.image_no || null,
       status: Number(editForm.status) || 1,
-      is_printed: Number(editForm.is_printed) || 0
+      is_printed: Number(editForm.is_printed) || 0,
+      isfees: Number(editForm.isfees) || 1 // 添加胶片打印字段
       // 注意：create_time 和 update_time 由后端设置，不需要前端发送
     };
 
@@ -663,6 +677,7 @@ function openEditModal(examination?: any) {
     editForm.image_no = '';
     editForm.status = 1;
     editForm.is_printed = 0;
+    editForm.isfees = 1; // 默认可以打印
     patientOptions.value = [];
     editForm.doctor_id = null;
     doctorOptions.value = [];
@@ -686,6 +701,7 @@ function closeEditModal() {
   editForm.image_no = '';
   editForm.status = 1;
   editForm.is_printed = 0;
+  editForm.isfees = 1; // 重置胶片打印状态
   patientOptions.value = [];
   doctorOptions.value = [];
 }
@@ -741,7 +757,7 @@ async function exportData() {
 
     // 生成CSV
     const headers = [
-      '检查号','患者姓名','诊断医生','检查类型','检查日期','报告编号','胶片检查号','打印状态'
+      '检查号','患者姓名','诊断医生','检查类型','检查日期','报告编号','胶片检查号','打印状态','胶片打印'
     ];
     const lines = [headers.join(',')];
     for (const row of allRows) {
@@ -753,7 +769,8 @@ async function exportData() {
         formatDate(null as any, null as any, row.exam_date),
         row.report_no ?? '',
         row.image_no ?? '',
-        row.is_printed === 1 ? '已打印' : '未打印'
+        row.is_printed === 1 ? '已打印' : '未打印',
+        row.isfees === 1 ? '可打印' : '不可打印'
       ];
       // CSV 转义
       const escaped = cells.map(v => {

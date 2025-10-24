@@ -17,12 +17,14 @@ namespace WebTaskClass.SampleJob
     public class OssUploadFileTask : IJob
     {
         private readonly ISqlHelper _dal;
+        private readonly ILoggerHelper _logger;
         private readonly IAppSettinghelper _appconfig;
 
-        public OssUploadFileTask(ISqlHelper dal, IAppSettinghelper appconfig)
+        public OssUploadFileTask(ISqlHelper dal, IAppSettinghelper appconfig, ILoggerHelper logger)
         {
             _dal = dal;
             _appconfig = appconfig;
+            _logger = logger;
         }
         /// <summary>
         /// 获取OSS配置
@@ -76,12 +78,18 @@ namespace WebTaskClass.SampleJob
                 var Bathcount = _appconfig.Get("Bathcount:Bathcount");
                 // 获取OSS配置
                 var configResponse = await GetConfigAsync(1);
-                if (!configResponse.success || configResponse.Response == null)
-                    return ;
+                if (!configResponse.success || configResponse.Response == null) 
+                {
+                    await _logger.LogInfo("获取OSS配置失败");
+                    return;
+                }
 
                 var config = configResponse.Response;
                 if (config.is_enabled != 1)
-                    return ;
+                {
+                    await _logger.LogInfo("OSS上传未启用");
+                    return;
+                }
 
                 var result = new BatchUploadResult
                 {
@@ -103,6 +111,7 @@ namespace WebTaskClass.SampleJob
 
                 if (result.TotalCount == 0)
                 {
+                    await _logger.LogInfo("没有需要上传的文件");
                     return ;
                 }
 
@@ -124,7 +133,7 @@ namespace WebTaskClass.SampleJob
                                 var reportResult = await UploadSingleFileAsync(exam, exam.report_path, "report", client, config);
                                 if (reportResult.Success)
                                 {
-                                    exam.report_path = reportResult.Url;
+                                    result.SuccessFiles.Add($"报告文件上传成功: {exam.report_path} => {reportResult.Url}");
                                 }
                                 else
                                 {
@@ -146,7 +155,7 @@ namespace WebTaskClass.SampleJob
                                 var imageResult = await UploadSingleFileAsync(exam, exam.image_path, "image", client, config);
                                 if (imageResult.Success)
                                 {
-                                    exam.image_path = imageResult.Url;
+                                    result.SuccessFiles.Add($"图像文件上传成功: {exam.image_path} => {imageResult.Url}");
                                 }
                                 else
                                 {
@@ -165,7 +174,7 @@ namespace WebTaskClass.SampleJob
                             // 更新上传状态
                             exam.is_upload = 1;
                             exam.update_time = DateTime.Now;
-                            await _dal.Db.Updateable(exam).ExecuteCommandAsync();
+                            await _dal.Db.Updateable(exam).UpdateColumns(x => new { x.is_upload, x.update_time }).ExecuteCommandAsync();
 
                             result.SuccessCount++;
                             result.SuccessFiles.Add($"检查记录 {exam.exam_no} 上传成功");
@@ -184,11 +193,11 @@ namespace WebTaskClass.SampleJob
                     }
                 }
 
-                return ;
+                await _logger.LogInfo($"批量上传完成：成功 {result.SuccessCount}，失败 {result.FailedCount}");
             }
             catch (Exception e)
             {
-                return;
+                await _logger.LogError($"批量上传失败：{e.Message}");
             }
         }    
         /// <summary>
@@ -331,7 +340,7 @@ namespace WebTaskClass.SampleJob
                     var fileExtension = Path.GetExtension(exam.report_path ?? exam.image_path ?? ".jpg");
                     var newFileName = $"{patientName}_{examDate}_{exam.id}_{fileType}{fileExtension}";
 
-                    return $"{folderPrefix ?? "examinations"}/{exam.id}/{newFileName}";
+                    return $"{folderPrefix ?? "examinations"}/{patientName}/{newFileName}";
                 }
                 else
                 {

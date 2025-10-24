@@ -86,6 +86,8 @@ namespace MyNamespace
         /// Nullable:True
         /// </summary>           
         public byte? status { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public string Account_no { get; set; }
 
     }
 }

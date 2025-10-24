@@ -4,6 +4,7 @@ using WebProjectTest.Common;
 using static WebProjectTest.Common.Message;
 using Microsoft.Extensions.Options;
 using WebIServices.IServices.DICOMIServices;
+using ModelClassLibrary.Model;
 
 namespace WebProjectTest.Controllers.DICOMController
 {

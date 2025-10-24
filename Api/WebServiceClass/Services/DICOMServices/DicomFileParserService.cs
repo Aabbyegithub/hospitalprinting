@@ -13,89 +13,92 @@ namespace WebServiceClass.Services.DICOMServices
     public class DicomFileParserService : IDicomFileParserService,IBaseService
     {
         private readonly ISqlHelper _dal;
-        private readonly ILogger<DicomFileParserService> _logger;
+        private readonly ILoggerHelper _logger;
 
-        public DicomFileParserService(ISqlHelper dal, ILogger<DicomFileParserService> logger)
+        public DicomFileParserService(ISqlHelper dal, ILoggerHelper logger)
         {
             _dal = dal;
             _logger = logger;
         }
 
-        public async Task<HolPatient?> ParsePatientInfoAsync(string filePath)
+        /// <summary>
+        /// 解析DICOM文件并保存到数据库
+        /// </summary>
+        /// <param name="filePath">DICOM文件路径</param>
+        /// <returns>解析结果</returns>
+        public async Task<HolDicomParsedData> ParsePatientInfoAsync(string filePath)
         {
             try
             {
                 if (!File.Exists(filePath))
                 {
-                    _logger.LogWarning($"DICOM文件不存在: {filePath}");
+                    await _logger.LogWarning($"DICOM文件不存在: {filePath}");
                     return null;
                 }
 
                 var dicomFile = await DicomFile.OpenAsync(filePath);
                 var dataset = dicomFile.Dataset;
+                var fileInfo = new FileInfo(filePath);
 
-                var patient = new HolPatient
+                var parsedData = new HolDicomParsedData
                 {
-                    //patient_id
-                    medical_no = dataset.GetSingleValueOrDefault(DicomTag.PatientID, ""),
-                    name = dataset.GetSingleValueOrDefault(DicomTag.PatientName, ""),
-                    //patient_birth_date = dataset.GetSingleValueOrDefault(DicomTag.PatientBirthDate, ""),
-                    gender = dataset.GetSingleValueOrDefault(DicomTag.PatientSex, ""),
-                    age = dataset.GetSingleValueOrDefault(DicomTag.PatientAge, "").ObjToInt(),
-                    createtime = DateTime.Now,
-                    updatetime = DateTime.Now
+                    file_path = filePath,
+                    file_name = fileInfo.Name,
+                    parse_time = DateTime.Now,
+                    create_time = DateTime.Now,
+                    update_time = DateTime.Now,
+                    is_deleted = false
                 };
 
-                _logger.LogInformation($"解析患者信息成功: {patient.name} ({patient.medical_no})");
-                return patient;
+                // 提取患者信息
+                parsedData.patient_id = dataset.GetSingleValueOrDefault(DicomTag.PatientID, "");
+                parsedData.patient_name = dataset.GetSingleValueOrDefault(DicomTag.PatientName, "");
+                parsedData.patient_birth_date = dataset.GetSingleValueOrDefault(DicomTag.PatientBirthDate, "");
+                parsedData.patient_sex = dataset.GetSingleValueOrDefault(DicomTag.PatientSex, "");
+                parsedData.patient_age = dataset.GetSingleValueOrDefault(DicomTag.PatientAge, "");
+
+                // 提取检查信息
+                parsedData.study_instance_uid = dataset.GetSingleValueOrDefault(DicomTag.StudyInstanceUID, "");
+                parsedData.study_date = dataset.GetSingleValueOrDefault(DicomTag.StudyDate, "");
+                parsedData.study_time = dataset.GetSingleValueOrDefault(DicomTag.StudyTime, "");
+                parsedData.study_description = dataset.GetSingleValueOrDefault(DicomTag.StudyDescription, "");
+                parsedData.study_id = dataset.GetSingleValueOrDefault(DicomTag.StudyID, "");
+                parsedData.accession_number = dataset.GetSingleValueOrDefault(DicomTag.AccessionNumber, "");
+
+
+                // 提取图像信息
+                parsedData.sop_instance_uid = dataset.GetSingleValueOrDefault(DicomTag.SOPInstanceUID, "");
+                parsedData.instance_number = dataset.GetSingleValueOrDefault(DicomTag.InstanceNumber, "");
+                parsedData.image_type = dataset.GetSingleValueOrDefault(DicomTag.ImageType, "");
+
+                // 提取设备信息
+                parsedData.institutional_department_name = dataset.GetSingleValueOrDefault(DicomTag.InstitutionalDepartmentName, "");
+                parsedData.modality = dataset.GetSingleValueOrDefault(DicomTag.Modality, "");
+
+                // 提取检查参数
+                parsedData.study_comments = dataset.GetSingleValueOrDefault(DicomTag.StudyCommentsRETIRED, "");
+                parsedData.study_status_id = dataset.GetSingleValueOrDefault(DicomTag.Status, "");
+                parsedData.study_priority_id = dataset.GetSingleValueOrDefault(DicomTag.StudyPriorityIDRETIRED, "");
+                parsedData.referring_physician_name = dataset.GetSingleValueOrDefault(DicomTag.ReferringPhysicianName, "");
+                parsedData.performing_physician_name = dataset.GetSingleValueOrDefault(DicomTag.PerformingPhysicianName, "");
+                parsedData.operator_name = dataset.GetSingleValueOrDefault(DicomTag.OperatorsName, "");
+
+                // 保存到数据库
+                var DicomId = await _dal.Db.Insertable(parsedData).ExecuteReturnBigIdentityAsync();
+
+
+
+                await _logger.LogInfo($"DICOM数据解析并保存成功: {filePath}","DICOM文件解析");
+                return parsedData;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"解析患者信息失败: {filePath}");
+                await _logger.LogError($"解析并保存DICOM数据失败: {filePath}--{ex.Message}");
                 return null;
             }
         }
 
-        public async Task<HolExamination?> ParseExaminationInfoAsync(string filePath)
-        {
-            try
-            {
-                if (!File.Exists(filePath))
-                {
-                    _logger.LogWarning($"DICOM文件不存在: {filePath}");
-                    return null;
-                }
 
-                var dicomFile = await DicomFile.OpenAsync(filePath);
-                var dataset = dicomFile.Dataset;
-
-                var examination = new HolExamination
-                {
-                    //study_instance_uid = dataset.GetSingleValueOrDefault(DicomTag.StudyInstanceUID, ""),
-                    //series_instance_uid = dataset.GetSingleValueOrDefault(DicomTag.SeriesInstanceUID, ""),
-                    //sop_instance_uid = dataset.GetSingleValueOrDefault(DicomTag.SOPInstanceUID, ""),
-                    //study_date = dataset.GetSingleValueOrDefault(DicomTag.StudyDate, ""),
-                    //study_time = dataset.GetSingleValueOrDefault(DicomTag.StudyTime, ""),
-                    //modality = dataset.GetSingleValueOrDefault(DicomTag.Modality, ""),
-                    //study_description = dataset.GetSingleValueOrDefault(DicomTag.StudyDescription, ""),
-                    //series_description = dataset.GetSingleValueOrDefault(DicomTag.SeriesDescription, ""),
-                    //patient_id = dataset.GetSingleValueOrDefault(DicomTag.PatientID, ""),
-                    //institution_name = dataset.GetSingleValueOrDefault(DicomTag.InstitutionName, ""),
-                    //department_name = dataset.GetSingleValueOrDefault(DicomTag.InstitutionalDepartmentName, ""),
-                    //physician_name = dataset.GetSingleValueOrDefault(DicomTag.ReferringPhysicianName, ""),
-                    //create_time = DateTime.Now,
-                    //update_time = DateTime.Now
-                };
-
-                //_logger.LogInformation($"解析检查信息成功: {examination.study_description} ({examination.modality})");
-                return examination;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"解析检查信息失败: {filePath}");
-                return null;
-            }
-        }
 
         public async Task<Dictionary<string, object>> GetDicomMetadataAsync(string filePath)
         {
@@ -105,7 +108,7 @@ namespace WebServiceClass.Services.DICOMServices
             {
                 if (!File.Exists(filePath))
                 {
-                    _logger.LogWarning($"DICOM文件不存在: {filePath}");
+                   await _logger.LogWarning($"DICOM文件不存在: {filePath}");
                     return metadata;
                 }
 
@@ -145,7 +148,7 @@ namespace WebServiceClass.Services.DICOMServices
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogDebug(ex, $"无法读取DICOM标签 {tag.Key}");
+                       await _logger.LogError( $"无法读取DICOM标签 {tag.Key}-{ex.Message}");
                     }
                 }
 
@@ -156,11 +159,11 @@ namespace WebServiceClass.Services.DICOMServices
                 metadata["FileCreationTime"] = fileInfo.CreationTime;
                 metadata["FileLastWriteTime"] = fileInfo.LastWriteTime;
 
-                _logger.LogInformation($"提取DICOM元数据成功: {filePath}, 共{metadata.Count}个字段");
+                 await _logger.LogInfo($"提取DICOM元数据成功: {filePath}, 共{metadata.Count}个字段","DICOM文件解析");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"提取DICOM元数据失败: {filePath}");
+                await _logger.LogError($"提取DICOM元数据失败: {filePath}-{ex.Message}");
             }
 
             return metadata;
@@ -186,12 +189,12 @@ namespace WebServiceClass.Services.DICOMServices
 
                 var isValid = hasPatientID && hasStudyInstanceUID && hasSOPInstanceUID;
                 
-                _logger.LogInformation($"DICOM文件验证结果: {filePath}, 有效: {isValid}");
+                await _logger.LogInfo($"DICOM文件验证结果: {filePath}, 有效: {isValid}","DICOM文件解析");
                 return isValid;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"DICOM文件验证失败: {filePath}");
+                await _logger.LogError($"DICOM文件验证失败: {filePath}-{ex.Message}");
                 return false;
             }
         }

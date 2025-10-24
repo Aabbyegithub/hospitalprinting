@@ -17,14 +17,7 @@ namespace WebIServices.IServices.DICOMIServices
         /// </summary>
         /// <param name="filePath">DICOM文件路径</param>
         /// <returns>患者信息</returns>
-        Task<HolPatient?> ParsePatientInfoAsync(string filePath);
-
-        /// <summary>
-        /// 解析DICOM文件并提取检查信息
-        /// </summary>
-        /// <param name="filePath">DICOM文件路径</param>
-        /// <returns>检查信息</returns>
-        Task<HolExamination?> ParseExaminationInfoAsync(string filePath);
+        Task<HolDicomParsedData?> ParsePatientInfoAsync(string filePath);
 
         /// <summary>
         /// 获取DICOM文件的元数据

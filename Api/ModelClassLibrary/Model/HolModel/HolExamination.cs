@@ -101,6 +101,11 @@ namespace MyNamespace
         public int is_upload { get; set; } = 0;
 
         /// <summary>
+        /// 胶片能否打印：1=可以打印，0=不能打印
+        /// </summary>
+        public int isfees { get; set; } = 1;
+
+        /// <summary>
         /// 导航属性：对应的患者信息
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(patient_id))]

@@ -16,7 +16,7 @@ export default defineConfig({
   ],
   server: {
     host: '0.0.0.0', // 允许外部访问
-    port: 3000,      // 端口号
+    port: 8081,      // 端口号
     open: true,      // 自动打开浏览器
     cors: true,      // 启用CORS
     

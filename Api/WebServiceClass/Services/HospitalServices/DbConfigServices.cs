@@ -242,7 +242,7 @@ namespace WebServiceClass.Services.HospitalServices
         {
             try
             {
-                var connectionString = BuildConnectionString(config);
+                var connectionString =await BuildConnectionString(config);
 
                 using var connection = new MySqlConnection(connectionString);
                 await connection.OpenAsync();
@@ -306,16 +306,17 @@ namespace WebServiceClass.Services.HospitalServices
         /// <summary>
         /// 构建MySQL连接字符串
         /// </summary>
-        private string BuildConnectionString(HolDbConfigDto config)
+        private async Task<string> BuildConnectionString(HolDbConfigDto config)
         {
             var type = (config.database_type ?? "MySQL").ToLower();
+            var password =await DecryptPasswordAsync(config.password);
             return type switch
             {
-                "mysql" => $"Server={config.server_ip};Port={config.server_port};Database={config.database_name};Uid={config.username};Pwd={config.password};",
-                "sqlserver" => $"Server={config.server_ip},{config.server_port};Database={config.database_name};User Id={config.username};Password={config.password};",
-                "oracle" => $"Data Source={config.server_ip}:{config.server_port}/{config.database_name};User Id={config.username};Password={config.password};",
-                "postgresql" => $"Host={config.server_ip};Port={config.server_port};Database={config.database_name};Username={config.username};Password={config.password};",
-                _ => $"Server={config.server_ip};Port={config.server_port};Database={config.database_name};Uid={config.username};Pwd={config.password};"
+                "mysql" => $"Server={config.server_ip};Port={config.server_port};Database={config.database_name};Uid={config.username};Pwd={password};",
+                "sqlserver" => $"Server={config.server_ip},{config.server_port};Database={config.database_name};User Id={config.username};Password={password};",
+                "oracle" => $"Data Source={config.server_ip}:{config.server_port}/{config.database_name};User Id={config.username};Password={password};",
+                "postgresql" => $"Host={config.server_ip};Port={config.server_port};Database={config.database_name};Username={config.username};Password={password};",
+                _ => $"Server={config.server_ip};Port={config.server_port};Database={config.database_name};Uid={config.username};Pwd={password};"
             };
         }
 

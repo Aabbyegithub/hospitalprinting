@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebIServices.IBase;
 
 namespace WebServiceClass.Helper
 {
     /// <summary>
     /// 日志记录
     /// </summary>
-    public class LoggerHelper:IDisposable
+    public class LoggerHelper : ILoggerHelper, IDisposable,IBaseService
     {
         /*请求样例
           using (var logger2 = new Logger(moduleName: "module2", logFileName: "custom_log"))
@@ -26,8 +27,8 @@ namespace WebServiceClass.Helper
             customLogger.LogError("This is an error message for custom_module.");
         }
          */
-        private readonly string _baseLogDirectory;
-        private readonly string _moduleName;
+        private readonly string _baseLogDirectory = "LogInfos";
+        private string _moduleName;
         private readonly string _logFileName;
         private readonly string _fileExtension;
         private StreamWriter _infoLogWriter;
@@ -67,15 +68,16 @@ namespace WebServiceClass.Helper
             };
         }
 
-        public void LogInfo(string message)
+        public async Task LogInfo(string message,string moduleName = "INFO")
         {
-            using (_infoLogWriter = CreateLogWriter("INFO", _logFileName))
+            using (_infoLogWriter = CreateLogWriter(moduleName, _logFileName))
             {
-                 Log("INFO", message, _infoLogWriter);
-            }           
+                 Log(moduleName, message, _infoLogWriter);
+            }
         }
 
-        public void LogWarning(string message)
+
+        public async Task LogWarning(string message)
         {
             using ( _warningLogWriter = CreateLogWriter("WARNING", _logFileName))
             {
@@ -84,16 +86,16 @@ namespace WebServiceClass.Helper
            
         }
 
-        public void LogError(string message)
+        public async Task LogError(string message)
         {
             using ( _errorLogWriter = CreateLogWriter("ERROR", _logFileName))
             {
-                  Log("ERROR", message, _errorLogWriter);
+                  await Log("ERROR", message, _errorLogWriter);
             };
           
         }
 
-        private void Log(string logLevel, string message, StreamWriter logWriter)
+        private async Task Log(string logLevel, string message, StreamWriter logWriter)
         {
             // 每次记录日志时，检查日志文件夹是否为当天的日志文件夹
             string currentDateString = DateTime.Now.ToString("yyyy-MM-dd");

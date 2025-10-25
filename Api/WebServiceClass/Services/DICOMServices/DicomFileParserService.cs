@@ -86,7 +86,15 @@ namespace WebServiceClass.Services.DICOMServices
                 // 保存到数据库
                 var DicomId = await _dal.Db.Insertable(parsedData).ExecuteReturnBigIdentityAsync();
 
+                var partient = await _dal.Db.Queryable<HolExamination>().FirstAsync(a => a.patientid == parsedData.patient_id && a.studyuid == parsedData.study_instance_uid);
 
+                if (partient != null )
+                {
+                    partient.image_path = parsedData.file_path;
+                    partient.ocr_identify_type = 1;
+                    await _dal.Db.Updateable(partient).ExecuteCommandAsync();
+                    await _dal.Db.Updateable<HolDicomParsedData>().SetColumns(a=>a.is_verify == true).Where(a=>a.id == DicomId).ExecuteCommandAsync();
+                }
 
                 await _logger.LogInfo($"DICOM数据解析并保存成功: {filePath}","DICOM文件解析");
                 return parsedData;

@@ -217,7 +217,7 @@ namespace MyNamespace
         /// Default:true
         /// Nullable:False
         /// </summary>           
-        public bool is_verify { get; set; } = true;
+        public bool is_verify { get; set; } = false;
 
         /// <summary>
         /// 设备类型

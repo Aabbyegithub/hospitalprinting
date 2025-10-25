@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WinSelfMachine.Common;
 using Newtonsoft.Json;
+using ModelClassLibrary.Model.HolModel;
 
 namespace Common
 {

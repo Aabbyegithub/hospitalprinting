@@ -2,6 +2,7 @@
 using MyNamespace;
 using Quartz;
 using SqlSugar;
+using SqlSugar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -163,36 +164,77 @@ namespace WebTaskClass.SampleJob
         /// </summary>
         private async Task SyncPatientDataAsync(ISqlSugarClient db)
         {
-            var Time = DateTime.Now.AddDays(-1);
+            var Time = DateTime.Now.AddHours(-1);
             var ThisSysPatient = await _dal.Db.Queryable<HolPatient>().Where(a => a.createtime > Time.AddHours(-5)).ToListAsync();
-            var ThisSysHolExamination = await _dal.Db.Queryable<HolExamination>().Where(a => a.create_time > Time.AddHours(-5)).ToListAsync();
+            var ThisSysHolExamination = await _dal.Db.Queryable<HolExamination>().Where(a => a.create_time > Time.AddHours(-3)).ToListAsync();
             var PatientInfo = await db.Queryable<HolMedicalRecord>("VIEW_FOR_PATIENTINFO")
                 .Where(a => a.CreateTime >= Time).ToListAsync();
-             var Data =  PatientInfo.Select(a=>new HolPatient
-                {
-                    name = a.Name,
-                    gender = a.Sex,
-                    age = a.Age,
-                    id_card = a.IdNumber,
-                    contact = a.Phone,
-                    medical_no = a.OutPatientNo,
-                    createtime = a.CreateTime,
-                    updatetime = a.UpdateTime,
-                    status = 1,
-                    Account_no = a.AccessionNumber
-             }).DistinctBy(a=>a.medical_no).ToList();
-            List<HolPatient> PatientInsert = new List<HolPatient>();
-            List<HolPatient> PatientUpdate = new List<HolPatient>();
-            List<HolExamination> PatientExaminationInsert = new List<HolExamination>();
-            List<HolExamination> PatientExaminationUpdate = new List<HolExamination>();
+            var Data = PatientInfo.Select(a => new HolPatient
+            {
+                name = a.Name,
+                gender = a.Sex,
+                age = a.Age,
+                id_card = a.IdNumber,
+                contact = a.Phone,
+                medical_no = a.OutPatientNo,
+                createtime = a.CreateTime,
+                updatetime = a.UpdateTime,
+                status = 1,
+                Account_no = a.AccessionNumber
+            }).DistinctBy(a => a.medical_no).ToList();
             foreach (var item in Data)
             {
                 var IsHas = ThisSysPatient.FirstOrDefault(a => a.medical_no == item.medical_no);
+             
                 if (IsHas != null)
                 {
+                    var IsExaminationHas = ThisSysHolExamination.Where(a => a.patient_id == IsHas.id).ToList();
                     item.id = IsHas.id;
-                    PatientUpdate.Add(item);
-
+                    await _dal.Db.Updateable(item).ExecuteCommandAsync();
+                    var ItemList = PatientInfo.Where(a => a.OutPatientNo == item.medical_no)
+                                .Select(a => new HolExamination
+                                {
+                                    id = IsExaminationHas.FirstOrDefault(b=>b.exam_no ==  a.AccessionNumber) == null ? 0:IsExaminationHas.FirstOrDefault(b=>b.exam_no ==  a.AccessionNumber).id,
+                                    exam_no = a.AccessionNumber,
+                                    patient_id = IsHas.id,
+                                    exam_type = a.Modality,
+                                    exam_date = a.StudyDate,
+                                    report_path = a.PdfReportUrl,
+                                    //image_path = a.Dicom_path,
+                                    create_time = a.CreateTime,
+                                    update_time = a.UpdateTime,
+                                    image_no = a.StudyUid,
+                                    report_status = a.ReportStatus,
+                                    card_no = a.CardNo,
+                                    in_patient_no = a.InPatientNo,
+                                    tj_no = a.TjNo,
+                                    id_number = a.IdNumber,
+                                    medicare_id = a.MedicareId,
+                                    patient_class = a.PatientClass,
+                                    report_doctor = a.ReportDoctor,
+                                    audit_doctor = a.AuditDoctor,
+                                    reg_date = a.RegDate,
+                                    report_date = a.ReportDate,
+                                    audit_date = a.AuditDate,
+                                    body_part = a.BodyPart,
+                                    req_dept = a.ReqDept,
+                                    req_physician = a.ReqPhysician,
+                                    ward = a.Ward,
+                                    bed_no = a.BedNo,
+                                    exam_method = a.ExamMethod,
+                                    description = a.Description,
+                                    impression = a.Impression,
+                                    recommendation = a.Recommendation,
+                                    report_doctor_sign = a.ReportDoctorSign,
+                                    audit_doctor_sign = a.AuditDoctorSign,
+                                    studyuid = a.StudyUid,
+                                    phone = a.Phone,
+                                    need_efilm = (byte)a.NeedEfilm.ObjToInt(),
+                                    filmtype = a.FilmType,
+                                    isfees = (byte)(a.Isfee == true ? 1 : 0),
+                                }).ToList();
+                    await  _dal.Db.Insertable(ItemList.Where(a=>a.id == 0).ToList()).ExecuteCommandAsync();
+                    await  _dal.Db.Updateable(ItemList.Where(a=>a.id != 0).ToList()).ExecuteCommandAsync();
                 }
                 else
                 {
@@ -200,8 +242,46 @@ namespace WebTaskClass.SampleJob
                     var ItemList = PatientInfo.Where(a => a.OutPatientNo == item.medical_no)
                         .Select(a => new HolExamination
                         {
-
+                            exam_no = a.AccessionNumber,
+                            patientid = a.PatientId,
+                            patient_id = InSertId,
+                            exam_type = a.Modality,
+                            exam_date = a.StudyDate,
+                            report_path = a.PdfReportUrl,
+                            //image_path = a.Dicom_path,
+                            create_time = a.CreateTime,
+                            update_time = a.UpdateTime,
+                            image_no = a.StudyUid,
+                            report_status = a.ReportStatus,
+                            card_no = a.CardNo,
+                            in_patient_no = a.InPatientNo,
+                            tj_no = a.TjNo,
+                            id_number = a.IdNumber,
+                            medicare_id = a.MedicareId,
+                            patient_class = a.PatientClass,
+                            report_doctor = a.ReportDoctor,
+                            audit_doctor = a.AuditDoctor,
+                            reg_date = a.RegDate,
+                            report_date = a.ReportDate,
+                            audit_date = a.AuditDate,
+                            body_part = a.BodyPart,
+                            req_dept = a.ReqDept,
+                            req_physician = a.ReqPhysician,
+                            ward = a.Ward,
+                            bed_no = a.BedNo,
+                            exam_method = a.ExamMethod,
+                            description = a.Description,
+                            impression = a.Impression,
+                            recommendation = a.Recommendation,
+                            report_doctor_sign = a.ReportDoctorSign,
+                            audit_doctor_sign = a.AuditDoctorSign,
+                            studyuid = a.StudyUid,
+                            phone = a.Phone,
+                            need_efilm = (byte)a.NeedEfilm.ObjToInt(),
+                            filmtype = a.FilmType,
+                            isfees =(byte)(a.Isfee== true ? 1:0),
                         }).ToList();
+                    await _dal.Db.Insertable(ItemList).ExecuteCommandAsync();
                 }
             }
 

@@ -111,7 +111,11 @@ const routes = [
             name: 'DbConnectionManagement',
             component: () => import('../views/Menu/BackendHome/Hospital/DbConnectionManagement.vue') 
           },
-          
+          { 
+            path: 'PrintTemplateManagement', 
+            name: 'PrintTemplateManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/PrintTemplateManagement.vue') 
+          },
         ]
        },
     ]

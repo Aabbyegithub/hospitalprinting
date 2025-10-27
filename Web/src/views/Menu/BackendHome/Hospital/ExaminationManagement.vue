@@ -607,10 +607,12 @@ function viewReport(row: any) {
   showReportModal.value = true;
 }
 
-// 查看胶片：压缩包直接下载，否则弹窗预览图片
+// 查看胶片：压缩包直接下载，DCM文件特殊处理，否则弹窗预览图片
 function viewImage(row: any) {
   const url = normalizeUrl(row.image_path);
   const ext = getExt(url);
+  
+  // 压缩包直接下载
   if (isArchive(ext)) {
     const a = document.createElement('a');
     a.href = url;
@@ -621,6 +623,25 @@ function viewImage(row: any) {
     document.body.removeChild(a);
     return;
   }
+  
+  // DCM文件特殊处理 - 使用DICOM查看器
+  if (ext === 'dcm') {
+    // 对于DCM文件，我们需要使用专门的DICOM查看器
+    // 这里可以集成DICOM.js或其他DICOM查看器
+    ElMessage.info('DCM文件需要专门的DICOM查看器，正在开发中...');
+    
+    // 临时方案：直接下载DCM文件
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `胶片_${row.exam_no}.dcm`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;
+  }
+  
+  // 其他图片格式正常预览
   currentImagePath.value = url;
   showImageModal.value = true;
 }

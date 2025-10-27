@@ -86,7 +86,7 @@ namespace WebServiceClass.Services.DICOMServices
                 // 保存到数据库
                 var DicomId = await _dal.Db.Insertable(parsedData).ExecuteReturnBigIdentityAsync();
 
-                var partient = await _dal.Db.Queryable<HolExamination>().FirstAsync(a => a.patientid == parsedData.patient_id && a.studyuid == parsedData.study_instance_uid);
+                var partient = await _dal.Db.Queryable<HolExamination>().FirstAsync(a => a.patientexid == parsedData.patient_id && a.studyuid == parsedData.study_instance_uid);
 
                 if (partient != null )
                 {

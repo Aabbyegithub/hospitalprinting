@@ -88,7 +88,7 @@ namespace WinSelfMachine
 
             if (!string.IsNullOrEmpty(SerUrl) && PrinterId != -1)
             {
-                await _apiCommon.UpdatePrinterStatus(PrinterId, 1);
+                await _apiCommon.UpdatePrinterStatus(SerUrl.TrimEnd('/'),PrinterId, 1);
             }
 
         }
@@ -258,7 +258,7 @@ namespace WinSelfMachine
 
             if (!string.IsNullOrEmpty(SerUrl) && PrinterId != -1)
             {
-                await _apiCommon.UpdatePrinterStatus(PrinterId,0);
+                await _apiCommon.UpdatePrinterStatus(SerUrl.TrimEnd('/'),PrinterId,0);
             }
             Close();
         }
@@ -366,13 +366,9 @@ namespace WinSelfMachine
                 // 检查是否已打印
                 if (examination.is_printed == 1)
                 {
-                    var result = MessageBox.Show("该检查报告已打印过，是否重新打印？", "提示", 
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (result != DialogResult.Yes)
-                    {
-                        this.Text = "医院自助一体机";
-                        return;
-                    }
+                    var result = MessageBox.Show("该检查报告已打印过", "提示", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
 
                 // 获取打印机配置

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using SqlSugar;
+
 
 namespace MyNamespace
 {
     ///<summary>
     ///患者信息表
     ///</summary>
-    [SugarTable("hol_patient")]
+
     public partial class HolPatient
     {
         public HolPatient()
@@ -21,7 +21,7 @@ namespace MyNamespace
         /// Default:
         /// Nullable:False
         /// </summary>           
-        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+
         public long id { get; set; }
 
         /// <summary>

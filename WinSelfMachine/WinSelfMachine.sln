@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinQueue", "WinQueue\WinQue
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{D5054155-0535-463A-A3E6-E6790AF7C0C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsOCR", "WindowsOCR\WindowsOCR.csproj", "{6426DEC0-C483-42AB-AB1B-07BD4DB0A410}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D5054155-0535-463A-A3E6-E6790AF7C0C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5054155-0535-463A-A3E6-E6790AF7C0C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5054155-0535-463A-A3E6-E6790AF7C0C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6426DEC0-C483-42AB-AB1B-07BD4DB0A410}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6426DEC0-C483-42AB-AB1B-07BD4DB0A410}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6426DEC0-C483-42AB-AB1B-07BD4DB0A410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6426DEC0-C483-42AB-AB1B-07BD4DB0A410}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

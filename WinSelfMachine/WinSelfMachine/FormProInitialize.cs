@@ -28,7 +28,7 @@ namespace WinSelfMachine
 
         private void LoadConfig()
         {
-            if (_iniConfig == null)
+            if (_iniConfig != null)
             {
                  var SerUrl = _iniConfig.Read("EquipmentUrl", "SerUrl", "");//请求数据Url
                 TxtServicesUrl.Text = SerUrl;
@@ -85,7 +85,9 @@ namespace WinSelfMachine
             _iniConfig.Write("EquipmentIsStart", "IsStart", "1");
             _iniConfig.Write("Printer", "PrinterId", CbmDep.SelectedValue.ToString());
             _iniConfig.Write("Printer", "PrinterName",CbmDep.SelectedText);
-            await _apiCommon.UpdatePrinterStatus(CbmDep.SelectedIndex,1);
+            var Url = TxtServicesUrl.Text.TrimEnd('/');
+            await _apiCommon.UpdatePrinterStatus(Url, CbmDep.SelectedIndex,1);
+            Close();
             
         }
     }

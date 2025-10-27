@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ModelClassLibrary.Model.HolModel;
+using MyNamespace;
 using WebIServices.IBase;
 using WebIServices.IServices.EquipmentIServices;
 using static WebProjectTest.Common.Message;
@@ -64,6 +65,23 @@ namespace WebProjectTest.Controllers.EquipmentController
         public async Task<ApiResponse<bool>> SavePrintConfigAsync(long PrinterId,int Type, int Action, HolPrinterConfig holPrinterConfigs)
         {
             return await _equipmentServices.SavePrintConfigAsync(PrinterId,Type, Action, holPrinterConfigs);
+        }
+        [HttpGet]
+        public async Task<ApiResponse<HolExamination>> GetByExamNoAsync(string examNo)
+        {
+            return await _equipmentServices.GetByExamNoAsync(examNo);
+        }
+
+        [HttpGet]
+        public async Task<ApiResponse<bool>> SavePrintRecordAsync([FromBody] PrintRecordModel print)
+        {
+            return await _equipmentServices.SavePrintRecordAsync(print);
+        }
+
+        [HttpGet]
+        public async Task<ApiResponse<List<HolExamination>>> GetAllUserAsync()
+        {
+            return await _equipmentServices.GetAllUserAsync();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using SqlSugar;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace ModelClassLibrary.Model.HolModel
 {
-    [SugarTable("hol_printer")]
+
     public class HolPrinter
     {
-        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public long id { get; set; }
 
         public string name { get; set; }

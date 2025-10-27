@@ -636,7 +636,7 @@ namespace WinSelfMachine
                 await PrintWithDcmtk(parameters);
                 
                 // 方法2：如果dcmtk不可用，使用自定义DICOM客户端
-                // await PrintWithCustomDicomClient(parameters);
+                await PrintWithCustomDicomClient(parameters);
             }
             catch (Exception ex)
             {
@@ -680,7 +680,7 @@ namespace WinSelfMachine
                 var output = await process.StandardOutput.ReadToEndAsync();
                 var error = await process.StandardError.ReadToEndAsync();
                 
-                await process.WaitForExitAsync();
+                process.WaitForExit();
 
                 if (process.ExitCode != 0)
                 {
@@ -1012,7 +1012,7 @@ namespace WinSelfMachine
                         }
                     }
 
-                    var fileContent = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
+                    var fileContent = File.ReadAllText(filePath, Encoding.UTF8);
                     
                     printDocument.PrintPage += (sender, e) =>
                     {

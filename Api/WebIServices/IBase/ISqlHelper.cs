@@ -22,6 +22,11 @@ namespace WebIServices.IBase
         /// <returns></returns>
         ISqlSugarClient DbContext(string configid);
 
+        /// <summary>
+        /// 根据配置创建连接
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         ISqlSugarClient CreateConnection(ConnectionConfig config);
     }
 }

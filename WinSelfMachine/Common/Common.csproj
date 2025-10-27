@@ -45,6 +45,7 @@
     <Compile Include="ApiCommon.cs" />
     <Compile Include="HolPrinterConfig.cs" />
     <Compile Include="IniFileHelper.cs" />
+    <Compile Include="PrintRecordModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Response.cs" />
   </ItemGroup>

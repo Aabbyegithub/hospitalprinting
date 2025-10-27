@@ -250,6 +250,17 @@ namespace WebProjectTest
                 FileProvider = new PhysicalFileProvider(basePath),
                 RequestPath = "" // 直接映射到根路径，根据实际需求调整
             });
+
+            // 添加项目根目录映射
+            string projectRootPath = AppContext.BaseDirectory;
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(projectRootPath),
+                RequestPath = "", // 映射到 /project 路径
+                ServeUnknownFileTypes = true, // 允许服务未知文件类型
+                DefaultContentType = "application/octet-stream" // 默认内容类型
+            });
+
             // 配置全局异常处理
             app.Use(async (context, next) =>
             {

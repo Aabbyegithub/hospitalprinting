@@ -155,8 +155,6 @@
     <Compile Include="Model\HolModel.cs" />
     <Compile Include="Model\HolPatient.cs" />
     <Compile Include="Model\HolPrinter.cs" />
-    <Compile Include="Model\HolPrinterConfig.cs" />
-    <Compile Include="Model\PrintRecordModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Controls\Carousel.resx">

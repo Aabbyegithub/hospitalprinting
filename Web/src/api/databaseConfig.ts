@@ -85,3 +85,4 @@ export function setDefaultDatabaseConfig(configId: number, orgId: number = 1) {
 export function getDatabaseTypeOptions() {
   return axios.get('/api/DatabaseConfig/GetDatabaseTypeOptions')
 }
+

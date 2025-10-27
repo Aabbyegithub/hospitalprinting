@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+echo "Api/WinFormsOCR/model/PP-OCRv5_server_rec_infer/inference.pdiparams" >> .gitignore
+echo "Api/WinFormsOCR/model/PP-OCRv5_server_rec_pretrained.pdparams" >> .gitignore
+git add .gitignore
+git commit -m "忽略 OCR 大模型文件"

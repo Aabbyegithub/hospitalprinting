@@ -328,18 +328,37 @@ namespace WindowsOCR
                 }
                 catch (Exception ex)
                 {
-                    result.AppendLine("OCR识别出错：");
-                    result.AppendLine(ex.Message);
+                    result.AppendLine("❌ OCR识别出错！");
                     result.AppendLine("");
-                    result.AppendLine("堆栈跟踪：");
-                    result.AppendLine(ex.StackTrace);
+                    result.AppendLine("错误信息：" + ex.Message);
+                    result.AppendLine("");
                     
-                    // 提供解决方案
+                    // 提供明确的解决方案
+                    result.AppendLine("💡 解决方案：");
                     result.AppendLine("");
-                    result.AppendLine("可能的解决方案：");
-                    result.AppendLine("1. 确保已安装Tesseract-OCR");
-                    result.AppendLine("2. 检查tessdata文件夹是否存在");
-                    result.AppendLine("3. 确保tessdata文件夹包含语言数据文件");
+                    result.AppendLine("您已安装 Tesseract-OCR，但需要复制本机库 DLL 到程序目录。");
+                    result.AppendLine("");
+                    result.AppendLine("【步骤1】复制 DLL 文件");
+                    result.AppendLine("从以下源文件夹复制所有 DLL：");
+                    result.AppendLine(@"  源: C:\Program Files\Tesseract-OCR");
+                    result.AppendLine($"  到: {Application.StartupPath}");
+                    result.AppendLine("");
+                    result.AppendLine("需要复制的文件：");
+                    result.AppendLine("  - tesseract*.dll");
+                    result.AppendLine("  - liblept*.dll");
+                    result.AppendLine("  - 其他 .dll 文件");
+                    result.AppendLine("");
+                    result.AppendLine("【步骤2】复制 tessdata 文件");
+                    result.AppendLine($"将以下 tessdata 文件复制到: {Application.StartupPath}\\tessdata");
+                    result.AppendLine("  - chi_sim.traineddata");
+                    result.AppendLine("  - eng.traineddata");
+                    result.AppendLine("");
+                    result.AppendLine("【步骤3】重启程序");
+                    result.AppendLine("");
+                    result.AppendLine("或者使用 NuGet 重新安装 Tesseract 包：");
+                    result.AppendLine("1. 右键项目 -> 管理 NuGet 程序包");
+                    result.AppendLine("2. 卸载 Tesseract");
+                    result.AppendLine("3. 重新安装 Tesseract");
                 }
 
                 return result.ToString();
@@ -352,16 +371,16 @@ namespace WindowsOCR
         private string GetTesseractDataPath()
         {
             // 首先尝试在程序目录下的tessdata文件夹
-            string appDirTessdata = Path.Combine(Application.StartupPath, "tessdata");
-            if (Directory.Exists(appDirTessdata))
-            {
-                string parentDir = Path.GetDirectoryName(appDirTessdata);
-                // 验证路径是否正确
-                if (Directory.Exists(Path.Combine(parentDir, "tessdata")))
-                {
-                    return parentDir;
-                }
-            }
+            //string appDirTessdata = Path.Combine(Application.StartupPath, "tessdata");
+            //if (Directory.Exists(appDirTessdata))
+            //{
+            //    string parentDir = Path.GetDirectoryName(appDirTessdata);
+            //    // 验证路径是否正确
+            //    if (Directory.Exists(Path.Combine(parentDir, "tessdata")))
+            //    {
+            //        return parentDir;
+            //    }
+            //}
 
             // 尝试常见的Tesseract安装路径
             string[] possiblePaths = new string[]

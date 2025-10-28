@@ -87,9 +87,8 @@ namespace WinQueue
                             {
                                 var maskedName = MaskName(exam.patient.name);
                                 dataGridView1.Rows.Add(
-                                    exam.req_dept, 
-                                    exam.exam_no,  // 编号
-                                    maskedName  // 姓名（加密显示）
+                                    exam.exam_no+maskedName 
+                                    
                                 );
                             }
                         }

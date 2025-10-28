@@ -73,6 +73,7 @@ namespace WinSelfMachine
             resetDoubleClickTimer = new Timer();
             resetDoubleClickTimer.Interval = resetDoubleClickInterval;
             resetDoubleClickTimer.Tick += ResetDoubleClickTimer_Tick;
+            label3.Parent = roundedContainer1;
         }
 
         private async void Form1_Load(object sender, EventArgs e)

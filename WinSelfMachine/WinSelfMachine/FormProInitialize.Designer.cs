@@ -33,6 +33,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.CbmDep = new System.Windows.Forms.ComboBox();
             this.BtnSave = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.RedYes = new System.Windows.Forms.RadioButton();
+            this.RedNo = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // label1
@@ -76,7 +79,7 @@
             // BtnSave
             // 
             this.BtnSave.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.BtnSave.Location = new System.Drawing.Point(187, 117);
+            this.BtnSave.Location = new System.Drawing.Point(184, 172);
             this.BtnSave.Name = "BtnSave";
             this.BtnSave.Size = new System.Drawing.Size(84, 39);
             this.BtnSave.TabIndex = 4;
@@ -84,11 +87,50 @@
             this.BtnSave.UseVisualStyleBackColor = true;
             this.BtnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("宋体", 15F);
+            this.label3.Location = new System.Drawing.Point(21, 125);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(199, 20);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "是否打开可选择界面:";
+            // 
+            // RedYes
+            // 
+            this.RedYes.AutoSize = true;
+            this.RedYes.Font = new System.Drawing.Font("宋体", 15F);
+            this.RedYes.Location = new System.Drawing.Point(229, 123);
+            this.RedYes.Name = "RedYes";
+            this.RedYes.Size = new System.Drawing.Size(47, 24);
+            this.RedYes.TabIndex = 6;
+            this.RedYes.TabStop = true;
+            this.RedYes.Text = "是";
+            this.RedYes.UseVisualStyleBackColor = true;
+            this.RedYes.CheckedChanged += new System.EventHandler(this.RedYes_CheckedChanged);
+            // 
+            // RedNo
+            // 
+            this.RedNo.AutoSize = true;
+            this.RedNo.Font = new System.Drawing.Font("宋体", 15F);
+            this.RedNo.Location = new System.Drawing.Point(298, 123);
+            this.RedNo.Name = "RedNo";
+            this.RedNo.Size = new System.Drawing.Size(47, 24);
+            this.RedNo.TabIndex = 7;
+            this.RedNo.TabStop = true;
+            this.RedNo.Text = "否";
+            this.RedNo.UseVisualStyleBackColor = true;
+            this.RedNo.CheckedChanged += new System.EventHandler(this.RedNo_CheckedChanged);
+            // 
             // FormProInitialize
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(483, 175);
+            this.ClientSize = new System.Drawing.Size(483, 230);
+            this.Controls.Add(this.RedNo);
+            this.Controls.Add(this.RedYes);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.BtnSave);
             this.Controls.Add(this.CbmDep);
             this.Controls.Add(this.label2);
@@ -109,5 +151,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox CbmDep;
         private System.Windows.Forms.Button BtnSave;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.RadioButton RedYes;
+        private System.Windows.Forms.RadioButton RedNo;
     }
 }

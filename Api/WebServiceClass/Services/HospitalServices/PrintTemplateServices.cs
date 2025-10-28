@@ -523,7 +523,7 @@ namespace WebServiceClass.Services.HospitalServices
                 "medical_no" => exam.patient?.medical_no ?? "",
                 "id_card" => exam.patient?.id_card ?? "",
                 "contact" => exam.patient?.contact ?? "",
-                "create_time" => exam.create_time.ToString("yyyy-MM-dd HH:mm:ss"),
+                "create_time" =>exam.create_time == null ? "": exam.create_time.Value.ToString("yyyy-MM-dd HH:mm:ss"),
                 _ => ""
             };
         }

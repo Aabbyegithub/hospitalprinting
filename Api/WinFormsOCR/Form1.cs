@@ -11,10 +11,10 @@ namespace WinFormsOCR
     {
         private string? _currentImagePath;
         private Bitmap? _currentBitmap;
-        private Rectangle _selectionRect;
+        private List<Rectangle> _selectionRects = new List<Rectangle>();
+        private Rectangle _currentSelectionRect;
         private bool _isSelecting;
         private Point _startPoint;
-        private bool _hasValidSelection;
 
         private PaddleOCREngine? _ocrEngine;
         private int _zoomFactor = 3; // 默认放大倍数
@@ -81,7 +81,7 @@ namespace WinFormsOCR
         {
             using var openDialog = new OpenFileDialog
             {
-                Filter = "图片文件 (*.jpg;*.jpeg;*.png;*.bmp;*.tiff)|*.jpg;*.jpeg;*.png;*.bmp;*.tiff|DICOM文件 (*.dcm;*.dicom)|*.dcm;*.dicom|DICOM UID文件 (无扩展名)|*|所有文件 (*.*)|*.*",
+                Filter = "所有文件 (*.*)|*.*",
                 Title = "选择图片或DICOM文件（支持UID格式）"
             };
 
@@ -166,7 +166,10 @@ namespace WinFormsOCR
                 pictureBox1.Refresh();
                 
                 _currentImagePath = filePath;
-                _hasValidSelection = false;
+                _selectionRects.Clear();
+
+                // 更新图片尺寸显示
+                UpdateImageSizeDisplay();
 
                 // 更新状态信息
                 toolStripStatusLabel1.Text = displayInfo;
@@ -201,26 +204,13 @@ namespace WinFormsOCR
                 return;
             }
 
-            if (!_hasValidSelection)
+            if (_selectionRects.Count == 0)
             {
                 MessageBox.Show("请先在图片上拖拽选择要识别的区域", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // 截取选区并放大显示
-            var croppedBitmap = CropAndEnhanceSelection(_selectionRect);
-            if (croppedBitmap != null)
-            {
-                // 显示放大的选区
-                pictureBox2.Image = croppedBitmap;
-                pictureBox2.Refresh();
-                
-                // 更新状态栏显示放大倍数
-                toolStripStatusLabel1.Text = $"选区已放大{_zoomFactor}倍并增强";
-                
-                // 对放大的选区进行OCR识别
-                await PerformOCROnCroppedImage(croppedBitmap);
-            }
+            await PerformOCROnMultipleSelections();
         }
 
         private async Task PerformOCR(Rectangle? selectionRect)
@@ -820,6 +810,52 @@ namespace WinFormsOCR
             return sharpenedBitmap;
         }
 
+        private async Task PerformOCROnMultipleSelections()
+        {
+            try
+            {
+                toolStripStatusLabel1.Text = $"正在识别 {_selectionRects.Count} 个选区...";
+
+                var allResults = new StringBuilder();
+                allResults.AppendLine("=== 多选区OCR识别结果 ===");
+                allResults.AppendLine($"共识别 {_selectionRects.Count} 个选区");
+                allResults.AppendLine();
+
+                for (int i = 0; i < _selectionRects.Count; i++)
+                {
+                    var selectionRect = _selectionRects[i];
+                    toolStripStatusLabel1.Text = $"正在识别选区 {i + 1}/{_selectionRects.Count}...";
+
+                    // 截取选区并放大显示
+                    var croppedBitmap = CropAndEnhanceSelection(selectionRect);
+                    if (croppedBitmap != null)
+                    {
+                        allResults.AppendLine($"--- 选区 {i + 1} ---");
+                        allResults.AppendLine($"位置: ({selectionRect.X}, {selectionRect.Y})");
+                        allResults.AppendLine($"尺寸: {selectionRect.Width}x{selectionRect.Height}");
+                        allResults.AppendLine();
+
+                        // 执行OCR识别
+                        var result = await RecognizeText(croppedBitmap);
+                        allResults.AppendLine(result);
+                        allResults.AppendLine();
+
+                        // 释放资源
+                        croppedBitmap.Dispose();
+                    }
+                }
+
+                // 显示所有结果
+                textBox1.Text = allResults.ToString();
+                toolStripStatusLabel1.Text = "所有选区识别完成";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"OCR识别失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                toolStripStatusLabel1.Text = "识别失败";
+            }
+        }
+
         private async Task PerformOCROnCroppedImage(Bitmap croppedBitmap)
         {
             try
@@ -876,7 +912,31 @@ namespace WinFormsOCR
             {
                 _isSelecting = true;
                 _startPoint = e.Location;
-                _hasValidSelection = false;
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                // 右键点击删除选区
+                var clickedRect = GetClickedSelection(e.Location);
+                if (clickedRect.HasValue)
+                {
+                    _selectionRects.RemoveAt(clickedRect.Value);
+                    pictureBox1.Invalidate();
+                    toolStripStatusLabel1.Text = $"已删除选区，剩余 {_selectionRects.Count} 个选区";
+                    
+                    // 更新pictureBox2的显示
+                    if (_selectionRects.Count == 1)
+                    {
+                        // 如果只剩一个选区，显示该选区
+                        ShowSelectionInPictureBox2(_selectionRects[0]);
+                    }
+                    else if (_selectionRects.Count == 0)
+                    {
+                        // 如果没有选区了，清空pictureBox2
+                        pictureBox2.Image?.Dispose();
+                        pictureBox2.Image = null;
+                        pictureBox2.Refresh();
+                    }
+                }
             }
         }
 
@@ -890,7 +950,7 @@ namespace WinFormsOCR
             var width = Math.Abs(currentPoint.X - _startPoint.X);
             var height = Math.Abs(currentPoint.Y - _startPoint.Y);
 
-            _selectionRect = new Rectangle(x, y, width, height);
+            _currentSelectionRect = new Rectangle(x, y, width, height);
             pictureBox1.Invalidate();
         }
 
@@ -903,26 +963,103 @@ namespace WinFormsOCR
                 _isSelecting = false;
                 
                 // 检查选择区域是否有效
-                if (_selectionRect.Width > 10 && _selectionRect.Height > 10)
+                if (_currentSelectionRect.Width > 10 && _currentSelectionRect.Height > 10)
                 {
-                    _hasValidSelection = true;
-                    toolStripStatusLabel1.Text = $"已选择区域: {_selectionRect.Width}x{_selectionRect.Height}";
+                    // 添加新的选区到列表
+                    _selectionRects.Add(_currentSelectionRect);
+                    toolStripStatusLabel1.Text = $"已添加选区 {_selectionRects.Count}: {_currentSelectionRect.Width}x{_currentSelectionRect.Height}";
+                    
+                    // 如果只有一个选区，在pictureBox2中显示放大图像
+                    if (_selectionRects.Count == 1)
+                    {
+                        ShowSelectionInPictureBox2(_currentSelectionRect);
+                    }
                 }
                 else
                 {
-                    _hasValidSelection = false;
                     toolStripStatusLabel1.Text = "选择区域太小，请重新选择";
                 }
+                
+                pictureBox1.Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// 获取点击位置对应的选区索引
+        /// </summary>
+        /// <param name="clickPoint">点击位置</param>
+        /// <returns>选区索引，如果没有点击到选区则返回null</returns>
+        private int? GetClickedSelection(Point clickPoint)
+        {
+            for (int i = _selectionRects.Count - 1; i >= 0; i--)
+            {
+                if (_selectionRects[i].Contains(clickPoint))
+                {
+                    return i;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 在pictureBox2中显示选区的放大图像
+        /// </summary>
+        private void ShowSelectionInPictureBox2(Rectangle selectionRect)
+        {
+            if (_currentBitmap == null) return;
+
+            try
+            {
+                // 确保选区在图片范围内
+                var imageRect = new Rectangle(0, 0, _currentBitmap.Width, _currentBitmap.Height);
+                var clippedRect = Rectangle.Intersect(selectionRect, imageRect);
+                
+                if (clippedRect.Width <= 0 || clippedRect.Height <= 0) return;
+
+                // 从原图中裁剪选区
+                using var croppedBitmap = new Bitmap(clippedRect.Width, clippedRect.Height);
+                using var g = Graphics.FromImage(croppedBitmap);
+                g.DrawImage(_currentBitmap, 
+                    new Rectangle(0, 0, clippedRect.Width, clippedRect.Height),
+                    clippedRect, 
+                    GraphicsUnit.Pixel);
+
+                // 设置pictureBox2的图像
+                pictureBox2.Image?.Dispose(); // 释放之前的图像
+                pictureBox2.Image = new Bitmap(croppedBitmap);
+                pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
+                
+                toolStripStatusLabel1.Text = $"选区放大显示: {clippedRect.Width}x{clippedRect.Height}";
+            }
+            catch (Exception ex)
+            {
+                toolStripStatusLabel1.Text = $"显示选区失败: {ex.Message}";
             }
         }
 
         private void pictureBox1_Paint(object? sender, PaintEventArgs e)
         {
-            // 绘制选择框
-            if (_isSelecting || _hasValidSelection)
+            // 绘制所有已保存的选区
+            if (_selectionRects.Count > 0)
             {
                 using var pen = new Pen(Color.Red, 2);
-                e.Graphics.DrawRectangle(pen, _selectionRect);
+                for (int i = 0; i < _selectionRects.Count; i++)
+                {
+                    var rect = _selectionRects[i];
+                    e.Graphics.DrawRectangle(pen, rect);
+                    
+                    // 在选区上显示编号
+                    using var font = new Font("Arial", 10, FontStyle.Bold);
+                    using var brush = new SolidBrush(Color.Red);
+                    e.Graphics.DrawString((i + 1).ToString(), font, brush, rect.X + 2, rect.Y + 2);
+                }
+            }
+            
+            // 绘制当前正在选择的区域
+            if (_isSelecting)
+            {
+                using var pen = new Pen(Color.Blue, 2) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
+                e.Graphics.DrawRectangle(pen, _currentSelectionRect);
             }
         }
 
@@ -1062,7 +1199,7 @@ namespace WinFormsOCR
 
         private void 清除选区ToolStripMenuItem_Click(object? sender, EventArgs e)
         {
-            _hasValidSelection = false;
+            _selectionRects.Clear();
             _isSelecting = false;
             pictureBox1.Invalidate();
             
@@ -1070,16 +1207,14 @@ namespace WinFormsOCR
             pictureBox2.Image = null;
             pictureBox2.Refresh();
             
-            toolStripStatusLabel1.Text = "选区已清除";
+            toolStripStatusLabel1.Text = "所有选区已清除";
         }
 
-        private void btnCopy_Click(object? sender, EventArgs e)
+        private void 多选模式ToolStripMenuItem_Click(object? sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textBox1.Text))
-            {
-                Clipboard.SetText(textBox1.Text);
-                toolStripStatusLabel1.Text = "文本已复制到剪贴板";
-            }
+            // 多选模式已经默认启用，这里可以添加一些提示信息
+            MessageBox.Show("多选模式已启用！\n\n使用说明：\n• 左键拖拽：添加新选区\n• 右键点击选区：删除该选区\n• 菜单中的'清除选区'：清除所有选区", 
+                "多选模式", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void 适应窗口ToolStripMenuItem_Click(object? sender, EventArgs e)
@@ -1133,6 +1268,153 @@ namespace WinFormsOCR
         public int GetZoomFactor()
         {
             return _zoomFactor;
+        }
+
+        /// <summary>
+        /// 正则表达式输入框文本改变事件
+        /// </summary>
+        private void txtRegexPattern_TextChanged(object? sender, EventArgs e)
+        {
+            ValidateRegexPattern();
+        }
+
+        /// <summary>
+        /// 识别按钮点击事件
+        /// </summary>
+        private async void btnIdentify_Click(object? sender, EventArgs e)
+        {
+            await PerformRegexIdentification();
+        }
+
+        /// <summary>
+        /// 胶片另存按钮点击事件
+        /// </summary>
+        private void btnSaveFilm_Click(object? sender, EventArgs e)
+        {
+            SaveCurrentImage();
+        }
+
+        /// <summary>
+        /// 验证正则表达式是否正确
+        /// </summary>
+        private void ValidateRegexPattern()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(txtRegexPattern.Text))
+                {
+                    var regex = new System.Text.RegularExpressions.Regex(txtRegexPattern.Text);
+                    txtRegexPattern.BackColor = Color.White;
+                    toolStripStatusLabel1.Text = "正则表达式格式正确";
+                }
+            }
+            catch (ArgumentException)
+            {
+                txtRegexPattern.BackColor = Color.LightPink;
+                toolStripStatusLabel1.Text = "正则表达式格式错误";
+            }
+        }
+
+        /// <summary>
+        /// 执行正则表达式识别
+        /// </summary>
+        private async Task PerformRegexIdentification()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(txtRegexPattern.Text))
+                {
+                    MessageBox.Show("请输入正则表达式", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(textBox1.Text))
+                {
+                    MessageBox.Show("请先进行OCR识别", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                var regex = new System.Text.RegularExpressions.Regex(txtRegexPattern.Text);
+                var match = regex.Match(textBox1.Text);
+                
+                if (match.Success)
+                {
+                    txtMatchedText.Text = match.Value;
+                    toolStripStatusLabel1.Text = $"匹配成功: {match.Value}";
+                }
+                else
+                {
+                    txtMatchedText.Text = "";
+                    toolStripStatusLabel1.Text = "未找到匹配的文本";
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show($"正则表达式错误: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"识别过程中发生错误: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 保存当前图片
+        /// </summary>
+        private void SaveCurrentImage()
+        {
+            try
+            {
+                if (_currentBitmap == null)
+                {
+                    MessageBox.Show("没有可保存的图片", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                using var saveDialog = new SaveFileDialog
+                {
+                    Filter = "PNG图片 (*.png)|*.png|JPEG图片 (*.jpg)|*.jpg|BMP图片 (*.bmp)|*.bmp|所有文件 (*.*)|*.*",
+                    Title = "保存胶片",
+                    FileName = $"胶片_{DateTime.Now:yyyyMMdd_HHmmss}.png"
+                };
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var format = ImageFormat.Png;
+                    switch (Path.GetExtension(saveDialog.FileName).ToLower())
+                    {
+                        case ".jpg":
+                        case ".jpeg":
+                            format = ImageFormat.Jpeg;
+                            break;
+                        case ".bmp":
+                            format = ImageFormat.Bmp;
+                            break;
+                    }
+
+                    _currentBitmap.Save(saveDialog.FileName, format);
+                    toolStripStatusLabel1.Text = $"图片已保存到: {saveDialog.FileName}";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"保存图片失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 更新图片尺寸显示
+        /// </summary>
+        private void UpdateImageSizeDisplay()
+        {
+            if (_currentBitmap != null)
+            {
+                lblImageSize.Text = $"{_currentBitmap.Width} x {_currentBitmap.Height}";
+            }
+            else
+            {
+                lblImageSize.Text = "0 x 0";
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)

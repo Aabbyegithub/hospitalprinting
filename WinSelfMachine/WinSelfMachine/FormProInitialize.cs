@@ -16,6 +16,7 @@ namespace WinSelfMachine
         private IniFileHelper _iniConfig;
         private string _configFilePath;
         private readonly ApiCommon _apiCommon;
+        private int _IsDisplay = 1;
         public FormProInitialize()
         {
             _configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
@@ -35,6 +36,15 @@ namespace WinSelfMachine
                 _iniConfig.ReadInt("EquipmentIsStart", "IsStart", 0);//是否初始化项目
                 var PrinterId =  _iniConfig.ReadInt("Printer", "PrinterId", -1);//打印机配置
                 _iniConfig.Read("Printer", "PrinterName", "");//打印机名称
+               _IsDisplay = _iniConfig.ReadInt("IsDisplay", "Display",1);
+                if (_IsDisplay ==1)
+                {
+                    RedYes.Checked = true;
+                }
+                else
+                {
+                    RedNo.Checked = true;
+                }
                 CbmDep.SelectedValue = PrinterId;
             }
         }
@@ -85,10 +95,29 @@ namespace WinSelfMachine
             _iniConfig.Write("EquipmentIsStart", "IsStart", "1");
             _iniConfig.Write("Printer", "PrinterId", CbmDep.SelectedValue.ToString());
             _iniConfig.Write("Printer", "PrinterName",CbmDep.SelectedText);
+            _iniConfig.Write("IsDisplay", "Display",_IsDisplay.ToString());
             var Url = TxtServicesUrl.Text.TrimEnd('/');
             await _apiCommon.UpdatePrinterStatus(Url, CbmDep.SelectedIndex,1);
             Close();
             
+        }
+
+        private void RedYes_CheckedChanged(object sender, EventArgs e)
+        {
+            if (RedYes.Checked)
+            {
+                RedNo.Checked = false;
+                _IsDisplay = 1;
+
+            }
+        }
+
+        private void RedNo_CheckedChanged(object sender, EventArgs e)
+        {
+            if (RedNo.Checked)
+            {
+                RedYes.Checked = false;_IsDisplay = 0;
+            }
         }
     }
 }

@@ -7,6 +7,8 @@ using SqlSugar.Extensions;
 using System.Text.Json;
 using WebIServices.IBase;
 using WebIServices.IServices.DICOMIServices;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace WebServiceClass.Services.DICOMServices
 {
@@ -14,11 +16,13 @@ namespace WebServiceClass.Services.DICOMServices
     {
         private readonly ISqlHelper _dal;
         private readonly ILoggerHelper _logger;
+        private readonly IAppSettinghelper  _appSettinghelper;
 
-        public DicomFileParserService(ISqlHelper dal, ILoggerHelper logger)
+        public DicomFileParserService(ISqlHelper dal, ILoggerHelper logger, IAppSettinghelper appSettinghelper)
         {
             _dal = dal;
             _logger = logger;
+            _appSettinghelper = appSettinghelper;
         }
 
         /// <summary>
@@ -42,7 +46,7 @@ namespace WebServiceClass.Services.DICOMServices
 
                 var parsedData = new HolDicomParsedData
                 {
-                    file_path = filePath,
+                    file_path = ConvertFilePathToUrl(filePath),
                     file_name = fileInfo.Name,
                     parse_time = DateTime.Now,
                     create_time = DateTime.Now,
@@ -106,7 +110,64 @@ namespace WebServiceClass.Services.DICOMServices
             }
         }
 
+        /// <summary>
+        /// 将文件路径转换为URL
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>URL字符串</returns>
+        private string ConvertFilePathToUrl(string filePath)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(filePath))
+                    return string.Empty;
 
+                // 获取配置的URL前缀
+                var fileUrl = _appSettinghelper.Get("UpFile:FileUrl") ?? "http://localhost:7092/";
+                var dicomSaveDirectory = Path.Combine(AppContext.BaseDirectory, "ReceivedDicom");
+                
+                // 确保URL以/结尾
+                if (!fileUrl.EndsWith("/"))
+                    fileUrl += "/";
+
+                // 确保保存目录路径以/或\结尾
+                if (!dicomSaveDirectory.EndsWith("/") && !dicomSaveDirectory.EndsWith("\\"))
+                    dicomSaveDirectory += Path.DirectorySeparatorChar;
+
+                // 检查文件路径是否在DICOM保存目录下
+                if (filePath.StartsWith(dicomSaveDirectory, StringComparison.OrdinalIgnoreCase))
+                {
+                    // 获取相对路径
+                    var relativePath = filePath.Substring(dicomSaveDirectory.Length);
+                    
+                    // 替换路径分隔符为URL分隔符
+                    relativePath = relativePath.Replace("\\", "/");
+                    
+                    // 组合成完整URL
+                    return fileUrl + "dicom/" + relativePath;
+                }
+                else
+                {
+                    // 如果不在DICOM目录下，尝试从项目根目录映射
+                    var projectRoot = AppContext.BaseDirectory;
+                    if (filePath.StartsWith(projectRoot, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var relativePath = filePath.Substring(projectRoot.Length);
+                        relativePath = relativePath.Replace("\\", "/");
+                        return fileUrl + relativePath;
+                    }
+                }
+
+                // 如果无法映射，返回原始路径
+                _logger.LogWarning($"无法将文件路径映射为URL: {filePath}");
+                return filePath;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"转换文件路径为URL时发生错误: {filePath} - {ex.Message}");
+                return filePath;
+            }
+        }
 
         public async Task<Dictionary<string, object>> GetDicomMetadataAsync(string filePath)
         {

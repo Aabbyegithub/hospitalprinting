@@ -35,9 +35,7 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.诊室 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.编号 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.姓名 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.编号姓名 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -74,9 +72,7 @@
             this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.诊室,
-            this.编号,
-            this.姓名});
+            this.编号姓名});
             this.dataGridView1.Location = new System.Drawing.Point(2, 87);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
@@ -109,32 +105,14 @@
             this.timer1.Interval = 60000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // 诊室
+            // 编号姓名
             // 
-            this.诊室.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.诊室.HeaderText = "诊室";
-            this.诊室.MinimumWidth = 9;
-            this.诊室.Name = "诊室";
-            this.诊室.ReadOnly = true;
-            this.诊室.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // 编号
-            // 
-            this.编号.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.编号.HeaderText = "编号";
-            this.编号.MinimumWidth = 9;
-            this.编号.Name = "编号";
-            this.编号.ReadOnly = true;
-            this.编号.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // 姓名
-            // 
-            this.姓名.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.姓名.HeaderText = "姓名";
-            this.姓名.MinimumWidth = 9;
-            this.姓名.Name = "姓名";
-            this.姓名.ReadOnly = true;
-            this.姓名.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.编号姓名.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.编号姓名.HeaderText = "编号姓名";
+            this.编号姓名.MinimumWidth = 9;
+            this.编号姓名.Name = "编号姓名";
+            this.编号姓名.ReadOnly = true;
+            this.编号姓名.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Form1
             // 
@@ -159,9 +137,7 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn 诊室;
-        private System.Windows.Forms.DataGridViewTextBoxColumn 编号;
-        private System.Windows.Forms.DataGridViewTextBoxColumn 姓名;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 编号姓名;
     }
 }
 

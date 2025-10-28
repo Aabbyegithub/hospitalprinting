@@ -38,6 +38,7 @@
             识别选中区域ToolStripMenuItem = new ToolStripMenuItem();
             识别全图ToolStripMenuItem = new ToolStripMenuItem();
             清除选区ToolStripMenuItem = new ToolStripMenuItem();
+            多选模式ToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             适应窗口ToolStripMenuItem = new ToolStripMenuItem();
             原始大小ToolStripMenuItem = new ToolStripMenuItem();
@@ -47,11 +48,16 @@
             panel1 = new Panel();
             pictureBox1 = new PictureBox();
             panel2 = new Panel();
-            btnCopy = new Button();
+            label3 = new Label();
             textBox1 = new TextBox();
             label2 = new Label();
             pictureBox2 = new PictureBox();
             label1 = new Label();
+            txtMatchedText = new TextBox();
+            lblImageSize = new Label();
+            txtRegexPattern = new TextBox();
+            btnIdentify = new Button();
+            btnSaveFilm = new Button();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             menuStrip1.SuspendLayout();
@@ -86,32 +92,32 @@
             // 打开图片ToolStripMenuItem
             // 
             打开图片ToolStripMenuItem.Name = "打开图片ToolStripMenuItem";
-            打开图片ToolStripMenuItem.Size = new Size(167, 22);
-            打开图片ToolStripMenuItem.Text = "打开图片";
+            打开图片ToolStripMenuItem.Size = new Size(180, 22);
+            打开图片ToolStripMenuItem.Text = "打开文件";
             打开图片ToolStripMenuItem.Click += 打开图片ToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(164, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // 显示DICOM信息ToolStripMenuItem
             // 
             显示DICOM信息ToolStripMenuItem.Name = "显示DICOM信息ToolStripMenuItem";
-            显示DICOM信息ToolStripMenuItem.Size = new Size(167, 22);
+            显示DICOM信息ToolStripMenuItem.Size = new Size(180, 22);
             显示DICOM信息ToolStripMenuItem.Text = "显示DICOM信息";
             显示DICOM信息ToolStripMenuItem.Click += 显示DICOM信息ToolStripMenuItem_Click;
             // 
             // 退出ToolStripMenuItem
             // 
             退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
-            退出ToolStripMenuItem.Size = new Size(167, 22);
+            退出ToolStripMenuItem.Size = new Size(180, 22);
             退出ToolStripMenuItem.Text = "退出";
             退出ToolStripMenuItem.Click += 退出ToolStripMenuItem_Click;
             // 
             // 操作ToolStripMenuItem
             // 
-            操作ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { 识别选中区域ToolStripMenuItem, 识别全图ToolStripMenuItem, 清除选区ToolStripMenuItem, toolStripSeparator2, 适应窗口ToolStripMenuItem, 原始大小ToolStripMenuItem, 适应宽度ToolStripMenuItem, 适应高度ToolStripMenuItem });
+            操作ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { 识别选中区域ToolStripMenuItem, 识别全图ToolStripMenuItem, 清除选区ToolStripMenuItem, 多选模式ToolStripMenuItem, toolStripSeparator2, 适应窗口ToolStripMenuItem, 原始大小ToolStripMenuItem, 适应宽度ToolStripMenuItem, 适应高度ToolStripMenuItem });
             操作ToolStripMenuItem.Name = "操作ToolStripMenuItem";
             操作ToolStripMenuItem.Size = new Size(44, 21);
             操作ToolStripMenuItem.Text = "操作";
@@ -136,6 +142,13 @@
             清除选区ToolStripMenuItem.Size = new Size(148, 22);
             清除选区ToolStripMenuItem.Text = "清除选区";
             清除选区ToolStripMenuItem.Click += 清除选区ToolStripMenuItem_Click;
+            // 
+            // 多选模式ToolStripMenuItem
+            // 
+            多选模式ToolStripMenuItem.Name = "多选模式ToolStripMenuItem";
+            多选模式ToolStripMenuItem.Size = new Size(148, 22);
+            多选模式ToolStripMenuItem.Text = "多选模式";
+            多选模式ToolStripMenuItem.Click += 多选模式ToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
@@ -174,7 +187,7 @@
             // 
             splitContainer1.Dock = DockStyle.Fill;
             splitContainer1.Location = new Point(0, 27);
-            splitContainer1.Margin = new Padding(4, 4, 4, 4);
+            splitContainer1.Margin = new Padding(4);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -196,7 +209,7 @@
             panel1.Controls.Add(pictureBox1);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
-            panel1.Margin = new Padding(4, 4, 4, 4);
+            panel1.Margin = new Padding(4);
             panel1.Name = "panel1";
             panel1.Size = new Size(956, 801);
             panel1.TabIndex = 0;
@@ -207,7 +220,7 @@
             pictureBox1.BorderStyle = BorderStyle.FixedSingle;
             pictureBox1.Cursor = Cursors.Cross;
             pictureBox1.Location = new Point(0, 0);
-            pictureBox1.Margin = new Padding(4, 4, 4, 4);
+            pictureBox1.Margin = new Padding(4);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(952, 795);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
@@ -220,49 +233,53 @@
             // 
             // panel2
             // 
-            panel2.Controls.Add(btnCopy);
+            panel2.Controls.Add(label3);
             panel2.Controls.Add(textBox1);
             panel2.Controls.Add(label2);
             panel2.Controls.Add(pictureBox2);
             panel2.Controls.Add(label1);
+            panel2.Controls.Add(txtMatchedText);
+            panel2.Controls.Add(lblImageSize);
+            panel2.Controls.Add(txtRegexPattern);
+            panel2.Controls.Add(btnIdentify);
+            panel2.Controls.Add(btnSaveFilm);
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(0, 0);
-            panel2.Margin = new Padding(4, 4, 4, 4);
+            panel2.Margin = new Padding(4);
             panel2.Name = "panel2";
             panel2.Padding = new Padding(12, 14, 12, 14);
             panel2.Size = new Size(314, 801);
             panel2.TabIndex = 0;
             // 
-            // btnCopy
+            // label3
             // 
-            btnCopy.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnCopy.Location = new Point(212, 749);
-            btnCopy.Margin = new Padding(4, 4, 4, 4);
-            btnCopy.Name = "btnCopy";
-            btnCopy.Size = new Size(88, 35);
-            btnCopy.TabIndex = 2;
-            btnCopy.Text = "复制";
-            btnCopy.UseVisualStyleBackColor = true;
-            btnCopy.Click += btnCopy_Click;
+            label3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label3.AutoSize = true;
+            label3.Font = new Font("Microsoft YaHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            label3.Location = new Point(15, 716);
+            label3.Name = "label3";
+            label3.Size = new Size(94, 21);
+            label3.TabIndex = 5;
+            label3.Text = "正则表达式:";
             // 
             // textBox1
             // 
             textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             textBox1.Font = new Font("微软雅黑", 10F);
-            textBox1.Location = new Point(12, 397);
-            textBox1.Margin = new Padding(4, 4, 4, 4);
+            textBox1.Location = new Point(12, 369);
+            textBox1.Margin = new Padding(4);
             textBox1.Multiline = true;
             textBox1.Name = "textBox1";
             textBox1.ReadOnly = true;
             textBox1.ScrollBars = ScrollBars.Vertical;
-            textBox1.Size = new Size(290, 342);
+            textBox1.Size = new Size(290, 293);
             textBox1.TabIndex = 1;
             // 
             // label2
             // 
             label2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label2.Font = new Font("微软雅黑", 10F, FontStyle.Bold);
-            label2.Location = new Point(12, 354);
+            label2.Location = new Point(12, 326);
             label2.Margin = new Padding(4, 0, 4, 0);
             label2.Name = "label2";
             label2.Size = new Size(291, 35);
@@ -275,9 +292,9 @@
             pictureBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             pictureBox2.BorderStyle = BorderStyle.FixedSingle;
             pictureBox2.Location = new Point(12, 61);
-            pictureBox2.Margin = new Padding(4, 4, 4, 4);
+            pictureBox2.Margin = new Padding(4);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(291, 282);
+            pictureBox2.Size = new Size(291, 261);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox2.TabIndex = 3;
             pictureBox2.TabStop = false;
@@ -293,6 +310,57 @@
             label1.TabIndex = 0;
             label1.Text = "选区放大显示";
             label1.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // txtMatchedText
+            // 
+            txtMatchedText.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txtMatchedText.Font = new Font("Microsoft YaHei UI", 15F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            txtMatchedText.Location = new Point(12, 670);
+            txtMatchedText.Name = "txtMatchedText";
+            txtMatchedText.Size = new Size(174, 33);
+            txtMatchedText.TabIndex = 0;
+            // 
+            // lblImageSize
+            // 
+            lblImageSize.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            lblImageSize.AutoSize = true;
+            lblImageSize.Font = new Font("Microsoft YaHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            lblImageSize.Location = new Point(193, 677);
+            lblImageSize.Name = "lblImageSize";
+            lblImageSize.Size = new Size(0, 21);
+            lblImageSize.TabIndex = 1;
+            // 
+            // txtRegexPattern
+            // 
+            txtRegexPattern.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txtRegexPattern.Font = new Font("Microsoft YaHei UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            txtRegexPattern.Location = new Point(110, 710);
+            txtRegexPattern.Name = "txtRegexPattern";
+            txtRegexPattern.Size = new Size(193, 32);
+            txtRegexPattern.TabIndex = 2;
+            txtRegexPattern.TextChanged += txtRegexPattern_TextChanged;
+            // 
+            // btnIdentify
+            // 
+            btnIdentify.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnIdentify.Location = new Point(15, 750);
+            btnIdentify.Name = "btnIdentify";
+            btnIdentify.Size = new Size(75, 31);
+            btnIdentify.TabIndex = 3;
+            btnIdentify.Text = "识别";
+            btnIdentify.UseVisualStyleBackColor = true;
+            btnIdentify.Click += btnIdentify_Click;
+            // 
+            // btnSaveFilm
+            // 
+            btnSaveFilm.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnSaveFilm.Location = new Point(122, 750);
+            btnSaveFilm.Name = "btnSaveFilm";
+            btnSaveFilm.Size = new Size(80, 31);
+            btnSaveFilm.TabIndex = 4;
+            btnSaveFilm.Text = "胶片另存";
+            btnSaveFilm.UseVisualStyleBackColor = true;
+            btnSaveFilm.Click += btnSaveFilm_Click;
             // 
             // statusStrip1
             // 
@@ -319,7 +387,7 @@
             Controls.Add(menuStrip1);
             Controls.Add(statusStrip1);
             MainMenuStrip = menuStrip1;
-            Margin = new Padding(4, 4, 4, 4);
+            Margin = new Padding(4);
             Name = "Form1";
             Text = "OCR图片识别工具";
             WindowState = FormWindowState.Maximized;
@@ -352,6 +420,7 @@
         private System.Windows.Forms.ToolStripMenuItem 识别选中区域ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 识别全图ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 清除选区ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 多选模式ToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem 适应窗口ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 原始大小ToolStripMenuItem;
@@ -365,8 +434,15 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.Button btnCopy;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        
+        // 新增控件
+        private System.Windows.Forms.TextBox txtMatchedText;
+        private System.Windows.Forms.Label lblImageSize;
+        private System.Windows.Forms.TextBox txtRegexPattern;
+        private System.Windows.Forms.Button btnIdentify;
+        private System.Windows.Forms.Button btnSaveFilm;
+        private Label label3;
     }
 }

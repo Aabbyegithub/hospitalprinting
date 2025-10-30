@@ -47,6 +47,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BarcodePrintHelper.cs" />
+    <Compile Include="FormBarcodeTemplate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormBarcodeTemplate.Designer.cs">
+      <DependentUpon>FormBarcodeTemplate.cs</DependentUpon>
+    </Compile>
     <Compile Include="IniFileHelper.cs" />
     <Compile Include="FormBarcodeCapture.cs">
       <SubType>Form</SubType>

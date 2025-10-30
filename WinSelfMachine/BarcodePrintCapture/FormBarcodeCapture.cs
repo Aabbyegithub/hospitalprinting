@@ -214,6 +214,92 @@ namespace BarcodePrintCapture
         }
 
         /// <summary>
+        /// 打印模板配置按钮点击事件
+        /// </summary>
+        private void btnTemplateConfig_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var templateForm = new FormBarcodeTemplate())
+                {
+                    if (templateForm.ShowDialog(this) == DialogResult.OK)
+                    {
+                        MessageBox.Show("打印模板配置已更新", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开打印模板配置失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 测试打印按钮点击事件
+        /// </summary>
+        private void btnPrintOptions_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 使用测试数据打印（包含性别和年龄）
+                string testId = "D049887";
+                string testName = "张三";
+                string testGender = "男";
+                string testAge = "58";
+                
+                ExecutePrint(testId, testName, testGender, testAge);
+                
+                MessageBox.Show("测试打印完成！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"测试打印失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 手动输入打印按钮点击事件
+        /// </summary>
+        private void btnManualPrint_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string id = textBoxManualId.Text.Trim();
+                string name = textBoxManualName.Text.Trim();
+
+                // 验证输入
+                if (string.IsNullOrEmpty(id))
+                {
+                    MessageBox.Show("请输入员工ID", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    textBoxManualId.Focus();
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    MessageBox.Show("请输入员工姓名", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    textBoxManualName.Focus();
+                    return;
+                }
+
+                // 打印条码
+                ExecutePrint(id, name, "", "");
+                
+                MessageBox.Show($"打印完成！\n\n员工ID：{id}\n员工姓名：{name}", "打印成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+                // 清空输入框，方便下一次输入
+                textBoxManualId.Clear();
+                textBoxManualName.Clear();
+                textBoxManualId.Focus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打印失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        /// <summary>
         /// 加载配置
         /// </summary>
         private void LoadConfig()
@@ -418,7 +504,7 @@ namespace BarcodePrintCapture
         /// <summary>
         /// 执行打印
         /// </summary>
-        private void ExecutePrint(string id, string name)
+        private void ExecutePrint(string id, string name, string gender = "", string age = "")
         {
             try
             {
@@ -426,7 +512,11 @@ namespace BarcodePrintCapture
                 {
                     HospitalName = "中国大医院",
                     PrinterName = "",
-                    PrintRegistrationTime = true
+                    PrintRegistrationTime = true,
+                    TitleTemplate = "",
+                    IdLabel = "编号：",
+                    NameLabel = "姓名：",
+                    TimeLabel = "登记时间："
                 };
 
                 try
@@ -436,17 +526,187 @@ namespace BarcodePrintCapture
                         printConfig.HospitalName = iniHelper.Read("Config", "HospitalName", "中国大医院");
                         printConfig.PrinterName = iniHelper.Read("Config", "PrinterName", "");
                         printConfig.PrintRegistrationTime = iniHelper.ReadInt("Config", "PrintRegTime", 1) == 1;
+                        
+                        // 加载模板配置
+                        printConfig.TitleTemplate = iniHelper.Read("Template", "Title", "");
+                        printConfig.IdLabel = iniHelper.Read("Template", "IdLabel", "编号：");
+                        printConfig.NameLabel = iniHelper.Read("Template", "NameLabel", "姓名：");
+                        printConfig.TimeLabel = iniHelper.Read("Template", "TimeLabel", "登记时间：");
                     }
                 }
                 catch { }
 
-                var helper = new BarcodePrintHelper(printConfig, id, name);
+                var helper = new BarcodePrintHelper(printConfig, id, name, gender, age);
                 helper.Print();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"打印失败：{ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// 手动打印方法（供悬停窗口调用）
+        /// </summary>
+        public void ManualPrint(string name)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"ManualPrint被调用，name={name}");
+                
+                // 如果是测试数据，直接使用测试数据
+                if (name.Contains("ceshi") || name.Contains("患者"))
+                {
+                    ExecutePrint("D049887", "张三", "男", "58");
+                    System.Diagnostics.Debug.WriteLine("使用测试数据打印");
+                    return;
+                }
+                
+                // 尝试从目标窗口获取真实数据
+                string id = "";
+                string actualName = name;
+                string gender = "";
+                string age = "";
+                
+                try
+                {
+                    // 读取配置
+                    string processName = "";
+                    string idCoords = "";
+                    string nameCoords = "";
+                    
+                    using (var iniHelper = new IniFileHelper(_configPath))
+                    {
+                        processName = iniHelper.Read("Config", "ProcessName", "");
+                        idCoords = iniHelper.Read("Config", "IdCoords", "");
+                        nameCoords = iniHelper.Read("Config", "NameCoords", "");
+                    }
+
+                    if (!string.IsNullOrEmpty(processName) && 
+                        !string.IsNullOrEmpty(idCoords) && 
+                        !idCoords.Equals("0,0") &&
+                        !idCoords.Equals("0, 0"))
+                    {
+                        // 搜索窗口
+                        var windows = WindowCaptureHelper.SearchWindows(processName, "", "");
+                        if (windows.Count > 0)
+                        {
+                            IntPtr targetWindow = windows[0].Handle;
+                            var controls = WindowCaptureHelper.GetChildControls(targetWindow);
+                            
+                            // 解析坐标
+                            ExtractCoordinates(idCoords, out int idX, out int idY);
+                            ExtractCoordinates(nameCoords, out int nameX, out int nameY);
+                            
+                            // 获取ID
+                            foreach (var control in controls)
+                            {
+                                if (!string.IsNullOrEmpty(control.Text))
+                                {
+                                    if (ExtractCoordinates(control.FullInfo, out int x, out int y) &&
+                                        x == idX && y == idY)
+                                    {
+                                        id = control.Text.Trim();
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            // 获取姓名
+                            foreach (var control in controls)
+                            {
+                                if (!string.IsNullOrEmpty(control.Text))
+                                {
+                                    if (ExtractCoordinates(control.FullInfo, out int x, out int y) &&
+                                        x == nameX && y == nameY)
+                                    {
+                                        actualName = control.Text.Trim();
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            System.Diagnostics.Debug.WriteLine($"从窗口读取：ID={id}, Name={actualName}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"读取窗口数据失败：{ex.Message}");
+                }
+                
+                // 如果获取不到ID，使用一个默认ID
+                if (string.IsNullOrEmpty(id))
+                {
+                    id = DateTime.Now.ToString("HHmmss");
+                    System.Diagnostics.Debug.WriteLine($"使用临时ID：{id}");
+                }
+
+                System.Diagnostics.Debug.WriteLine($"开始打印，ID={id}, Name={actualName}");
+                
+                // 调用打印
+                ExecutePrint(id, actualName, gender, age);
+                
+                System.Diagnostics.Debug.WriteLine("打印完成");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打印失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"打印异常：{ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 从目标窗口获取ID
+        /// </summary>
+        private string GetIdFromWindow(string name)
+        {
+            try
+            {
+                // 读取配置
+                string processName = "";
+                string idCoords = "";
+                try
+                {
+                    using (var iniHelper = new IniFileHelper(_configPath))
+                    {
+                        processName = iniHelper.Read("Config", "ProcessName", "");
+                        idCoords = iniHelper.Read("Config", "IdCoords", "");
+                    }
+                }
+                catch { }
+
+                if (string.IsNullOrEmpty(processName) || string.IsNullOrEmpty(idCoords))
+                    return "";
+
+                // 搜索窗口
+                var windows = WindowCaptureHelper.SearchWindows(processName, "", "");
+                if (windows.Count == 0)
+                    return "";
+
+                IntPtr targetWindow = windows[0].Handle;
+
+                // 解析坐标
+                ExtractCoordinates(idCoords, out int idX, out int idY);
+
+                // 获取控件内容
+                var controls = WindowCaptureHelper.GetChildControls(targetWindow);
+                
+                foreach (var control in controls)
+                {
+                    if (!string.IsNullOrEmpty(control.Text))
+                    {
+                        if (ExtractCoordinates(control.FullInfo, out int x, out int y) &&
+                            x == idX && y == idY)
+                        {
+                            return control.Text.Trim();
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return "";
         }
 
         /// <summary>

@@ -17,12 +17,24 @@ namespace WinSelfMachine
         private string _configFilePath;
         private readonly ApiCommon _apiCommon;
         private int _IsDisplay = 1;
+        private int _IsShow = 1;
         public FormProInitialize()
         {
             _configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
             _iniConfig = new IniFileHelper(_configFilePath);
             InitializeComponent();
             _apiCommon = new ApiCommon();
+            // 将单选按钮设为手动互斥，避免同容器下相互影响
+            RedYes.AutoCheck = false;
+            RedNo.AutoCheck = false;
+            RedYes2.AutoCheck = false;
+            RedNo2.AutoCheck = false;
+
+            // 绑定点击事件以实现分组互斥
+            RedYes.Click += RedYes_Click;
+            RedNo.Click += RedNo_Click;
+            RedYes2.Click += RedYes2_Click;
+            RedNo2.Click += RedNo2_Click;
             LoadConfig();
         }
 
@@ -37,6 +49,7 @@ namespace WinSelfMachine
                 var PrinterId =  _iniConfig.ReadInt("Printer", "PrinterId", -1);//打印机配置
                 _iniConfig.Read("Printer", "PrinterName", "");//打印机名称
                _IsDisplay = _iniConfig.ReadInt("IsDisplay", "Display",1);
+               _IsShow = _iniConfig.ReadInt("IsShow", "IsShow",1);
                 if (_IsDisplay ==1)
                 {
                     RedYes.Checked = true;
@@ -44,6 +57,14 @@ namespace WinSelfMachine
                 else
                 {
                     RedNo.Checked = true;
+                }
+                if (_IsShow == 1)
+                {
+                    RedYes2.Checked = true;
+                }
+                else
+                {
+                    RedNo2.Checked = true;
                 }
                 CbmDep.SelectedValue = PrinterId;
             }
@@ -99,6 +120,7 @@ namespace WinSelfMachine
                 _iniConfig.Write("Printer", "PrinterId", CbmDep.SelectedValue?.ToString() ?? "-1");
                 _iniConfig.Write("Printer", "PrinterName", CbmDep.Text);
                 _iniConfig.Write("IsDisplay", "Display", _IsDisplay.ToString());
+                _iniConfig.Write("IsShow", "IsShow", _IsShow.ToString());
 
                 // 同步设备状态
                 var url = TxtServicesUrl.Text.TrimEnd('/');
@@ -136,6 +158,54 @@ namespace WinSelfMachine
             {
                 RedYes.Checked = false;_IsDisplay = 0;
             }
+        }
+
+        private void RedYes2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (RedYes2.Checked)
+            {
+                RedNo2.Checked = false;
+                _IsShow = 1;
+            }
+        }
+
+        private void RedNo2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (RedNo2.Checked)
+            {
+                RedYes2.Checked = false;
+                _IsShow = 0;
+            }
+        }
+
+        // 分组一：显示设置
+        private void RedYes_Click(object sender, EventArgs e)
+        {
+            RedYes.Checked = true;
+            RedNo.Checked = false;
+            _IsDisplay = 1;
+        }
+
+        private void RedNo_Click(object sender, EventArgs e)
+        {
+            RedNo.Checked = true;
+            RedYes.Checked = false;
+            _IsDisplay = 0;
+        }
+
+        // 分组二：是否显示某项
+        private void RedYes2_Click(object sender, EventArgs e)
+        {
+            RedYes2.Checked = true;
+            RedNo2.Checked = false;
+            _IsShow = 1;
+        }
+
+        private void RedNo2_Click(object sender, EventArgs e)
+        {
+            RedNo2.Checked = true;
+            RedYes2.Checked = false;
+            _IsShow = 0;
         }
     }
 }

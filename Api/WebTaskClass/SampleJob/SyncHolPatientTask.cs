@@ -185,7 +185,7 @@ namespace WebTaskClass.SampleJob
             foreach (var item in Data)
             {
                 var IsHas = ThisSysPatient.FirstOrDefault(a => a.medical_no == item.medical_no);
-             
+                
                 if (IsHas != null)
                 {
                     var IsExaminationHas = ThisSysHolExamination.Where(a => a.patient_id == IsHas.id).ToList();

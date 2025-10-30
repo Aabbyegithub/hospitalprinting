@@ -106,24 +106,61 @@ namespace BarcodePrintCapture
         /// </summary>
         private void BtnPrint_Click(object sender, EventArgs e)
         {
-            // 查找选中的项
-            for (int i = 0; i < _checkBoxes.Length; i++)
+            try
             {
-                if (_checkBoxes[i].Checked)
+                // 调试：检查当前状态
+                System.Diagnostics.Debug.WriteLine($"=== 打印按钮被点击 ===");
+                for (int i = 0; i < _checkBoxes.Length; i++)
                 {
-                    string selectedName = _labels[i].Text;
-                    if (!string.IsNullOrEmpty(selectedName) && _nameList.Contains(selectedName))
-                    {
-                        int index = _nameList.IndexOf(selectedName);
-                        if (index >= 0 && index < _nameList.Count)
-                        {
-                            // 这里应该调用打印方法，需要从配置中获取ID
-                            // 简化处理：只打印姓名
-                            MessageBox.Show($"打印条码：{selectedName}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                    }
-                    break;
+                    System.Diagnostics.Debug.WriteLine($"CheckBox[{i}]: Checked={_checkBoxes[i].Checked}, Text={_labels[i].Text}");
                 }
+
+                // 查找选中的项
+                bool found = false;
+                for (int i = 0; i < _checkBoxes.Length; i++)
+                {
+                    if (_checkBoxes[i].Checked)
+                    {
+                        string selectedName = _labels[i].Text;
+                        System.Diagnostics.Debug.WriteLine($"选中项：{selectedName}");
+                        
+                        // 如果名称为空或者是测试数据，直接使用
+                        if (string.IsNullOrEmpty(selectedName) || selectedName.StartsWith("1测试"))
+                        {
+                            // 使用测试数据
+                            _mainForm?.ManualPrint("测试患者");
+                        }
+                        else if (_nameList.Contains(selectedName))
+                        {
+                            int index = _nameList.IndexOf(selectedName);
+                            if (index >= 0 && index < _nameList.Count)
+                            {
+                                // 调用主窗体的打印方法
+                                _mainForm?.ManualPrint(selectedName);
+                            }
+                        }
+                        else
+                        {
+                            // 如果不在列表中，直接使用这个名称
+                            _mainForm?.ManualPrint(selectedName);
+                        }
+                        
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    // 如果没有选中任何项，使用默认的测试数据进行打印
+                    System.Diagnostics.Debug.WriteLine("没有找到选中的项，使用默认测试数据");
+                    _mainForm?.ManualPrint("测试患者");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打印错误：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"打印异常：{ex.Message}");
             }
         }
     }

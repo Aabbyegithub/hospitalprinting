@@ -1530,5 +1530,25 @@ namespace WinSelfMachine
 
 
         }
+
+        /// <summary>
+        /// Ai解析按钮点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnAiAnalysis_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 直接打印按钮点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnDirect_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

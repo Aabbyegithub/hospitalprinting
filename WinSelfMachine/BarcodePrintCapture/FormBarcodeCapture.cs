@@ -100,13 +100,56 @@ namespace BarcodePrintCapture
                     return;
                 }
 
+                // 额外探测：如果配置了进程名和坐标，尝试直接命中DataGridView行，展示读取结果，方便校准
+                try
+                {
+                    string cfgProcess = textBoxConfigProcessName.Text.Trim();
+                    if (!string.IsNullOrEmpty(cfgProcess) &&
+                        ExtractCoordinates(textBoxIdCoords.Text.Trim(), out int cfgIdX, out int cfgIdY) &&
+                        ExtractCoordinates(textBoxNameCoords.Text.Trim(), out int cfgNameX, out int cfgNameY))
+                    {
+                        var wins = WindowCaptureHelper.SearchWindows(cfgProcess, string.Empty, string.Empty);
+                        if (wins.Count > 0)
+                        {
+                            var hTarget = wins[0].Handle;
+                            if (TryReadByCoords(hTarget, cfgIdX, cfgIdY, cfgNameX, cfgNameY, out string rid, out string rname))
+                            {
+                                textBoxResults.AppendText($"[探测] 命中行 → ID:{rid} 姓名:{rname}\r\n");
+                                if (!string.IsNullOrEmpty(rid)) textBoxIdContent.Text = rid;
+                                if (!string.IsNullOrEmpty(rname)) textBoxNameContent.Text = rname;
+                            }
+                            else
+                            {
+                                textBoxResults.AppendText("[探测] 未命中任何文本，请微调‘ID/姓名’坐标并确保落在同一行单元格内部\r\n");
+                            }
+                        }
+                    }
+                }
+                catch { }
+
                 // 显示找到的窗口信息
                 foreach (var window in windows)
                 {
                     textBoxResults.AppendText($"{window.ProcessName} - {window.WindowTitle}\r\n");
                     
-                    // 获取子控件信息
+                    // 获取子控件信息（先Win32，再UIA补充）
                     var controls = WindowCaptureHelper.GetChildControls(window.Handle);
+
+                    // 如果Win32抓不到文字，尝试UI Automation增强
+                    bool hasAnyText = false;
+                    foreach (var c in controls)
+                    {
+                        if (!string.IsNullOrEmpty(c.Text)) { hasAnyText = true; break; }
+                    }
+                    if (!hasAnyText)
+                    {
+                        var uiaControls = UIAutomationHelper.GetChildControls(window.Handle);
+                        if (uiaControls.Count > 0)
+                        {
+                            textBoxResults.AppendText("  [UIA] 尝试使用UI Automation读取...\r\n");
+                            controls = uiaControls;
+                        }
+                    }
                     
                     // 添加到下拉框
                     foreach (var control in controls)
@@ -241,15 +284,43 @@ namespace BarcodePrintCapture
         {
             try
             {
-                // 使用测试数据打印（包含性别和年龄）
-                string testId = "D049887";
-                string testName = "张三";
-                string testGender = "男";
-                string testAge = "58";
-                
-                ExecutePrint(testId, testName, testGender, testAge);
-                
-                MessageBox.Show("测试打印完成！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // 优先：如果手动输入区有值，则直接按手动输入打印
+                string manualId = textBoxManualId != null ? textBoxManualId.Text.Trim() : string.Empty;
+                string manualName = textBoxManualName != null ? textBoxManualName.Text.Trim() : string.Empty;
+                if (!string.IsNullOrEmpty(manualId) && !string.IsNullOrEmpty(manualName))
+                {
+                    ExecutePrint(manualId, manualName, "", "");
+                    MessageBox.Show("已按手动输入打印", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // 其次：尝试按当前配置，从目标窗口读取ID/姓名
+                string processName = textBoxConfigProcessName.Text.Trim();
+                string idCoordsText = textBoxIdCoords.Text.Trim();
+                string nameCoordsText = textBoxNameCoords.Text.Trim();
+
+                if (!string.IsNullOrEmpty(processName) &&
+                    ExtractCoordinates(idCoordsText, out int idX, out int idY) &&
+                    ExtractCoordinates(nameCoordsText, out int nameX, out int nameY))
+                {
+                    var windows = WindowCaptureHelper.SearchWindows(processName, string.Empty, string.Empty);
+                    if (windows.Count > 0)
+                    {
+                        var target = windows[0].Handle;
+
+                        // 先用Win32，找不到再用UIA
+                        if (TryReadByCoords(target, idX, idY, nameX, nameY, out string idVal, out string nameVal))
+                        {
+                            ExecutePrint(idVal, nameVal, "", "");
+                            MessageBox.Show("已按窗口读取打印", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            return;
+                        }
+                    }
+                }
+
+                // 最后：回退到内置测试数据
+                ExecutePrint("D049887", "张三", "男", "58");
+                MessageBox.Show("未获取到数据，已使用测试数据打印", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -738,6 +809,71 @@ namespace BarcodePrintCapture
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// 按坐标从目标窗口读取ID/姓名文本，先Win32后UIA，坐标允许±5像素误差
+        /// </summary>
+        private bool TryReadByCoords(
+            IntPtr targetWindow,
+            int idX, int idY,
+            int nameX, int nameY,
+            out string id,
+            out string name)
+        {
+            id = string.Empty;
+            name = string.Empty;
+
+            const int TOLERANCE = 5; // 坐标容差 ±5 像素
+
+            // ① MSAA命中优先（更稳）
+            string msaaId = MSAAHelper.GetNameAtWindowRelativePoint(targetWindow, idX, idY);
+            string msaaName = MSAAHelper.GetNameAtWindowRelativePoint(targetWindow, nameX, nameY);
+            if (!string.IsNullOrWhiteSpace(msaaId) && !string.IsNullOrWhiteSpace(msaaName))
+            {
+                id = msaaId.Trim();
+                name = msaaName.Trim();
+                return true;
+            }
+
+            // ② Win32方式
+            var controls = WindowCaptureHelper.GetChildControls(targetWindow);
+            foreach (var c in controls)
+            {
+                if (string.IsNullOrEmpty(c.Text)) continue;
+
+                if (ExtractCoordinates(c.FullInfo, out int x, out int y))
+                {
+                    // ID 匹配
+                    if (Math.Abs(x - idX) <= TOLERANCE && Math.Abs(y - idY) <= TOLERANCE)
+                        id = c.Text.Trim();
+
+                    // 姓名匹配
+                    if (Math.Abs(x - nameX) <= TOLERANCE && Math.Abs(y - nameY) <= TOLERANCE)
+                        name = c.Text.Trim();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(name))
+                return true;
+
+            // ③ 若 Win32 读取失败 → UIAutomation 补充
+            var uiaControls = UIAutomationHelper.GetChildControls(targetWindow);
+            foreach (var c in uiaControls)
+            {
+                if (string.IsNullOrEmpty(c.Text)) continue;
+
+                if (ExtractCoordinates(c.FullInfo, out int x, out int y))
+                {
+                    if (Math.Abs(x - idX) <= TOLERANCE && Math.Abs(y - idY) <= TOLERANCE)
+                        id = c.Text.Trim();
+
+                    if (Math.Abs(x - nameX) <= TOLERANCE && Math.Abs(y - nameY) <= TOLERANCE)
+                        name = c.Text.Trim();
+                }
+            }
+
+            return !string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(name);
         }
     }
 }

@@ -91,15 +91,33 @@ namespace WinSelfMachine
                 return;
             }
 
-            _iniConfig.Write("EquipmentUrl", "SerUrl", TxtServicesUrl.Text);
-            _iniConfig.Write("EquipmentIsStart", "IsStart", "1");
-            _iniConfig.Write("Printer", "PrinterId", CbmDep.SelectedValue.ToString());
-            _iniConfig.Write("Printer", "PrinterName",CbmDep.SelectedText);
-            _iniConfig.Write("IsDisplay", "Display",_IsDisplay.ToString());
-            var Url = TxtServicesUrl.Text.TrimEnd('/');
-            await _apiCommon.UpdatePrinterStatus(Url, CbmDep.SelectedIndex,1);
-            Close();
-            
+            try
+            {
+                // 写入配置
+                _iniConfig.Write("EquipmentUrl", "SerUrl", TxtServicesUrl.Text.Trim());
+                _iniConfig.Write("EquipmentIsStart", "IsStart", "1");
+                _iniConfig.Write("Printer", "PrinterId", CbmDep.SelectedValue?.ToString() ?? "-1");
+                _iniConfig.Write("Printer", "PrinterName", CbmDep.Text);
+                _iniConfig.Write("IsDisplay", "Display", _IsDisplay.ToString());
+
+                // 同步设备状态
+                var url = TxtServicesUrl.Text.TrimEnd('/');
+                int printerId;
+                int.TryParse(CbmDep.SelectedValue?.ToString(), out printerId);
+                if (!string.IsNullOrEmpty(url) && printerId > -1)
+                {
+                    await _apiCommon.UpdatePrinterStatus(url, printerId, 1);
+                }
+
+                // 提示并重启以加载最新配置
+                MessageBox.Show("设置已保存，程序将重启以加载最新配置。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Application.Restart();
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"保存配置失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void RedYes_CheckedChanged(object sender, EventArgs e)

@@ -28,7 +28,7 @@ namespace WebServiceClass.Services.EquipmentServices
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ApiResponse<List<HolExamination>>> GetAllUserAsync()
         {
-            var res = await _dal.Db.Queryable<HolExamination>().Includes(a => a.patient).Where(a => a.is_printed == 0).ToListAsync();
+            var res = await _dal.Db.Queryable<HolExamination>().Includes(a => a.patient).Where(a => a.is_printed == 0 && a.isfees == 1).ToListAsync();
             return Success(res);
         }
 
@@ -38,9 +38,9 @@ namespace WebServiceClass.Services.EquipmentServices
         /// <param name="examNo"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<HolExamination>> GetByExamNoAsync(string examNo)
+        public async Task<ApiResponse<List<HolExamination>>> GetByExamNoAsync(string examNo)
         {
-            var res = await _dal.Db.Queryable<HolExamination>().FirstAsync(a => a.exam_no == examNo);
+            var res = await _dal.Db.Queryable<HolExamination>().Includes(a => a.patient).Where(a => a.exam_no == examNo).ToListAsync();
             return Success(res);
         }
 

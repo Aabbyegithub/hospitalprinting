@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.TxtTitle = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -42,15 +42,20 @@
             this.BtnPrintSetting = new WinSelfMachine.Controls.RoundButton();
             this.roundedContainer1 = new WinSelfMachine.Controls.RoundedContainer();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.label3 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.TxtSelect = new System.Windows.Forms.Label();
+            this.BtnConfirmPaint = new System.Windows.Forms.Button();
+            this.BtnCancelPrint = new System.Windows.Forms.Button();
             this.姓名 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.检查日期 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.类型 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.胶片数量 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.报告数量 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.是否打印 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.胶片路径 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.报告路径 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.是否已打印 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.patient_id = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -252,7 +257,8 @@
             this.roundedContainer1.DividerHorizontalPadding = 16;
             this.roundedContainer1.DividerThickness = 1;
             this.roundedContainer1.DividerTopSpacing = 8;
-            this.roundedContainer1.FillColor = System.Drawing.Color.Black;
+            this.roundedContainer1.FillColor = System.Drawing.Color.White;
+            this.roundedContainer1.Font = new System.Drawing.Font("宋体", 9F);
             this.roundedContainer1.FontSize = 9;
             this.roundedContainer1.Location = new System.Drawing.Point(43, 85);
             this.roundedContainer1.Name = "roundedContainer1";
@@ -260,28 +266,29 @@
             this.roundedContainer1.ShadowOffsetY = 2;
             this.roundedContainer1.ShadowSize = 6;
             this.roundedContainer1.ShowShadow = true;
-            this.roundedContainer1.Size = new System.Drawing.Size(599, 415);
+            this.roundedContainer1.Size = new System.Drawing.Size(599, 473);
             this.roundedContainer1.TabIndex = 17;
             this.roundedContainer1.TitleColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.roundedContainer1.TitleFont = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.roundedContainer1.TitleFont = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.roundedContainer1.TitleText = "请选择要打印的胶片和报告";
             this.roundedContainer1.TitleTopPadding = 10;
             this.roundedContainer1.TopLeft = true;
             this.roundedContainer1.TopRight = true;
+            this.roundedContainer1.Visible = false;
             // 
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.Peru;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Peru;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.姓名,
@@ -289,50 +296,61 @@
             this.类型,
             this.胶片数量,
             this.报告数量,
-            this.是否打印});
+            this.是否打印,
+            this.胶片路径,
+            this.报告路径,
+            this.是否已打印,
+            this.id,
+            this.patient_id});
             this.dataGridView1.Location = new System.Drawing.Point(53, 143);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(577, 298);
+            this.dataGridView1.Size = new System.Drawing.Size(577, 345);
             this.dataGridView1.TabIndex = 18;
+            this.dataGridView1.Visible = false;
             // 
-            // label3
+            // TxtSelect
             // 
-            this.label3.AutoSize = true;
-            this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.ForeColor = System.Drawing.Color.SaddleBrown;
-            this.label3.Location = new System.Drawing.Point(63, 454);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(69, 20);
-            this.label3.TabIndex = 19;
-            this.label3.Text = "已选择";
+            this.TxtSelect.AutoSize = true;
+            this.TxtSelect.BackColor = System.Drawing.Color.White;
+            this.TxtSelect.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TxtSelect.ForeColor = System.Drawing.Color.SaddleBrown;
+            this.TxtSelect.Location = new System.Drawing.Point(63, 513);
+            this.TxtSelect.Name = "TxtSelect";
+            this.TxtSelect.Size = new System.Drawing.Size(0, 20);
+            this.TxtSelect.TabIndex = 19;
+            this.TxtSelect.Visible = false;
             // 
-            // button1
+            // BtnConfirmPaint
             // 
-            this.button1.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button1.Location = new System.Drawing.Point(406, 447);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(93, 35);
-            this.button1.TabIndex = 20;
-            this.button1.Text = "确认";
-            this.button1.UseVisualStyleBackColor = true;
+            this.BtnConfirmPaint.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.BtnConfirmPaint.Location = new System.Drawing.Point(406, 506);
+            this.BtnConfirmPaint.Name = "BtnConfirmPaint";
+            this.BtnConfirmPaint.Size = new System.Drawing.Size(93, 35);
+            this.BtnConfirmPaint.TabIndex = 20;
+            this.BtnConfirmPaint.Text = "确认";
+            this.BtnConfirmPaint.UseVisualStyleBackColor = true;
+            this.BtnConfirmPaint.Visible = false;
+            this.BtnConfirmPaint.Click += new System.EventHandler(this.BtnConfirmPaint_Click);
             // 
-            // button2
+            // BtnCancelPrint
             // 
-            this.button2.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button2.Location = new System.Drawing.Point(523, 447);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(98, 35);
-            this.button2.TabIndex = 21;
-            this.button2.Text = "放弃打印";
-            this.button2.UseVisualStyleBackColor = true;
+            this.BtnCancelPrint.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.BtnCancelPrint.Location = new System.Drawing.Point(523, 506);
+            this.BtnCancelPrint.Name = "BtnCancelPrint";
+            this.BtnCancelPrint.Size = new System.Drawing.Size(98, 35);
+            this.BtnCancelPrint.TabIndex = 21;
+            this.BtnCancelPrint.Text = "放弃打印";
+            this.BtnCancelPrint.UseVisualStyleBackColor = true;
+            this.BtnCancelPrint.Visible = false;
+            this.BtnCancelPrint.Click += new System.EventHandler(this.BtnCancelPrint_Click);
             // 
             // 姓名
             // 
             this.姓名.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.姓名.FillWeight = 30.81218F;
             this.姓名.HeaderText = "姓名";
             this.姓名.Name = "姓名";
             this.姓名.ReadOnly = true;
@@ -340,6 +358,7 @@
             // 检查日期
             // 
             this.检查日期.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.检查日期.FillWeight = 60.81218F;
             this.检查日期.HeaderText = "检查日期";
             this.检查日期.Name = "检查日期";
             this.检查日期.ReadOnly = true;
@@ -347,6 +366,7 @@
             // 类型
             // 
             this.类型.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.类型.FillWeight = 30.81218F;
             this.类型.HeaderText = "类型";
             this.类型.Name = "类型";
             this.类型.ReadOnly = true;
@@ -354,6 +374,7 @@
             // 胶片数量
             // 
             this.胶片数量.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.胶片数量.FillWeight = 40.81218F;
             this.胶片数量.HeaderText = "胶片数量";
             this.胶片数量.Name = "胶片数量";
             this.胶片数量.ReadOnly = true;
@@ -361,6 +382,7 @@
             // 报告数量
             // 
             this.报告数量.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.报告数量.FillWeight = 40.81218F;
             this.报告数量.HeaderText = "报告数量";
             this.报告数量.Name = "报告数量";
             this.报告数量.ReadOnly = true;
@@ -368,9 +390,45 @@
             // 是否打印
             // 
             this.是否打印.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.是否打印.FillWeight = 40.81218F;
             this.是否打印.HeaderText = "是否打印";
             this.是否打印.Name = "是否打印";
             this.是否打印.ReadOnly = true;
+            // 
+            // 胶片路径
+            // 
+            this.胶片路径.HeaderText = "胶片路径";
+            this.胶片路径.Name = "胶片路径";
+            this.胶片路径.ReadOnly = true;
+            this.胶片路径.Visible = false;
+            // 
+            // 报告路径
+            // 
+            this.报告路径.HeaderText = "报告路径";
+            this.报告路径.Name = "报告路径";
+            this.报告路径.ReadOnly = true;
+            this.报告路径.Visible = false;
+            // 
+            // 是否已打印
+            // 
+            this.是否已打印.HeaderText = "是否已打印";
+            this.是否已打印.Name = "是否已打印";
+            this.是否已打印.ReadOnly = true;
+            this.是否已打印.Visible = false;
+            // 
+            // id
+            // 
+            this.id.HeaderText = "id";
+            this.id.Name = "id";
+            this.id.ReadOnly = true;
+            this.id.Visible = false;
+            // 
+            // patient_id
+            // 
+            this.patient_id.HeaderText = "patient_id";
+            this.patient_id.Name = "patient_id";
+            this.patient_id.ReadOnly = true;
+            this.patient_id.Visible = false;
             // 
             // Form1
             // 
@@ -381,9 +439,9 @@
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(689, 698);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.BtnCancelPrint);
+            this.Controls.Add(this.BtnConfirmPaint);
+            this.Controls.Add(this.TxtSelect);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.roundedContainer1);
             this.Controls.Add(this.BtnSetting);
@@ -425,15 +483,20 @@
         private Controls.RoundButton BtnSetting;
         private Controls.RoundedContainer roundedContainer1;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label TxtSelect;
+        private System.Windows.Forms.Button BtnConfirmPaint;
+        private System.Windows.Forms.Button BtnCancelPrint;
         private System.Windows.Forms.DataGridViewTextBoxColumn 姓名;
         private System.Windows.Forms.DataGridViewTextBoxColumn 检查日期;
         private System.Windows.Forms.DataGridViewTextBoxColumn 类型;
         private System.Windows.Forms.DataGridViewTextBoxColumn 胶片数量;
         private System.Windows.Forms.DataGridViewTextBoxColumn 报告数量;
         private System.Windows.Forms.DataGridViewCheckBoxColumn 是否打印;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 胶片路径;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 报告路径;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 是否已打印;
+        private System.Windows.Forms.DataGridViewTextBoxColumn id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn patient_id;
     }
 }
 

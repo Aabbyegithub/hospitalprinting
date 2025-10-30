@@ -64,10 +64,10 @@ namespace Common
         /// <param name="PrinterId"></param>
         /// <param name="status"></param>
         /// <returns></returns>
-        public async Task<string> UpdatePrinterStatus(long PrinterId,int status)
+        public async Task<string> UpdatePrinterStatus(string url, long PrinterId,int status)
         {
             var res = "";
-            var Response = await _httpClient.GetAsync($"{_Url}/api/Equipment/UpdatePrintStaus?PrinterId={PrinterId}&status={status}");
+            var Response = await _httpClient.GetAsync($"{url}/api/Equipment/UpdatePrintStaus?PrinterId={PrinterId}&status={status}");
             if (Response.IsSuccessStatusCode)
             {
                 res = await Response.Content.ReadAsStringAsync();
@@ -113,7 +113,18 @@ namespace Common
         public async Task<string> GetExaminationByNo(string examNo)
         {
             var res = "";
-            var Response = await _httpClient.GetAsync($"{_Url}/api/Examination/GetByExamNo?examNo={examNo}");
+            var Response = await _httpClient.GetAsync($"{_Url}/api/Equipment/GetByExamNo?examNo={examNo}");
+            if (Response.IsSuccessStatusCode)
+            {
+                res = await Response.Content.ReadAsStringAsync();
+            }
+            return res;
+        }
+
+        public async Task<string> GetExaminationAllUser()
+        {
+            var res = "";
+            var Response = await _httpClient.GetAsync($"{_Url}/api/Equipment/GetAllUser");
             if (Response.IsSuccessStatusCode)
             {
                 res = await Response.Content.ReadAsStringAsync();
@@ -131,12 +142,14 @@ namespace Common
             var res = "";
             var json = JsonConvert.SerializeObject(printRecord);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var Response = await _httpClient.PostAsync($"{_Url}/api/Print/SavePrintRecord", content);
+            var Response = await _httpClient.PostAsync($"{_Url}/api/Equipment/SavePrintRecord", content);
             if (Response.IsSuccessStatusCode)
             {
                 res = await Response.Content.ReadAsStringAsync();
             }
             return res;
         }
+
+
     }
 }

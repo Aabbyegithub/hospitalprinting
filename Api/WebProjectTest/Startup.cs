@@ -261,6 +261,19 @@ namespace WebProjectTest
                 DefaultContentType = "application/octet-stream" // 默认内容类型
             });
 
+            // 添加DICOM文件映射
+            var dicomSaveDirectory = Configuration["DicomService:SaveDirectory"] ?? "D:/ReceivedDicom";
+            if (Directory.Exists(dicomSaveDirectory))
+            {
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(dicomSaveDirectory),
+                    RequestPath = "/dicom", // 映射到 /dicom 路径
+                    ServeUnknownFileTypes = true, // 允许服务DICOM文件
+                    DefaultContentType = "application/dicom" // DICOM文件内容类型
+                });
+            }
+
             // 配置全局异常处理
             app.Use(async (context, next) =>
             {

@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.textScrollControl1 = new WinQueue.TextScrollControl();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.诊室 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.编号 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.姓名 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.编号姓名 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -61,7 +62,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.BackgroundColor = System.Drawing.Color.SkyBlue;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.SkyBlue;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("宋体", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
@@ -71,40 +72,20 @@
             this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.诊室,
-            this.编号,
-            this.姓名});
+            this.编号姓名});
             this.dataGridView1.Location = new System.Drawing.Point(2, 87);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowHeadersWidth = 72;
-            this.dataGridView1.RowTemplate.Height = 33;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.SkyBlue;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("宋体", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
+            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            this.dataGridView1.RowTemplate.Height = 60;
             this.dataGridView1.Size = new System.Drawing.Size(1161, 493);
             this.dataGridView1.TabIndex = 2;
-            // 
-            // 诊室
-            // 
-            this.诊室.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.诊室.HeaderText = "诊室";
-            this.诊室.MinimumWidth = 9;
-            this.诊室.Name = "诊室";
-            this.诊室.ReadOnly = true;
-            // 
-            // 编号
-            // 
-            this.编号.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.编号.HeaderText = "编号";
-            this.编号.MinimumWidth = 9;
-            this.编号.Name = "编号";
-            this.编号.ReadOnly = true;
-            // 
-            // 姓名
-            // 
-            this.姓名.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.姓名.HeaderText = "姓名";
-            this.姓名.MinimumWidth = 9;
-            this.姓名.Name = "姓名";
-            this.姓名.ReadOnly = true;
             // 
             // richTextBox1
             // 
@@ -118,6 +99,20 @@
             this.richTextBox1.Size = new System.Drawing.Size(1161, 90);
             this.richTextBox1.TabIndex = 3;
             this.richTextBox1.Text = "自助打印系统";
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 60000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // 编号姓名
+            // 
+            this.编号姓名.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.编号姓名.HeaderText = "编号姓名";
+            this.编号姓名.MinimumWidth = 9;
+            this.编号姓名.Name = "编号姓名";
+            this.编号姓名.ReadOnly = true;
+            this.编号姓名.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Form1
             // 
@@ -141,9 +136,8 @@
         private TextScrollControl textScrollControl1;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.RichTextBox richTextBox1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn 诊室;
-        private System.Windows.Forms.DataGridViewTextBoxColumn 编号;
-        private System.Windows.Forms.DataGridViewTextBoxColumn 姓名;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 编号姓名;
     }
 }
 

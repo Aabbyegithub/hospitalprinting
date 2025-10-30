@@ -43,6 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiCommon.cs" />
+    <Compile Include="HolExamination.cs" />
+    <Compile Include="HolPatient.cs" />
+    <Compile Include="HolPrinter.cs" />
     <Compile Include="HolPrinterConfig.cs" />
     <Compile Include="IniFileHelper.cs" />
     <Compile Include="PrintRecordModel.cs" />

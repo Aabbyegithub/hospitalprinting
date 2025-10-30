@@ -1,4 +1,5 @@
 ﻿using ModelClassLibrary.Model.HolModel;
+using MyNamespace;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,25 @@ namespace WebIServices.IServices.EquipmentIServices
         /// <param name="holPrinterConfigs"></param>
         /// <returns></returns>
         Task<ApiResponse<bool>> SavePrintConfigAsync(long PrinterId ,int Type, int Action, HolPrinterConfig holPrinterConfigs);
+
+        /// <summary>
+        /// 获取打印数据
+        /// </summary>
+        /// <param name="examNo"></param>
+        /// <returns></returns>
+        Task<ApiResponse<HolExamination>> GetByExamNoAsync(string examNo);
+
+        /// <summary>
+        /// 保存打印记录
+        /// </summary>
+        /// <param name="print"></param>
+        /// <returns></returns>
+        Task<ApiResponse<bool>> SavePrintRecordAsync(PrintRecordModel print);
+        /// <summary>
+        /// 获取未打印的患者
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResponse<List<HolExamination>>> GetAllUserAsync();
 
     }
 }

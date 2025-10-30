@@ -1,7 +1,6 @@
 ﻿using Common;
 using ModelClassLibrary.Model.HolModel;
 using Newtonsoft.Json;
-using SqlSugar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,7 +19,7 @@ namespace WinSelfMachine
     public partial class FormWaitTime : Form
     {
         private readonly ApiCommon _apiCommon;
-        private List<WaitTimeList> _WaitTimeList;
+        private List<WaitTimeList> _WaitTimeList = new List<WaitTimeList>();
 
         public FormWaitTime()
         {
@@ -219,7 +218,7 @@ namespace WinSelfMachine
             {
                 printer_id = item?.Id ?? 0,
                 film_size = size,
-                print_time_seconds = TxtWaitTime.Text.ObjToInt()
+                print_time_seconds = int.Parse(TxtWaitTime.Text)
             };
             await _apiCommon.SavePrinterConfig(1, 2, printerConfig);
 

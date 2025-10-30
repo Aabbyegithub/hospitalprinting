@@ -49,6 +49,7 @@ namespace WinSelfMachine
             }
             _iniConfig.Write("EquipmentUrl", "SerUrl", TxtServicesUrl.Text);
             _iniConfig.Write("EquipmentIsStart", "IsStart", "1");
+            Close();
             
         }
     }

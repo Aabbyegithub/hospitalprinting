@@ -1,6 +1,7 @@
 ﻿using Dm.util;
 using FellowOakDicom.Tools;
 using ModelClassLibrary.Model.HolModel;
+using MyNamespace;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,29 @@ namespace WebServiceClass.Services.EquipmentServices
         public EquipmentServices(ISqlHelper dal)
         {
             _dal = dal;
+        }
+
+        /// <summary>
+        /// 获取所有患者信息
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<List<HolExamination>>> GetAllUserAsync()
+        {
+            var res = await _dal.Db.Queryable<HolExamination>().Includes(a => a.patient).Where(a => a.is_printed == 0).ToListAsync();
+            return Success(res);
+        }
+
+        /// <summary>
+        /// 获取打印数据
+        /// </summary>
+        /// <param name="examNo"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<HolExamination>> GetByExamNoAsync(string examNo)
+        {
+            var res = await _dal.Db.Queryable<HolExamination>().FirstAsync(a => a.exam_no == examNo);
+            return Success(res);
         }
 
         /// <summary>
@@ -164,6 +188,19 @@ namespace WebServiceClass.Services.EquipmentServices
             {
                 return Fail<bool>("保存失败！");
             }
+        }
+
+        /// <summary>
+        /// 保存打印记录
+        /// </summary>
+        /// <param name="print"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+
+        public async Task<ApiResponse<bool>> SavePrintRecordAsync(PrintRecordModel print)
+        {
+            await _dal.Db.Insertable(print).ExecuteCommandAsync();
+            return Success(true);
         }
 
         /// <summary>

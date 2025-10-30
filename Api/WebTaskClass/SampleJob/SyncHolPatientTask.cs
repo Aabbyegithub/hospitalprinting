@@ -243,7 +243,7 @@ namespace WebTaskClass.SampleJob
                         .Select(a => new HolExamination
                         {
                             exam_no = a.AccessionNumber,
-                            patientid = a.PatientId,
+                            patientexid = a.PatientId,
                             patient_id = InSertId,
                             exam_type = a.Modality,
                             exam_date = a.StudyDate,

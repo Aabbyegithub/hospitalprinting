@@ -38,7 +38,7 @@ namespace MyNamespace
            /// Nullable:False
            /// </summary>           
            public long patient_id {get;set;}
-           public string patientid {get;set;}
+           public string patientexid {get;set;}
 
            /// <summary>
            /// Desc:所属机构ID
@@ -364,16 +364,18 @@ namespace MyNamespace
         /// <summary>
         /// 导航属性：对应的患者信息
         /// </summary>
+        [SugarColumn(IsIgnore = true)]
         [Navigate(NavigateType.OneToOne, nameof(patient_id))]
-        [JsonIgnore]
-        public HolPatient? patient { get; set; }
+        //[JsonIgnore]
+        public MyNamespace.HolPatient patient { get; set; }
 
         /// <summary>
         /// 导航属性：对应的医生信息
         /// </summary>
+        [SugarColumn(IsIgnore = true)]
         [Navigate(NavigateType.OneToOne, nameof(doctor_id))]
-        [JsonIgnore]
-        public HolDoctor? doctor { get; set; }
+        //[JsonIgnore]
+        public ModelClassLibrary.Model.HolModel.HolDoctor doctor { get; set; }
 
     }
 }

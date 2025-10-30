@@ -1,7 +1,6 @@
 ﻿using Common;
 using ModelClassLibrary.Model.HolModel;
 using Newtonsoft.Json;
-using SqlSugar.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -150,7 +149,7 @@ namespace WinSelfMachine
             {
                 printer_id = item?.Id ?? 0,
                 film_size = size,
-                available_count = TxtSum.Text.ObjToInt()
+                available_count =int.Parse(TxtSum.Text)
             };
             await _apiCommon.SavePrinterConfig(2, 2, printerConfig);
 
@@ -192,7 +191,7 @@ namespace WinSelfMachine
                 {
                     printer_id = 0,
                     film_size = size,
-                    available_count = TxtSum.Text.ObjToInt()
+                    available_count = int.Parse(TxtSum.Text)
                 };
                 await _apiCommon.SavePrinterConfig(2, 1, printerConfig);
 

@@ -67,9 +67,16 @@ namespace BarcodePrintCapture
             this.labelPrinterName = new System.Windows.Forms.Label();
             this.comboBoxPrinter = new System.Windows.Forms.ComboBox();
             this.btnPrintOptions = new System.Windows.Forms.Button();
+            this.btnTemplateConfig = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.textBoxResults = new System.Windows.Forms.TextBox();
+            this.groupBoxManualInput = new System.Windows.Forms.GroupBox();
+            this.labelManualId = new System.Windows.Forms.Label();
+            this.textBoxManualId = new System.Windows.Forms.TextBox();
+            this.labelManualName = new System.Windows.Forms.Label();
+            this.textBoxManualName = new System.Windows.Forms.TextBox();
+            this.btnManualPrint = new System.Windows.Forms.Button();
             this.groupBoxCapture.SuspendLayout();
             this.groupBoxConfig.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).BeginInit();
@@ -240,6 +247,7 @@ namespace BarcodePrintCapture
             // 
             this.groupBoxConfig.Controls.Add(this.btnCancel);
             this.groupBoxConfig.Controls.Add(this.btnSave);
+            this.groupBoxConfig.Controls.Add(this.btnTemplateConfig);
             this.groupBoxConfig.Controls.Add(this.btnPrintOptions);
             this.groupBoxConfig.Controls.Add(this.comboBoxPrinter);
             this.groupBoxConfig.Controls.Add(this.labelPrinterName);
@@ -463,12 +471,23 @@ namespace BarcodePrintCapture
             this.btnPrintOptions.Name = "btnPrintOptions";
             this.btnPrintOptions.Size = new System.Drawing.Size(80, 25);
             this.btnPrintOptions.TabIndex = 19;
-            this.btnPrintOptions.Text = "打印选项";
+            this.btnPrintOptions.Text = "测试打印";
             this.btnPrintOptions.UseVisualStyleBackColor = true;
+            this.btnPrintOptions.Click += new System.EventHandler(this.btnPrintOptions_Click);
+            // 
+            // btnTemplateConfig
+            // 
+            this.btnTemplateConfig.Location = new System.Drawing.Point(20, 165);
+            this.btnTemplateConfig.Name = "btnTemplateConfig";
+            this.btnTemplateConfig.Size = new System.Drawing.Size(130, 30);
+            this.btnTemplateConfig.TabIndex = 22;
+            this.btnTemplateConfig.Text = "打印模板配置";
+            this.btnTemplateConfig.UseVisualStyleBackColor = true;
+            this.btnTemplateConfig.Click += new System.EventHandler(this.btnTemplateConfig_Click);
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(430, 250);
+            this.btnSave.Location = new System.Drawing.Point(430, 220);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 30);
             this.btnSave.TabIndex = 20;
@@ -478,7 +497,7 @@ namespace BarcodePrintCapture
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(520, 250);
+            this.btnCancel.Location = new System.Drawing.Point(520, 220);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 30);
             this.btnCancel.TabIndex = 21;
@@ -486,11 +505,68 @@ namespace BarcodePrintCapture
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
+            // groupBoxManualInput
+            // 
+            this.groupBoxManualInput.Controls.Add(this.btnManualPrint);
+            this.groupBoxManualInput.Controls.Add(this.textBoxManualName);
+            this.groupBoxManualInput.Controls.Add(this.labelManualName);
+            this.groupBoxManualInput.Controls.Add(this.textBoxManualId);
+            this.groupBoxManualInput.Controls.Add(this.labelManualId);
+            this.groupBoxManualInput.Location = new System.Drawing.Point(12, 698);
+            this.groupBoxManualInput.Name = "groupBoxManualInput";
+            this.groupBoxManualInput.Size = new System.Drawing.Size(600, 85);
+            this.groupBoxManualInput.TabIndex = 2;
+            this.groupBoxManualInput.TabStop = false;
+            this.groupBoxManualInput.Text = "手动输入打印（从浏览器复制粘贴）";
+            // 
+            // labelManualId
+            // 
+            this.labelManualId.AutoSize = true;
+            this.labelManualId.Location = new System.Drawing.Point(20, 30);
+            this.labelManualId.Name = "labelManualId";
+            this.labelManualId.Size = new System.Drawing.Size(53, 12);
+            this.labelManualId.TabIndex = 0;
+            this.labelManualId.Text = "员工ID：";
+            // 
+            // textBoxManualId
+            // 
+            this.textBoxManualId.Location = new System.Drawing.Point(80, 27);
+            this.textBoxManualId.Name = "textBoxManualId";
+            this.textBoxManualId.Size = new System.Drawing.Size(150, 21);
+            this.textBoxManualId.TabIndex = 1;
+            // 
+            // labelManualName
+            // 
+            this.labelManualName.AutoSize = true;
+            this.labelManualName.Location = new System.Drawing.Point(250, 30);
+            this.labelManualName.Name = "labelManualName";
+            this.labelManualName.Size = new System.Drawing.Size(41, 12);
+            this.labelManualName.TabIndex = 2;
+            this.labelManualName.Text = "姓名：";
+            // 
+            // textBoxManualName
+            // 
+            this.textBoxManualName.Location = new System.Drawing.Point(300, 27);
+            this.textBoxManualName.Name = "textBoxManualName";
+            this.textBoxManualName.Size = new System.Drawing.Size(150, 21);
+            this.textBoxManualName.TabIndex = 3;
+            // 
+            // btnManualPrint
+            // 
+            this.btnManualPrint.Location = new System.Drawing.Point(470, 25);
+            this.btnManualPrint.Name = "btnManualPrint";
+            this.btnManualPrint.Size = new System.Drawing.Size(110, 25);
+            this.btnManualPrint.TabIndex = 4;
+            this.btnManualPrint.Text = "立即打印 ►";
+            this.btnManualPrint.UseVisualStyleBackColor = true;
+            this.btnManualPrint.Click += new System.EventHandler(this.btnManualPrint_Click);
+            // 
             // FormBarcodeCapture
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(624, 692);
+            this.ClientSize = new System.Drawing.Size(624, 795);
+            this.Controls.Add(this.groupBoxManualInput);
             this.Controls.Add(this.groupBoxConfig);
             this.Controls.Add(this.groupBoxCapture);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -504,6 +580,8 @@ namespace BarcodePrintCapture
             this.groupBoxCapture.PerformLayout();
             this.groupBoxConfig.ResumeLayout(false);
             this.groupBoxConfig.PerformLayout();
+            this.groupBoxManualInput.ResumeLayout(false);
+            this.groupBoxManualInput.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInterval)).EndInit();
             this.ResumeLayout(false);
 
@@ -550,8 +628,15 @@ namespace BarcodePrintCapture
         private System.Windows.Forms.Label labelPrinterName;
         private System.Windows.Forms.ComboBox comboBoxPrinter;
         private System.Windows.Forms.Button btnPrintOptions;
+        private System.Windows.Forms.Button btnTemplateConfig;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.GroupBox groupBoxManualInput;
+        private System.Windows.Forms.Label labelManualId;
+        private System.Windows.Forms.TextBox textBoxManualId;
+        private System.Windows.Forms.Label labelManualName;
+        private System.Windows.Forms.TextBox textBoxManualName;
+        private System.Windows.Forms.Button btnManualPrint;
     }
 }
 

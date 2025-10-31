@@ -1,14 +1,16 @@
-﻿using System;
+﻿using ModelClassLibrary.Model.Dto.HolDto;
+using ModelClassLibrary.Model.HolModel;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using WinSelfMachine.Common;
-using Newtonsoft.Json;
-using System.Security.Cryptography;
-using ModelClassLibrary.Model.HolModel;
+using static Common.Response;
 
 namespace Common
 {
@@ -92,7 +94,13 @@ namespace Common
             return res;
         }
 
-
+        /// <summary>
+        /// 保存打印机配置
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="action"></param>
+        /// <param name="holPrinterConfigs"></param>
+        /// <returns></returns>
         public async Task<string> SavePrinterConfig(int type,int action,  HolPrinterConfig holPrinterConfigs)
         {
             var res = "";
@@ -122,6 +130,10 @@ namespace Common
             return res;
         }
 
+        /// <summary>
+        /// 获取所有患者
+        /// </summary>
+        /// <returns></returns>
         public async Task<string> GetExaminationAllUser()
         {
             var res = "";
@@ -148,8 +160,43 @@ namespace Common
             {
                 res = await Response.Content.ReadAsStringAsync();
             }
+            else
+            {
+                var errorContent = await Response.Content.ReadAsStringAsync();
+                throw new Exception($"保存打印记录失败：{Response.StatusCode} - {errorContent}");
+            }
             return res;
         }
+
+        /// <summary>
+        /// 获取ai配置
+        /// </summary>
+        /// <returns></returns>
+        public async Task<HolAiConfig> GetAiConfig()
+        {
+            var res =new HolAiConfig();
+            var Response = await _httpClient.GetAsync($"{_Url}/api/Equipment/GetAIConfig");
+            if (Response.IsSuccessStatusCode)
+            {
+                var data = await Response.Content.ReadAsStringAsync();
+                res = JsonConvert.DeserializeObject<ApiResponse<HolAiConfig>>(data).Response;
+            }
+            return res;
+        }
+
+        public async Task<OcrRecognitionDto> OCRPDF(string Url)
+        {
+            var res =new OcrRecognitionDto();
+            var Response = await _httpClient.PostAsync($"{_Url}/api/OCRRecognition/RecognizeFile?filePath={Url}",null);
+            if (Response.IsSuccessStatusCode)
+            {
+                var data = await Response.Content.ReadAsStringAsync();
+                res = JsonConvert.DeserializeObject<ApiResponse<OcrRecognitionDto>>(data).Response;
+            }
+            return res;
+        }
+
+
 
         /// <summary>
         /// 生成报告Pdf（返回PDF字节流）。按接口要求生成 time、nonce_str、sign。
@@ -160,12 +207,17 @@ namespace Common
         /// <param name="messageText">读解内容文字</param>
         /// <param name="secretKey">签名密钥 secret_key</param>
         /// <returns>application/pdf 字节流；失败时抛出异常或返回 null</returns>
-        public async Task<byte[]> GenerateReportPdf(string examType, string date, string filename, string messageText, string secretKey)
+        public async Task<byte[]> GenerateReportPdf(string examType, string date, string filename, string messageText)
         {
+            var config = await GetAiConfig();
+            if (config == null || string.IsNullOrEmpty(config.api_key))
+            {
+                throw new Exception("AI配置未设置或API密钥为空，无法生成报告PDF");
+            }
             // 1) 公共参数
             string time = GenerateTimestampSeconds();
             string nonceStr = GenerateNonce(16, 32);
-            string sign = ComputeMd5Lower($"nonce_str={nonceStr}&time={time}" + secretKey);
+            string sign = ComputeMd5Lower($"nonce_str={nonceStr}&time={time}" + config.api_key);
 
             // 2) 业务参数 content
             var payload = new
@@ -185,7 +237,7 @@ namespace Common
             var json = JsonConvert.SerializeObject(payload);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_Url}/ai/responses/report_review", content);
+            var response = await _httpClient.PostAsync($"{config.api_url}/ai/responses/report_review", content);
             if (!response.IsSuccessStatusCode)
             {
                 // 尝试读取错误信息

@@ -144,7 +144,7 @@ namespace WebServiceClass.Services.DICOMServices
                     relativePath = relativePath.Replace("\\", "/");
                     
                     // 组合成完整URL
-                    return fileUrl + "dicom/" + relativePath;
+                    return fileUrl + "ReceivedDicom/" + relativePath;
                 }
                 else
                 {

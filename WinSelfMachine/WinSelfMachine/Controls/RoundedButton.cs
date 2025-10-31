@@ -152,7 +152,6 @@ namespace WinSelfMachine.Controls
             {
                 isPressed = false;
                 Invalidate();
-                OnClick(EventArgs.Empty);
             }
         }
 

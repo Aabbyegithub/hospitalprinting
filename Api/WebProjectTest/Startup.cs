@@ -277,7 +277,7 @@ namespace WebProjectTest
                 app.UseStaticFiles(new StaticFileOptions
                 {
                     FileProvider = new PhysicalFileProvider(dicomSaveDirectory),
-                    RequestPath = "/dicom", // 映射到 /dicom 路径
+                    RequestPath = "/ReceivedDicom", // 映射到 /dicom 路径
                     ServeUnknownFileTypes = true, // 允许服务DICOM文件
                     DefaultContentType = "application/dicom" // DICOM文件内容类型
                 });

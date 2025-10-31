@@ -16,7 +16,7 @@
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -50,12 +50,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiCommon.cs" />
+    <Compile Include="HolAiConfig.cs" />
     <Compile Include="HolExamination.cs" />
     <Compile Include="HolPatient.cs" />
     <Compile Include="HolPrinter.cs" />
     <Compile Include="HolPrinterConfig.cs" />
     <Compile Include="IniFileHelper.cs" />
     <Compile Include="LicenseCommon.cs" />
+    <Compile Include="OcrRecognitionDto.cs" />
     <Compile Include="PrintRecordModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Response.cs" />

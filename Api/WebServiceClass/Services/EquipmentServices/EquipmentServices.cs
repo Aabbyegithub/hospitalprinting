@@ -20,6 +20,17 @@ namespace WebServiceClass.Services.EquipmentServices
         {
             _dal = dal;
         }
+        
+        /// <summary>
+        /// 获取ai配置
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<HolAiConfig>> GetAIConfigAsync()
+        {
+            var res = await _dal.Db.Queryable<HolAiConfig>().FirstAsync();
+            return Success(res);
+        }
 
         /// <summary>
         /// 获取所有患者信息
@@ -200,6 +211,7 @@ namespace WebServiceClass.Services.EquipmentServices
         public async Task<ApiResponse<bool>> SavePrintRecordAsync(PrintRecordModel print)
         {
             await _dal.Db.Insertable(print).ExecuteCommandAsync();
+            await _dal.Db.Updateable<HolExamination>().SetColumns(a => a.is_printed == 1).Where(a => a.id == print.exam_id).ExecuteCommandAsync();
             return Success(true);
         }
 

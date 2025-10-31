@@ -1,24 +1,25 @@
 ﻿using Common;
 using Microsoft.SqlServer.Server;
+using ModelClassLibrary.Model.HolModel;
+using MyNamespace;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinSelfMachine.Common;
 using WinSelfMachine.Controls;
-using ModelClassLibrary.Model.HolModel;
-using Newtonsoft.Json;
 using static Common.Response;
-using MyNamespace;
 using static WinSelfMachine.Model.HolModel;
-using System.Diagnostics;
 
 namespace WinSelfMachine
 {
@@ -35,15 +36,21 @@ namespace WinSelfMachine
 		// 自绘复选框图片资源
 		private Bitmap _chkOnImg;
 		private Bitmap _chkOffImg;
-		// 红框区域控件（容器+列表+操作区）
-		private Rectangle _roundedContainerBounds;
-		private Rectangle _dataGridBounds;
-		private Rectangle _selectedLabelBounds;
-		private Rectangle _confirmButtonBounds;
-		private Rectangle _abortButtonBounds;
-		private float _selectedLabelFontSize;
-		private float _confirmButtonFontSize;
-		private float _abortButtonFontSize;
+	// 红框区域控件（容器+列表+操作区）
+	private Rectangle _roundedContainerBounds;
+	private Rectangle _dataGridBounds;
+	private Rectangle _selectedLabelBounds;
+	private Rectangle _confirmButtonBounds;
+	private Rectangle _abortButtonBounds;
+	private float _selectedLabelFontSize;
+	private float _confirmButtonFontSize;
+	private float _abortButtonFontSize;
+	// AI解析区域控件
+	private Rectangle _roundedContainer2Bounds;
+	private Rectangle _btnAiAnalysisBounds;
+	private Rectangle _btnDirectBounds;
+	private float _btnAiAnalysisFontSize;
+	private float _btnDirectFontSize;
 
         private IniFileHelper _iniConfig;
         private string _configFilePath;
@@ -295,26 +302,32 @@ namespace WinSelfMachine
             Close();
         }
 
-		// ======= 自适应布局实现 =======
-		private void _captureDesignMetrics()
-		{
-			_designClientSize = this.ClientSize;
-			_label1Bounds = label1.Bounds;
-			_roundTextBox1Bounds = Txtbr.Bounds;
-			_label2Bounds = label2.Bounds;
-			_label1FontSize = label1.Font.Size;
-			_roundTextBox1FontSize = Txtbr.Font.Size;
-			_label2FontSize = label2.Font.Size;
-			// 红框区域
-			_roundedContainerBounds = roundedContainer1.Bounds;
-			_dataGridBounds = dataGridView1.Bounds;
-			_selectedLabelBounds = TxtSelect.Bounds;
-			_confirmButtonBounds = BtnConfirmPaint.Bounds;
-			_abortButtonBounds = BtnCancelPrint.Bounds;
-			_selectedLabelFontSize = TxtSelect.Font.Size;
-			_confirmButtonFontSize = BtnConfirmPaint.Font.Size;
-			_abortButtonFontSize = BtnCancelPrint.Font.Size;
-		}
+	// ======= 自适应布局实现 =======
+	private void _captureDesignMetrics()
+	{
+		_designClientSize = this.ClientSize;
+		_label1Bounds = label1.Bounds;
+		_roundTextBox1Bounds = Txtbr.Bounds;
+		_label2Bounds = label2.Bounds;
+		_label1FontSize = label1.Font.Size;
+		_roundTextBox1FontSize = Txtbr.Font.Size;
+		_label2FontSize = label2.Font.Size;
+		// 红框区域
+		_roundedContainerBounds = roundedContainer1.Bounds;
+		_dataGridBounds = dataGridView1.Bounds;
+		_selectedLabelBounds = TxtSelect.Bounds;
+		_confirmButtonBounds = BtnConfirmPaint.Bounds;
+		_abortButtonBounds = BtnCancelPrint.Bounds;
+		_selectedLabelFontSize = TxtSelect.Font.Size;
+		_confirmButtonFontSize = BtnConfirmPaint.Font.Size;
+		_abortButtonFontSize = BtnCancelPrint.Font.Size;
+		// AI解析区域
+		_roundedContainer2Bounds = roundedContainer2.Bounds;
+		_btnAiAnalysisBounds = BtnAiAnalysis.Bounds;
+		_btnDirectBounds = BtnDirect.Bounds;
+		_btnAiAnalysisFontSize = BtnAiAnalysis.Font.Size;
+		_btnDirectFontSize = BtnDirect.Font.Size;
+	}
 
 		private void SetupLargeCheckboxColumn()
 		{
@@ -499,15 +512,45 @@ namespace WinSelfMachine
 				(int)Math.Round(_confirmButtonBounds.Height * scaleY));
 			BtnConfirmPaint.Font = new Font(BtnConfirmPaint.Font.FontFamily, Math.Max(8f, _confirmButtonFontSize * fontScale), BtnConfirmPaint.Font.Style, BtnConfirmPaint.Font.Unit);
 
-			// 放弃打印按钮
-			BtnCancelPrint.Location = new Point(
-				(int)Math.Round(_abortButtonBounds.X * scaleX),
-				(int)Math.Round(_abortButtonBounds.Y * scaleY));
-			BtnCancelPrint.Size = new Size(
-				(int)Math.Round(_abortButtonBounds.Width * scaleX),
-				(int)Math.Round(_abortButtonBounds.Height * scaleY));
-			BtnCancelPrint.Font = new Font(BtnCancelPrint.Font.FontFamily, Math.Max(8f, _abortButtonFontSize * fontScale), BtnCancelPrint.Font.Style, BtnCancelPrint.Font.Unit);
-		}
+	        // 放弃打印按钮
+	        BtnCancelPrint.Location = new Point(
+		        (int)Math.Round(_abortButtonBounds.X * scaleX),
+		        (int)Math.Round(_abortButtonBounds.Y * scaleY));
+	        BtnCancelPrint.Size = new Size(
+		        (int)Math.Round(_abortButtonBounds.Width * scaleX),
+		        (int)Math.Round(_abortButtonBounds.Height * scaleY));
+	        BtnCancelPrint.Font = new Font(BtnCancelPrint.Font.FontFamily, Math.Max(8f, _abortButtonFontSize * fontScale), BtnCancelPrint.Font.Style, BtnCancelPrint.Font.Unit);
+
+	        // ===== AI解析区域：容器 + 按钮 =====
+	        roundedContainer2.Location = new Point(
+		        (int)Math.Round(_roundedContainer2Bounds.X * scaleX),
+		        (int)Math.Round(_roundedContainer2Bounds.Y * scaleY));
+	        roundedContainer2.Size = new Size(
+		        (int)Math.Round(_roundedContainer2Bounds.Width * scaleX),
+		        (int)Math.Round(_roundedContainer2Bounds.Height * scaleY));
+	        // 标题字号随比例调整
+	        roundedContainer2.TitleFont = new Font(roundedContainer2.TitleFont.FontFamily,
+		        Math.Max(10f, roundedContainer2.TitleFont.Size * fontScale),
+		        roundedContainer2.TitleFont.Style, roundedContainer2.TitleFont.Unit);
+
+	        // AI分析按钮
+	        BtnAiAnalysis.Location = new Point(
+		        (int)Math.Round(_btnAiAnalysisBounds.X * scaleX),
+		        (int)Math.Round(_btnAiAnalysisBounds.Y * scaleY));
+	        BtnAiAnalysis.Size = new Size(
+		        (int)Math.Round(_btnAiAnalysisBounds.Width * scaleX),
+		        (int)Math.Round(_btnAiAnalysisBounds.Height * scaleY));
+	        BtnAiAnalysis.Font = new Font(BtnAiAnalysis.Font.FontFamily, Math.Max(8f, _btnAiAnalysisFontSize * fontScale), BtnAiAnalysis.Font.Style, BtnAiAnalysis.Font.Unit);
+
+	        // 直接打印按钮
+	        BtnDirect.Location = new Point(
+		        (int)Math.Round(_btnDirectBounds.X * scaleX),
+		        (int)Math.Round(_btnDirectBounds.Y * scaleY));
+	        BtnDirect.Size = new Size(
+		        (int)Math.Round(_btnDirectBounds.Width * scaleX),
+		        (int)Math.Round(_btnDirectBounds.Height * scaleY));
+	        BtnDirect.Font = new Font(BtnDirect.Font.FontFamily, Math.Max(8f, _btnDirectFontSize * fontScale), BtnDirect.Font.Style, BtnDirect.Font.Unit);
+        }
 
         /// <summary>
         /// 触发打印
@@ -523,6 +566,7 @@ namespace WinSelfMachine
 
             try
             {
+                GetTableData(examNo);
                 if (_IsOpen == 1)
                 {
                     roundedContainer1.Visible = true;
@@ -534,55 +578,83 @@ namespace WinSelfMachine
                     BtnConfirmPaint.BringToFront();
                     BtnCancelPrint.Visible = true;
                     BtnCancelPrint.BringToFront();
-                    GetTableData(examNo);
                     return;
                 }
-                // 显示加载提示
-                this.Text = "正在查询检查数据...";
-                this.Refresh();
-
-                // 获取检查数据
-                var response = await _apiCommon.GetExaminationByNo(examNo);
-                if (string.IsNullOrEmpty(response))
+                if (_IsShow == 1)
                 {
-                    MessageBox.Show("未找到该检查号的数据", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    roundedContainer2.Visible = true;
+                    roundedContainer2.BringToFront();
+                    BtnAiAnalysis.Visible = true;
+                    BtnAiAnalysis.BringToFront();
+                    BtnDirect.Visible = true;
+                    BtnDirect.BringToFront();
+                    return;
+                }
+
+                foreach (DataGridViewRow item in dataGridView1.Rows)
+                {
+                    // 检查是否已打印
+                    var isPrintedValue = item.Cells["是否已打印"]?.Value;
+                    if (isPrintedValue != null && isPrintedValue.ToString() == "1")
+                    {
+                        MessageBox.Show("警告", "已打印的不可重复打印", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // 检查是否勾选打印
+                    var printValue = item.Cells["是否打印值"]?.Value;
+                    if (printValue == null || !Convert.ToBoolean(printValue))
+                    {
+                        continue;
+                    }
+
+                    // 安全地获取单元格值
+                    var idValue = item.Cells["id"]?.Value;
+                    var patientIdValue = item.Cells["patient_id"]?.Value;
+                    var exam_type = item.Cells["类型"]?.Value;
+                    var imagePathValue = item.Cells["胶片路径"]?.Value;
+                    var reportPathValue = item.Cells["报告路径"]?.Value;
+
+                    // 验证必要字段
+                    if (idValue == null || patientIdValue == null)
+                    {
+                        continue; // 跳过数据不完整的行
+                    }
+
+                    var info = new HolExamination()
+                    {
+                        id = Convert.ToInt64(idValue),
+                        exam_type = exam_type?.ToString() ?? "",
+                        image_path = imagePathValue?.ToString() ?? "",
+                        report_path = reportPathValue?.ToString() ?? "",
+                        patient_id = Convert.ToInt64(patientIdValue),
+                    };
+                    _holExamination.Add(info);
+                }
+
+                var printerConfig = await GetPrinterConfiguration();
+                if (printerConfig == null)
+                {
+                    MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     this.Text = "医院自助一体机";
                     return;
                 }
-
-                var responseData = JsonConvert.DeserializeObject<ApiResponse<List<HolExamination>>>(response);
-                if (responseData?.Response == null)
+                foreach (var item in _holExamination)
                 {
-                    MessageBox.Show("检查数据格式错误", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    this.Text = "医院自助一体机";
-                    return;
+                    try
+                    {
+                        // 执行打印
+                        await PrintReport(item, printerConfig);
+
+                        // 保存打印记录
+                        await SavePrintRecord(item);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"打印失败-{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                 }
-
-                var examination = responseData.Response;
-                
-                //// 检查是否已打印
-                //if (examination.is_printed == 1)
-                //{
-                //    var result = MessageBox.Show("该检查报告已打印过", "提示", 
-                //        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                //    return;
-                //}
-
-                //// 获取打印机配置
-                //var printerConfig = await GetPrinterConfiguration();
-                //if (printerConfig == null)
-                //{
-                //    MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //    this.Text = "医院自助一体机";
-                //    return;
-                //}
-
-                //// 执行打印
-                //await PrintReport(examination, printerConfig);
-
-                //// 保存打印记录
-                //await SavePrintRecord(examination);
-
                 MessageBox.Show("打印完成！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -669,7 +741,7 @@ namespace WinSelfMachine
             }
             catch (Exception ex)
             {
-                throw new Exception($"打印过程中发生错误：{ex.Message}", ex);
+                MessageBox.Show($"打印过程中发生错误：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -720,27 +792,20 @@ namespace WinSelfMachine
         {
             // 根据检查类型或胶片尺寸匹配配置
             var examType = examination.exam_type?.ToUpper();
-            
-            // 尝试匹配胶片尺寸
-            foreach (var config in printerConfig.Configs)
+
+            if (!string.IsNullOrEmpty(examType))
             {
-                if (!string.IsNullOrEmpty(config.film_size) && 
-                    config.film_size.Equals(examType, StringComparison.OrdinalIgnoreCase))
+                // 尝试匹配胶片尺寸
+                var DicomFil = CommonList.PrintDepFilmSizes();
+                foreach (var item in DicomFil)
                 {
-                    return config;
+                    if (item.Key == examType)
+                    {
+                        var Size = item.Value.Split(',')[0];
+                        return printerConfig.Configs.FirstOrDefault(c => c.film_size == Size);
+                    }
                 }
             }
-
-            // 如果没有精确匹配，尝试模糊匹配
-            foreach (var config in printerConfig.Configs)
-            {
-                if (!string.IsNullOrEmpty(config.film_size) && 
-                    config.film_size.Contains(examType))
-                {
-                    return config;
-                }
-            }
-
             return null;
         }
 
@@ -786,30 +851,29 @@ namespace WinSelfMachine
             try
             {
                 // 验证DICOM文件
-                if (!File.Exists(imagePath))
+                if (!string.IsNullOrEmpty(imagePath) && IsValidFilePath(imagePath))
                 {
-                    throw new Exception($"DICOM文件不存在：{imagePath}");
+
+                    // 构建DICOM打印参数
+                    var dicomPrintParams = new DicomPrintParameters
+                    {
+                        ImagePath = imagePath,
+                        AETitle = laserCamera.name ?? "LASER_CAMERA",
+                        IPAddress = laserCamera.ip_address,
+                        Port = laserCamera.port ?? 104,
+                        PatientName = examination.patient?.name ?? "Unknown",
+                        PatientID = examination.patient_id.ToString(),
+                        StudyInstanceUID = examination.exam_no,
+                        SeriesInstanceUID = examination.exam_no + "_SERIES",
+                        SOPInstanceUID = examination.exam_no + "_INSTANCE"
+                    };
+
+                    // 执行DICOM打印
+                    await ExecuteDicomPrint(dicomPrintParams);
+
+                    // 记录打印日志
+                   // LogDicomPrint(dicomPrintParams, examination);
                 }
-
-                // 构建DICOM打印参数
-                var dicomPrintParams = new DicomPrintParameters
-                {
-                    ImagePath = imagePath,
-                    AETitle = laserCamera.name ?? "LASER_CAMERA",
-                    IPAddress = laserCamera.ip_address,
-                    Port = laserCamera.port ?? 104,
-                    PatientName = examination.patient?.name ?? "Unknown",
-                    PatientID = examination.patient_id.ToString(),
-                    StudyInstanceUID = examination.exam_no,
-                    SeriesInstanceUID = examination.exam_no + "_SERIES",
-                    SOPInstanceUID = examination.exam_no + "_INSTANCE"
-                };
-
-                // 执行DICOM打印
-                await ExecuteDicomPrint(dicomPrintParams);
-
-                // 记录打印日志
-                LogDicomPrint(dicomPrintParams, examination);
             }
             catch (Exception ex)
             {
@@ -827,12 +891,10 @@ namespace WinSelfMachine
             {
                 // 方法1：使用DICOM工具（如dcmtk）进行打印
                 await PrintWithDcmtk(parameters);
-                
-                // 方法2：如果dcmtk不可用，使用自定义DICOM客户端
-                await PrintWithCustomDicomClient(parameters);
             }
             catch (Exception ex)
             {
+                // 如果dcmtk失败，抛出异常
                 throw new Exception($"DICOM打印执行失败：{ex.Message}", ex);
             }
         }
@@ -845,6 +907,22 @@ namespace WinSelfMachine
         {
             try
             {
+                // 判断系统位数
+                bool is64Bit = Environment.Is64BitProcess;
+                string archFolder = is64Bit ? "x64" : "x86";
+                
+                // 获取项目根目录下的dcmtk工具路径（按系统位数）
+                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var projectRoot = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(baseDirectory)));
+                var dcmtkExe = Path.Combine(projectRoot, $"dcmtk{archFolder}", "bin", "dcmsend.exe");
+               
+                
+                // 如果还是不存在，使用系统PATH中的dcmsend
+                if (!File.Exists(dcmtkExe))
+                {
+                    dcmtkExe = "dcmsend";
+                }
+
                 // 构建dcmtk命令行参数
                 var arguments = $"-aet {parameters.AETitle} " +
                                $"-aec LASER_CAMERA " +
@@ -858,7 +936,8 @@ namespace WinSelfMachine
                 {
                     StartInfo = new System.Diagnostics.ProcessStartInfo
                     {
-                        FileName = "dcmsend", // dcmtk工具
+                        FileName = dcmtkExe,
+                        WorkingDirectory = Path.GetDirectoryName(dcmtkExe) ?? baseDirectory,
                         Arguments = arguments,
                         UseShellExecute = false,
                         CreateNoWindow = true,
@@ -1031,8 +1110,8 @@ namespace WinSelfMachine
         {
             try
             {
-                // 优先打印已有文件
-                if (!string.IsNullOrEmpty(examination.report_path) && File.Exists(examination.report_path))
+                // 优先打印已有文件（支持URL、网络共享路径或本地文件路径）
+                if (!string.IsNullOrEmpty(examination.report_path) && IsValidFilePath(examination.report_path))
                 {
                     await PrintExistingFile(examination.report_path, printerConfig);
                 }
@@ -1045,6 +1124,55 @@ namespace WinSelfMachine
             catch (Exception ex)
             {
                 throw new Exception($"文档打印失败：{ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 检查路径是否为有效文件路径（支持URL、网络路径、本地路径）
+        /// </summary>
+        /// <param name="path">文件路径</param>
+        /// <returns>是否为有效路径</returns>
+        private bool IsValidFilePath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+
+            try
+            {
+                // URL 格式检查（http/https/ftp等）
+                if (Uri.TryCreate(path, UriKind.Absolute, out Uri uri))
+                {
+                    if (uri.Scheme == Uri.UriSchemeHttp || 
+                        uri.Scheme == Uri.UriSchemeHttps || 
+                        uri.Scheme == Uri.UriSchemeFtp)
+                    {
+                        return true;
+                    }
+                }
+
+                // 网络共享路径检查（\\server\share）
+                if (path.StartsWith(@"\\"))
+                {
+                    return true;
+                }
+
+                // 本地文件路径检查
+                if (File.Exists(path))
+                {
+                    return true;
+                }
+
+                // 如果是相对路径或格式正确的路径，也认为有效
+                if (Path.IsPathRooted(path) || Path.GetExtension(path) != string.Empty)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -1117,6 +1245,45 @@ namespace WinSelfMachine
             catch (Exception ex)
             {
                 throw new Exception($"PDF打印失败：{ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 打印PDF字节流
+        /// </summary>
+        /// <param name="pdfBytes">PDF字节数组</param>
+        /// <param name="printerConfig">打印机配置</param>
+        private async Task PrintPdfBytes(byte[] pdfBytes, PrinterConfiguration printerConfig)
+        {
+            try
+            {
+                // 创建临时文件保存PDF
+                string tempFilePath = Path.Combine(Path.GetTempPath(), $"temp_pdf_{DateTime.Now:yyyyMMddHHmmss}_{Guid.NewGuid()}.pdf");
+                
+                try
+                {
+                    // 将字节数组写入临时文件
+                    File.WriteAllBytes(tempFilePath, pdfBytes);
+                    
+                    // 使用临时文件打印
+                    await PrintPdfFile(tempFilePath, printerConfig);
+                }
+                finally
+                {
+                    // 删除临时文件
+                    try
+                    {
+                        if (File.Exists(tempFilePath))
+                        {
+                            File.Delete(tempFilePath);
+                        }
+                    }
+                    catch { /* 忽略删除临时文件失败的错误 */ }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"PDF字节流打印失败：{ex.Message}", ex);
             }
         }
 
@@ -1404,6 +1571,7 @@ namespace WinSelfMachine
             {
                 var printRecord = new PrintRecordModel
                 {
+                    id = 0,
                     exam_id = examination.id,
                     patient_id = examination.patient_id,
                     print_time = DateTime.Now,
@@ -1428,11 +1596,15 @@ namespace WinSelfMachine
         /// <param name="e"></param>
         private void BtnCancelPrint_Click(object sender, EventArgs e)
         {
+            dataGridView1.Rows.Clear();
             roundedContainer1.Visible = false;
             dataGridView1.Visible = false;
             TxtSelect.Visible = false;
             BtnConfirmPaint.Visible = false;
             BtnCancelPrint.Visible = false;
+            roundedContainer2.Visible = false;
+            BtnAiAnalysis.Visible = false;
+            BtnDirect.Visible = false;
 
         }
         /// <summary>
@@ -1442,37 +1614,55 @@ namespace WinSelfMachine
         /// <param name="e"></param>
         private async void BtnConfirmPaint_Click(object sender, EventArgs e)
         {
+
             BtnCancelPrint.Text = "返回";
             _holExamination.Clear();
-            // 获取打印机配置
-            var printerConfig = await GetPrinterConfiguration();
-            if (printerConfig == null)
-            {
-                MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.Text = "医院自助一体机";
-                return;
-            }
+
             foreach (DataGridViewRow item in dataGridView1.Rows)
             {
-                if (item.Cells["是否已打印"].Value.ToString() == "1")
+                // 检查是否已打印
+                var isPrintedValue = item.Cells["是否已打印"]?.Value;
+                if (isPrintedValue != null && isPrintedValue.ToString() == "1")
                 {
-                    MessageBox.Show("警告","已打印的不可重复打印",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                    MessageBox.Show("已打印的不可重复打印", "警告",MessageBoxButtons.OK,MessageBoxIcon.Warning);
                     return;
                 }
-                if (!Convert.ToBoolean(item.Cells["是否打印值"]))
+                
+                // 检查是否勾选打印
+                var printValue = item.Cells["是否打印值"]?.Value;
+                if (printValue == null || !Convert.ToBoolean(printValue))
                 {
                     continue;
                 }
-                 var info = new HolExamination()
+                
+                // 安全地获取单元格值
+                var idValue = item.Cells["id"]?.Value;
+                var patientIdValue = item.Cells["patient_id"]?.Value;
+                var exam_type = item.Cells["类型"]?.Value;
+                var imagePathValue = item.Cells["胶片路径"]?.Value;
+                var reportPathValue = item.Cells["报告路径"]?.Value;
+                
+                // 验证必要字段
+                if (idValue == null || patientIdValue == null)
                 {
-                    id = Convert.ToInt64(item.Cells["id"].Value),
-                    image_path = item.Cells["胶片路径"].Value.ToString(),
-                    report_path = item.Cells["报告路径"].Value.ToString(),
-                    patient_id = Convert.ToInt64(item.Cells["patient_id"].Value),
+                    continue; // 跳过数据不完整的行
+                }
+                
+                var info = new HolExamination()
+                {
+                    id = Convert.ToInt64(idValue),
+                    exam_type = exam_type?.ToString() ?? "",
+                    image_path = imagePathValue?.ToString() ?? "",
+                    report_path = reportPathValue?.ToString() ?? "",
+                    patient_id = Convert.ToInt64(patientIdValue),
                 };
                 _holExamination.Add(info);
             }
-
+            if (_holExamination.Count() == 0)
+            {
+                MessageBox.Show("请选择打印", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             if (_IsShow == 1)
             {
                 roundedContainer2.Visible = true;
@@ -1481,17 +1671,39 @@ namespace WinSelfMachine
                 BtnAiAnalysis.BringToFront();
                 BtnDirect.Visible = true;
                 BtnDirect.BringToFront();
+                BtnConfirmPaint.Visible = false;
                 return;
             }
+
+            // 获取打印机配置
+            var printerConfig = await GetPrinterConfiguration();
+            if (printerConfig == null)
+            {
+                MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Text = "医院自助一体机";
+                return;
+            }
+            BtnConfirmPaint.Visible = false;
             foreach (var item in _holExamination)
             {
-                // 执行打印
-                await PrintReport(item, printerConfig);
+                try
+                {
+                    // 执行打印
+                    await PrintReport(item, printerConfig);
 
-                // 保存打印记录
-                await SavePrintRecord(item);
+                    // 保存打印记录
+                    await SavePrintRecord(item);
+                }
+                catch (Exception ex)
+                {
+
+                    MessageBox.Show($"打印失败！{ex.Message}", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
             }
-
+            BtnCancelPrint_Click(null,null);
+            MessageBox.Show("打印完成！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
 
@@ -1570,14 +1782,50 @@ namespace WinSelfMachine
             {
                 if (!string.IsNullOrEmpty(item.report_path))
                 {
-
+                    var reportResult = await _apiCommon.OCRPDF(item.report_path);
+                    try
+                    {
+                        if (reportResult != null)
+                        {
+                            var data = "";
+                            var examType = ExtractValue(reportResult.Text, @"检查类型[:：\s]*([^\n]+)"); 
+                            if (DateTime.TryParse(ExtractValue(reportResult.Text, @"登记日期[:：\s]*(\d{4}[年/-]\d{1,2}[月/-]\d{1,2}[日]?)"), out DateTime examDate))
+                            {
+                                 data  = examDate.ToString("yyyy-MM-dd");
+                            }
+                  
+                            var pdfResult = await _apiCommon.GenerateReportPdf(examType, data, $"report{DateTime.Now:yyyyMMddHHmmss}", reportResult.Text);
+                            
+                            // 如果成功生成PDF，直接打印
+                            if (pdfResult != null && pdfResult.Length > 0)
+                            {
+                                await PrintPdfBytes(pdfResult, printerConfig);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ai解析错误-{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                 }
-                // 执行打印
-                await PrintReport(item, printerConfig);
+                try
+                {
+                    // 执行打印
+                    await PrintReport(item, printerConfig);
 
-                // 保存打印记录
-                await SavePrintRecord(item);
+                    // 保存打印记录
+                    await SavePrintRecord(item);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"打印失败-{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
             }
+            BtnCancelPrint_Click(null, null);
+            MessageBox.Show("打印完成！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -1587,6 +1835,42 @@ namespace WinSelfMachine
         /// <param name="e"></param>
         private async void BtnDirect_Click(object sender, EventArgs e)
         {
+            if (_holExamination.Count() == 0)
+            {
+                foreach (DataGridViewRow item in dataGridView1.Rows)
+                {
+                    // 检查是否已打印
+                    var isPrintedValue = item.Cells["是否已打印"]?.Value;
+                    if (isPrintedValue != null && isPrintedValue.ToString() == "1")
+                    {
+                        MessageBox.Show("警告", "已打印的不可重复打印", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // 安全地获取单元格值
+                    var idValue = item.Cells["id"]?.Value;
+                    var patientIdValue = item.Cells["patient_id"]?.Value;
+                    var exam_type = item.Cells["类型"]?.Value;
+                    var imagePathValue = item.Cells["胶片路径"]?.Value;
+                    var reportPathValue = item.Cells["报告路径"]?.Value;
+
+                    // 验证必要字段
+                    if (idValue == null || patientIdValue == null)
+                    {
+                        continue; // 跳过数据不完整的行
+                    }
+
+                    var info = new HolExamination()
+                    {
+                        id = Convert.ToInt64(idValue),
+                        exam_type = exam_type?.ToString() ?? "",
+                        image_path = imagePathValue?.ToString() ?? "",
+                        report_path = reportPathValue?.ToString() ?? "",
+                        patient_id = Convert.ToInt64(patientIdValue),
+                    };
+                    _holExamination.Add(info);
+                }
+            }
             // 获取打印机配置
             var printerConfig = await GetPrinterConfiguration();
             if (printerConfig == null)
@@ -1597,12 +1881,33 @@ namespace WinSelfMachine
             }
             foreach (var item in _holExamination)
             {
-                // 执行打印
-                await PrintReport(item, printerConfig);
+                try
+                {
+                    // 执行打印
+                    await PrintReport(item, printerConfig);
 
-                // 保存打印记录
-                await SavePrintRecord(item);
+                    // 保存打印记录
+                    await SavePrintRecord(item);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"打印失败-{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
             }
+            BtnCancelPrint_Click(null, null);
+            MessageBox.Show("打印完成！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+
+        /// <summary>
+        /// 从文本中提取指定信息
+        /// </summary>
+        private string ExtractValue(string text, string pattern)
+        {
+            var match = Regex.Match(text, pattern);
+            return match.Success ? match.Groups[1].Value.Trim() : null;
         }
     }
 }

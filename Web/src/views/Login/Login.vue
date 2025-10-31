@@ -124,7 +124,7 @@ const submit = async () => {
   font-weight: bold;
   margin-left: 50px;
   margin-top: 50px;
-  color: #409eff;
+  color:white;
 }
 /* 登录页面容器，通过 flex 布局控制表单位置 */
 .login-container {

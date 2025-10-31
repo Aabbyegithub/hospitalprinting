@@ -66,22 +66,47 @@ namespace WebProjectTest.Controllers.EquipmentController
         {
             return await _equipmentServices.SavePrintConfigAsync(PrinterId,Type, Action, holPrinterConfigs);
         }
+
+        /// <summary>
+        /// 获取患者报告
+        /// </summary>
+        /// <param name="examNo"></param>
+        /// <returns></returns>
         [HttpGet]
         public async  Task<ApiResponse<List<HolExamination>>> GetByExamNoAsync(string examNo)
         {
             return await _equipmentServices.GetByExamNoAsync(examNo);
         }
 
-        [HttpGet]
+        /// <summary>
+        /// 保存打印记录
+        /// </summary>
+        /// <param name="print"></param>
+        /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResponse<bool>> SavePrintRecordAsync([FromBody] PrintRecordModel print)
         {
             return await _equipmentServices.SavePrintRecordAsync(print);
         }
 
+        /// <summary>
+        /// 获取患者队列
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ApiResponse<List<HolExamination>>> GetAllUserAsync()
         {
             return await _equipmentServices.GetAllUserAsync();
+        }
+
+        /// <summary>
+        /// 获取Ai配置
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResponse<HolAiConfig>> GetAIConfigAsync()
+        {
+            return await _equipmentServices.GetAIConfigAsync();
         }
     }
 }

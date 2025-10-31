@@ -65,5 +65,11 @@ namespace WebIServices.IServices.EquipmentIServices
         /// <returns></returns>
         Task<ApiResponse<List<HolExamination>>> GetAllUserAsync();
 
+        /// <summary>
+        /// 获取ai配置
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResponse<HolAiConfig>> GetAIConfigAsync();
+
     }
 }

@@ -31,11 +31,12 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.textScrollControl1 = new WinQueue.TextScrollControl();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.编号姓名 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.编号姓名 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -87,6 +88,15 @@
             this.dataGridView1.Size = new System.Drawing.Size(1161, 493);
             this.dataGridView1.TabIndex = 2;
             // 
+            // 编号姓名
+            // 
+            this.编号姓名.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.编号姓名.HeaderText = "编号姓名";
+            this.编号姓名.MinimumWidth = 9;
+            this.编号姓名.Name = "编号姓名";
+            this.编号姓名.ReadOnly = true;
+            this.编号姓名.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
             // richTextBox1
             // 
             this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -105,15 +115,6 @@
             this.timer1.Interval = 60000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // 编号姓名
-            // 
-            this.编号姓名.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.编号姓名.HeaderText = "编号姓名";
-            this.编号姓名.MinimumWidth = 9;
-            this.编号姓名.Name = "编号姓名";
-            this.编号姓名.ReadOnly = true;
-            this.编号姓名.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -123,6 +124,7 @@
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.textScrollControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Form1";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;

@@ -90,7 +90,7 @@ namespace Common
     /// License 加密解密帮助类
     /// 使用机器码和时间进行管控，时间精确到秒
     /// </summary>
-    public class LicenseHelper
+    public static class LicenseHelper
     {
         // AES 加密密钥和初始化向量（建议在生产环境中使用配置文件或安全存储）
         private static readonly string DefaultKey = "HospitalPrintSystemLicenseKey123456"; // 32字符

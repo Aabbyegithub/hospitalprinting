@@ -58,13 +58,13 @@ namespace ModelClassLibrary.Model.HolModel
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(exam_id))]
         [JsonIgnore]
-        public HolExamination holExamination { get; set; }
+        public HolExamination? holExamination { get; set; }
 
         /// <summary>
         /// 导航属性：对应的诊断信息
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(patient_id))]
         [JsonIgnore]
-        public HolPatient holPatient { get; set; }
+        public HolPatient? holPatient { get; set; }
     }
 }

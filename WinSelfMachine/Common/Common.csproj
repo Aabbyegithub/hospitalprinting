@@ -45,6 +45,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -54,7 +55,7 @@
     <Compile Include="HolPrinter.cs" />
     <Compile Include="HolPrinterConfig.cs" />
     <Compile Include="IniFileHelper.cs" />
-    <Compile Include="PdfOcrHelper.cs" />
+    <Compile Include="LicenseCommon.cs" />
     <Compile Include="PrintRecordModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Response.cs" />

@@ -57,6 +57,9 @@ namespace WebProjectTest
 
             // 确保注册依赖服务
             services.AddHttpContextAccessor();
+            
+            // 注册HttpClientFactory用于HTTP请求
+            services.AddHttpClient();
 
             // 配置 Redis
             services.AddStackExchangeRedisCache(options =>

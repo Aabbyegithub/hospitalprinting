@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.TxtTitle = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -42,15 +42,23 @@
             this.BtnPrintSetting = new WinSelfMachine.Controls.RoundButton();
             this.roundedContainer1 = new WinSelfMachine.Controls.RoundedContainer();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.label3 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.姓名 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.检查日期 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.类型 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.胶片数量 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.报告数量 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.是否打印 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.胶片路径 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.报告路径 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.是否已打印 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.patient_id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TxtSelect = new System.Windows.Forms.Label();
+            this.BtnConfirmPaint = new System.Windows.Forms.Button();
+            this.BtnCancelPrint = new System.Windows.Forms.Button();
+            this.roundedContainer2 = new WinSelfMachine.Controls.RoundedContainer();
+            this.BtnAiAnalysis = new WinSelfMachine.Controls.RoundedButton();
+            this.BtnDirect = new WinSelfMachine.Controls.RoundedButton();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -60,9 +68,10 @@
             this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBox1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.BackgroundImage")));
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox1.Location = new System.Drawing.Point(12, 25);
+            this.pictureBox1.Location = new System.Drawing.Point(22, 44);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(36, 38);
+            this.pictureBox1.Size = new System.Drawing.Size(66, 66);
             this.pictureBox1.TabIndex = 8;
             this.pictureBox1.TabStop = false;
             // 
@@ -71,9 +80,10 @@
             this.TxtTitle.AutoSize = true;
             this.TxtTitle.BackColor = System.Drawing.Color.Transparent;
             this.TxtTitle.Font = new System.Drawing.Font("宋体", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtTitle.Location = new System.Drawing.Point(72, 30);
+            this.TxtTitle.Location = new System.Drawing.Point(132, 52);
+            this.TxtTitle.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.TxtTitle.Name = "TxtTitle";
-            this.TxtTitle.Size = new System.Drawing.Size(276, 29);
+            this.TxtTitle.Size = new System.Drawing.Size(483, 51);
             this.TxtTitle.TabIndex = 7;
             this.TxtTitle.Text = "****医院自助一体机";
             // 
@@ -81,9 +91,10 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(168, 398);
+            this.label1.Location = new System.Drawing.Point(308, 696);
+            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(109, 20);
+            this.label1.Size = new System.Drawing.Size(190, 35);
             this.label1.TabIndex = 13;
             this.label1.Text = "检验单号：";
             // 
@@ -91,9 +102,10 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(149, 453);
+            this.label2.Location = new System.Drawing.Point(273, 793);
+            this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(365, 35);
+            this.label2.Size = new System.Drawing.Size(647, 62);
             this.label2.TabIndex = 14;
             this.label2.Text = "请在左下角刷条码取片";
             // 
@@ -109,13 +121,13 @@
             this.BtnSetting.IconSize = new System.Drawing.Size(24, 24);
             this.BtnSetting.IconTextSpacing = 5;
             this.BtnSetting.LabelText = "启动设置";
-            this.BtnSetting.Location = new System.Drawing.Point(394, 575);
-            this.BtnSetting.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.BtnSetting.Location = new System.Drawing.Point(722, 1006);
+            this.BtnSetting.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnSetting.Name = "BtnSetting";
             this.BtnSetting.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnSetting.ShadowOffset = 3;
             this.BtnSetting.ShowShadow = true;
-            this.BtnSetting.Size = new System.Drawing.Size(94, 82);
+            this.BtnSetting.Size = new System.Drawing.Size(172, 144);
             this.BtnSetting.TabIndex = 16;
             this.BtnSetting.TextColor = System.Drawing.Color.Black;
             this.BtnSetting.Visible = false;
@@ -133,13 +145,13 @@
             this.BtnClose.IconSize = new System.Drawing.Size(24, 24);
             this.BtnClose.IconTextSpacing = 5;
             this.BtnClose.LabelText = "关闭";
-            this.BtnClose.Location = new System.Drawing.Point(523, 575);
-            this.BtnClose.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.BtnClose.Location = new System.Drawing.Point(959, 1006);
+            this.BtnClose.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnClose.Name = "BtnClose";
             this.BtnClose.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnClose.ShadowOffset = 3;
             this.BtnClose.ShowShadow = true;
-            this.BtnClose.Size = new System.Drawing.Size(94, 82);
+            this.BtnClose.Size = new System.Drawing.Size(172, 144);
             this.BtnClose.TabIndex = 15;
             this.BtnClose.TextColor = System.Drawing.Color.Black;
             this.BtnClose.Visible = false;
@@ -154,14 +166,14 @@
             this.Txtbr.CornerRadius = 8;
             this.Txtbr.Font = new System.Drawing.Font("宋体", 15F);
             this.Txtbr.FontSize = 15;
-            this.Txtbr.Location = new System.Drawing.Point(277, 390);
-            this.Txtbr.Margin = new System.Windows.Forms.Padding(10, 8, 10, 8);
+            this.Txtbr.Location = new System.Drawing.Point(508, 682);
+            this.Txtbr.Margin = new System.Windows.Forms.Padding(18, 14, 18, 14);
             this.Txtbr.MaxLength = 32767;
             this.Txtbr.Name = "Txtbr";
-            this.Txtbr.Padding = new System.Windows.Forms.Padding(8, 6, 8, 6);
+            this.Txtbr.Padding = new System.Windows.Forms.Padding(15, 10, 15, 10);
             this.Txtbr.PasswordChar = '\0';
             this.Txtbr.ReadOnly = false;
-            this.Txtbr.Size = new System.Drawing.Size(200, 33);
+            this.Txtbr.Size = new System.Drawing.Size(367, 58);
             this.Txtbr.TabIndex = 12;
             this.Txtbr.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
             this.Txtbr.UseSystemPasswordChar = false;
@@ -179,13 +191,13 @@
             this.BtnAvailableFilm.IconSize = new System.Drawing.Size(24, 24);
             this.BtnAvailableFilm.IconTextSpacing = 5;
             this.BtnAvailableFilm.LabelText = "可用胶片";
-            this.BtnAvailableFilm.Location = new System.Drawing.Point(275, 575);
-            this.BtnAvailableFilm.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.BtnAvailableFilm.Location = new System.Drawing.Point(504, 1006);
+            this.BtnAvailableFilm.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnAvailableFilm.Name = "BtnAvailableFilm";
             this.BtnAvailableFilm.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnAvailableFilm.ShadowOffset = 3;
             this.BtnAvailableFilm.ShowShadow = true;
-            this.BtnAvailableFilm.Size = new System.Drawing.Size(94, 82);
+            this.BtnAvailableFilm.Size = new System.Drawing.Size(172, 144);
             this.BtnAvailableFilm.TabIndex = 11;
             this.BtnAvailableFilm.TextColor = System.Drawing.Color.Black;
             this.BtnAvailableFilm.Visible = false;
@@ -203,13 +215,13 @@
             this.BtnWaitTime.IconSize = new System.Drawing.Size(24, 24);
             this.BtnWaitTime.IconTextSpacing = 5;
             this.BtnWaitTime.LabelText = "等待时间";
-            this.BtnWaitTime.Location = new System.Drawing.Point(155, 575);
-            this.BtnWaitTime.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.BtnWaitTime.Location = new System.Drawing.Point(284, 1006);
+            this.BtnWaitTime.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnWaitTime.Name = "BtnWaitTime";
             this.BtnWaitTime.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnWaitTime.ShadowOffset = 3;
             this.BtnWaitTime.ShowShadow = true;
-            this.BtnWaitTime.Size = new System.Drawing.Size(94, 82);
+            this.BtnWaitTime.Size = new System.Drawing.Size(172, 144);
             this.BtnWaitTime.TabIndex = 10;
             this.BtnWaitTime.TextColor = System.Drawing.Color.Black;
             this.BtnWaitTime.Visible = false;
@@ -227,13 +239,13 @@
             this.BtnPrintSetting.IconSize = new System.Drawing.Size(24, 24);
             this.BtnPrintSetting.IconTextSpacing = 5;
             this.BtnPrintSetting.LabelText = "打印设置";
-            this.BtnPrintSetting.Location = new System.Drawing.Point(28, 575);
-            this.BtnPrintSetting.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.BtnPrintSetting.Location = new System.Drawing.Point(51, 1006);
+            this.BtnPrintSetting.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.BtnPrintSetting.Name = "BtnPrintSetting";
             this.BtnPrintSetting.ShadowColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.BtnPrintSetting.ShadowOffset = 3;
             this.BtnPrintSetting.ShowShadow = true;
-            this.BtnPrintSetting.Size = new System.Drawing.Size(94, 82);
+            this.BtnPrintSetting.Size = new System.Drawing.Size(172, 144);
             this.BtnPrintSetting.TabIndex = 9;
             this.BtnPrintSetting.TextColor = System.Drawing.Color.Black;
             this.BtnPrintSetting.Visible = false;
@@ -252,36 +264,39 @@
             this.roundedContainer1.DividerHorizontalPadding = 16;
             this.roundedContainer1.DividerThickness = 1;
             this.roundedContainer1.DividerTopSpacing = 8;
-            this.roundedContainer1.FillColor = System.Drawing.Color.Black;
+            this.roundedContainer1.FillColor = System.Drawing.Color.White;
+            this.roundedContainer1.Font = new System.Drawing.Font("宋体", 9F);
             this.roundedContainer1.FontSize = 9;
-            this.roundedContainer1.Location = new System.Drawing.Point(43, 85);
+            this.roundedContainer1.Location = new System.Drawing.Point(79, 149);
+            this.roundedContainer1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.roundedContainer1.Name = "roundedContainer1";
             this.roundedContainer1.ShadowOffsetX = 0;
             this.roundedContainer1.ShadowOffsetY = 2;
             this.roundedContainer1.ShadowSize = 6;
             this.roundedContainer1.ShowShadow = true;
-            this.roundedContainer1.Size = new System.Drawing.Size(599, 415);
+            this.roundedContainer1.Size = new System.Drawing.Size(1098, 828);
             this.roundedContainer1.TabIndex = 17;
             this.roundedContainer1.TitleColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.roundedContainer1.TitleFont = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.roundedContainer1.TitleFont = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.roundedContainer1.TitleText = "请选择要打印的胶片和报告";
             this.roundedContainer1.TitleTopPadding = 10;
             this.roundedContainer1.TopLeft = true;
             this.roundedContainer1.TopRight = true;
+            this.roundedContainer1.Visible = false;
             // 
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.Peru;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.Color.Peru;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.姓名,
@@ -289,101 +304,247 @@
             this.类型,
             this.胶片数量,
             this.报告数量,
-            this.是否打印});
-            this.dataGridView1.Location = new System.Drawing.Point(53, 143);
+            this.是否打印,
+            this.胶片路径,
+            this.报告路径,
+            this.是否已打印,
+            this.id,
+            this.patient_id});
+            this.dataGridView1.Location = new System.Drawing.Point(97, 250);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.RowHeadersWidth = 72;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(577, 298);
+            this.dataGridView1.Size = new System.Drawing.Size(1058, 604);
             this.dataGridView1.TabIndex = 18;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.ForeColor = System.Drawing.Color.SaddleBrown;
-            this.label3.Location = new System.Drawing.Point(63, 454);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(69, 20);
-            this.label3.TabIndex = 19;
-            this.label3.Text = "已选择";
-            // 
-            // button1
-            // 
-            this.button1.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button1.Location = new System.Drawing.Point(406, 447);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(93, 35);
-            this.button1.TabIndex = 20;
-            this.button1.Text = "确认";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button2.Location = new System.Drawing.Point(523, 447);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(98, 35);
-            this.button2.TabIndex = 21;
-            this.button2.Text = "放弃打印";
-            this.button2.UseVisualStyleBackColor = true;
+            this.dataGridView1.Visible = false;
             // 
             // 姓名
             // 
             this.姓名.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.姓名.FillWeight = 30.81218F;
             this.姓名.HeaderText = "姓名";
+            this.姓名.MinimumWidth = 9;
             this.姓名.Name = "姓名";
             this.姓名.ReadOnly = true;
             // 
             // 检查日期
             // 
             this.检查日期.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.检查日期.FillWeight = 60.81218F;
             this.检查日期.HeaderText = "检查日期";
+            this.检查日期.MinimumWidth = 9;
             this.检查日期.Name = "检查日期";
             this.检查日期.ReadOnly = true;
             // 
             // 类型
             // 
             this.类型.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.类型.FillWeight = 30.81218F;
             this.类型.HeaderText = "类型";
+            this.类型.MinimumWidth = 9;
             this.类型.Name = "类型";
             this.类型.ReadOnly = true;
             // 
             // 胶片数量
             // 
             this.胶片数量.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.胶片数量.FillWeight = 40.81218F;
             this.胶片数量.HeaderText = "胶片数量";
+            this.胶片数量.MinimumWidth = 9;
             this.胶片数量.Name = "胶片数量";
             this.胶片数量.ReadOnly = true;
             // 
             // 报告数量
             // 
             this.报告数量.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.报告数量.FillWeight = 40.81218F;
             this.报告数量.HeaderText = "报告数量";
+            this.报告数量.MinimumWidth = 9;
             this.报告数量.Name = "报告数量";
             this.报告数量.ReadOnly = true;
             // 
             // 是否打印
             // 
             this.是否打印.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.是否打印.FillWeight = 40.81218F;
             this.是否打印.HeaderText = "是否打印";
+            this.是否打印.MinimumWidth = 9;
             this.是否打印.Name = "是否打印";
             this.是否打印.ReadOnly = true;
             // 
+            // 胶片路径
+            // 
+            this.胶片路径.HeaderText = "胶片路径";
+            this.胶片路径.MinimumWidth = 9;
+            this.胶片路径.Name = "胶片路径";
+            this.胶片路径.ReadOnly = true;
+            this.胶片路径.Visible = false;
+            this.胶片路径.Width = 175;
+            // 
+            // 报告路径
+            // 
+            this.报告路径.HeaderText = "报告路径";
+            this.报告路径.MinimumWidth = 9;
+            this.报告路径.Name = "报告路径";
+            this.报告路径.ReadOnly = true;
+            this.报告路径.Visible = false;
+            this.报告路径.Width = 175;
+            // 
+            // 是否已打印
+            // 
+            this.是否已打印.HeaderText = "是否已打印";
+            this.是否已打印.MinimumWidth = 9;
+            this.是否已打印.Name = "是否已打印";
+            this.是否已打印.ReadOnly = true;
+            this.是否已打印.Visible = false;
+            this.是否已打印.Width = 175;
+            // 
+            // id
+            // 
+            this.id.HeaderText = "id";
+            this.id.MinimumWidth = 9;
+            this.id.Name = "id";
+            this.id.ReadOnly = true;
+            this.id.Visible = false;
+            this.id.Width = 175;
+            // 
+            // patient_id
+            // 
+            this.patient_id.HeaderText = "patient_id";
+            this.patient_id.MinimumWidth = 9;
+            this.patient_id.Name = "patient_id";
+            this.patient_id.ReadOnly = true;
+            this.patient_id.Visible = false;
+            this.patient_id.Width = 175;
+            // 
+            // TxtSelect
+            // 
+            this.TxtSelect.AutoSize = true;
+            this.TxtSelect.BackColor = System.Drawing.Color.White;
+            this.TxtSelect.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TxtSelect.ForeColor = System.Drawing.Color.SaddleBrown;
+            this.TxtSelect.Location = new System.Drawing.Point(116, 898);
+            this.TxtSelect.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.TxtSelect.Name = "TxtSelect";
+            this.TxtSelect.Size = new System.Drawing.Size(0, 35);
+            this.TxtSelect.TabIndex = 19;
+            this.TxtSelect.Visible = false;
+            // 
+            // BtnConfirmPaint
+            // 
+            this.BtnConfirmPaint.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.BtnConfirmPaint.Location = new System.Drawing.Point(744, 886);
+            this.BtnConfirmPaint.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.BtnConfirmPaint.Name = "BtnConfirmPaint";
+            this.BtnConfirmPaint.Size = new System.Drawing.Size(170, 61);
+            this.BtnConfirmPaint.TabIndex = 20;
+            this.BtnConfirmPaint.Text = "确认";
+            this.BtnConfirmPaint.UseVisualStyleBackColor = true;
+            this.BtnConfirmPaint.Visible = false;
+            this.BtnConfirmPaint.Click += new System.EventHandler(this.BtnConfirmPaint_Click);
+            // 
+            // BtnCancelPrint
+            // 
+            this.BtnCancelPrint.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.BtnCancelPrint.Location = new System.Drawing.Point(959, 886);
+            this.BtnCancelPrint.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.BtnCancelPrint.Name = "BtnCancelPrint";
+            this.BtnCancelPrint.Size = new System.Drawing.Size(180, 61);
+            this.BtnCancelPrint.TabIndex = 21;
+            this.BtnCancelPrint.Text = "放弃打印";
+            this.BtnCancelPrint.UseVisualStyleBackColor = true;
+            this.BtnCancelPrint.Visible = false;
+            this.BtnCancelPrint.Click += new System.EventHandler(this.BtnCancelPrint_Click);
+            // 
+            // roundedContainer2
+            // 
+            this.roundedContainer2.BackColor = System.Drawing.Color.Transparent;
+            this.roundedContainer2.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.roundedContainer2.BorderThickness = 1;
+            this.roundedContainer2.BottomLeft = true;
+            this.roundedContainer2.BottomRight = true;
+            this.roundedContainer2.CornerRadius = 12;
+            this.roundedContainer2.DividerColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(100)))), ((int)(((byte)(140)))), ((int)(((byte)(220)))));
+            this.roundedContainer2.DividerEnabled = false;
+            this.roundedContainer2.DividerHorizontalPadding = 16;
+            this.roundedContainer2.DividerThickness = 1;
+            this.roundedContainer2.DividerTopSpacing = 8;
+            this.roundedContainer2.FillColor = System.Drawing.Color.White;
+            this.roundedContainer2.FontSize = 9;
+            this.roundedContainer2.Location = new System.Drawing.Point(314, 421);
+            this.roundedContainer2.Name = "roundedContainer2";
+            this.roundedContainer2.ShadowOffsetX = 0;
+            this.roundedContainer2.ShadowOffsetY = 2;
+            this.roundedContainer2.ShadowSize = 6;
+            this.roundedContainer2.ShowShadow = true;
+            this.roundedContainer2.Size = new System.Drawing.Size(619, 168);
+            this.roundedContainer2.TabIndex = 22;
+            this.roundedContainer2.TitleColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.roundedContainer2.TitleFont = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.roundedContainer2.TitleText = "";
+            this.roundedContainer2.TitleTopPadding = 10;
+            this.roundedContainer2.TopLeft = true;
+            this.roundedContainer2.TopRight = true;
+            this.roundedContainer2.Visible = false;
+            // 
+            // BtnAiAnalysis
+            // 
+            this.BtnAiAnalysis.BorderColor = System.Drawing.Color.Transparent;
+            this.BtnAiAnalysis.BorderThickness = 0;
+            this.BtnAiAnalysis.ButtonText = "Ai解析";
+            this.BtnAiAnalysis.CornerRadius = 12;
+            this.BtnAiAnalysis.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnAiAnalysis.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(123)))), ((int)(((byte)(244)))));
+            this.BtnAiAnalysis.FillDownColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(113)))), ((int)(((byte)(234)))));
+            this.BtnAiAnalysis.FillHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(133)))), ((int)(((byte)(254)))));
+            this.BtnAiAnalysis.Font = new System.Drawing.Font("宋体", 14.14286F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.BtnAiAnalysis.Location = new System.Drawing.Point(353, 464);
+            this.BtnAiAnalysis.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.BtnAiAnalysis.Name = "BtnAiAnalysis";
+            this.BtnAiAnalysis.Size = new System.Drawing.Size(232, 79);
+            this.BtnAiAnalysis.TabIndex = 23;
+            this.BtnAiAnalysis.TextColor = System.Drawing.Color.White;
+            this.BtnAiAnalysis.Visible = false;
+            this.BtnAiAnalysis.Click += new System.EventHandler(this.BtnAiAnalysis_Click);
+            // 
+            // BtnDirect
+            // 
+            this.BtnDirect.BorderColor = System.Drawing.Color.Transparent;
+            this.BtnDirect.BorderThickness = 0;
+            this.BtnDirect.ButtonText = "直接打印";
+            this.BtnDirect.CornerRadius = 12;
+            this.BtnDirect.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnDirect.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(123)))), ((int)(((byte)(244)))));
+            this.BtnDirect.FillDownColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(113)))), ((int)(((byte)(234)))));
+            this.BtnDirect.FillHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(133)))), ((int)(((byte)(254)))));
+            this.BtnDirect.Font = new System.Drawing.Font("宋体", 14.14286F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.BtnDirect.Location = new System.Drawing.Point(662, 464);
+            this.BtnDirect.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtnDirect.Name = "BtnDirect";
+            this.BtnDirect.Size = new System.Drawing.Size(232, 79);
+            this.BtnDirect.TabIndex = 24;
+            this.BtnDirect.TextColor = System.Drawing.Color.White;
+            this.BtnDirect.Visible = false;
+            this.BtnDirect.Click += new System.EventHandler(this.BtnDirect_Click);
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(689, 698);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.label3);
+            this.ClientSize = new System.Drawing.Size(1263, 1222);
+            this.Controls.Add(this.BtnDirect);
+            this.Controls.Add(this.BtnAiAnalysis);
+            this.Controls.Add(this.roundedContainer2);
+            this.Controls.Add(this.BtnCancelPrint);
+            this.Controls.Add(this.BtnConfirmPaint);
+            this.Controls.Add(this.TxtSelect);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.roundedContainer1);
             this.Controls.Add(this.BtnSetting);
@@ -399,6 +560,7 @@
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.KeyPreview = true;
+            this.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.Name = "Form1";
             this.Text = "Form1";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -425,15 +587,23 @@
         private Controls.RoundButton BtnSetting;
         private Controls.RoundedContainer roundedContainer1;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label TxtSelect;
+        private System.Windows.Forms.Button BtnConfirmPaint;
+        private System.Windows.Forms.Button BtnCancelPrint;
         private System.Windows.Forms.DataGridViewTextBoxColumn 姓名;
         private System.Windows.Forms.DataGridViewTextBoxColumn 检查日期;
         private System.Windows.Forms.DataGridViewTextBoxColumn 类型;
         private System.Windows.Forms.DataGridViewTextBoxColumn 胶片数量;
         private System.Windows.Forms.DataGridViewTextBoxColumn 报告数量;
         private System.Windows.Forms.DataGridViewCheckBoxColumn 是否打印;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 胶片路径;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 报告路径;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 是否已打印;
+        private System.Windows.Forms.DataGridViewTextBoxColumn id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn patient_id;
+        private Controls.RoundedContainer roundedContainer2;
+        private Controls.RoundedButton BtnAiAnalysis;
+        private Controls.RoundedButton BtnDirect;
     }
 }
 

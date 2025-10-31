@@ -12,6 +12,8 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -209,4 +211,15 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Paddle.Runtime.win_x64.3.1.0\build\Paddle.Runtime.win_x64.targets" Condition="Exists('..\packages\Paddle.Runtime.win_x64.3.1.0\build\Paddle.Runtime.win_x64.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Paddle.Runtime.win_x64.3.1.0\build\Paddle.Runtime.win_x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Paddle.Runtime.win_x64.3.1.0\build\Paddle.Runtime.win_x64.targets'))" />
+    <Error Condition="!Exists('..\packages\PaddleOCRSharp.5.1.0\build\PaddleOCRSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PaddleOCRSharp.5.1.0\build\PaddleOCRSharp.targets'))" />
+    <Error Condition="!Exists('..\packages\PaddleOCRSharp.PDF.1.0.1\build\PaddleOCRSharp.PDF.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PaddleOCRSharp.PDF.1.0.1\build\PaddleOCRSharp.PDF.targets'))" />
+  </Target>
+  <Import Project="..\packages\PaddleOCRSharp.5.1.0\build\PaddleOCRSharp.targets" Condition="Exists('..\packages\PaddleOCRSharp.5.1.0\build\PaddleOCRSharp.targets')" />
+  <Import Project="..\packages\PaddleOCRSharp.PDF.1.0.1\build\PaddleOCRSharp.PDF.targets" Condition="Exists('..\packages\PaddleOCRSharp.PDF.1.0.1\build\PaddleOCRSharp.PDF.targets')" />
 </Project>

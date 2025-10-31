@@ -32,6 +32,18 @@ namespace WinSelfMachine
 		private float _label1FontSize;
 		private float _roundTextBox1FontSize;
 		private float _label2FontSize;
+		// 自绘复选框图片资源
+		private Bitmap _chkOnImg;
+		private Bitmap _chkOffImg;
+		// 红框区域控件（容器+列表+操作区）
+		private Rectangle _roundedContainerBounds;
+		private Rectangle _dataGridBounds;
+		private Rectangle _selectedLabelBounds;
+		private Rectangle _confirmButtonBounds;
+		private Rectangle _abortButtonBounds;
+		private float _selectedLabelFontSize;
+		private float _confirmButtonFontSize;
+		private float _abortButtonFontSize;
 
         private IniFileHelper _iniConfig;
         private string _configFilePath;
@@ -42,6 +54,10 @@ namespace WinSelfMachine
         private const int requiredDoubleClicks = 5;
         private Timer resetDoubleClickTimer;
         private const int resetDoubleClickInterval = 10000; // 3秒后重置计数
+        /// <summary>
+        /// 是否显示报告具体面板
+        /// </summary>
+        private int _IsOpen = 0;
 
 
         public Form1()
@@ -58,6 +74,17 @@ namespace WinSelfMachine
                          ControlStyles.UserPaint | 
                          ControlStyles.DoubleBuffer | 
                          ControlStyles.ResizeRedraw, true);
+
+            // 配置打印列表交互：仅允许最后一列复选框可编辑
+            try
+            {
+                dataGridView1.EditMode = DataGridViewEditMode.EditOnEnter;
+                dataGridView1.ReadOnly = false;
+                dataGridView1.ClearSelection();
+                // 将“是否打印”列改为图片列，配合隐藏布尔列，获得更大更清晰的复选框
+                SetupLargeCheckboxColumn();
+            }
+            catch { }
             
             // 绑定顶部区域双击事件（窗体与顶部控件）
             this.MouseDoubleClick += Form1_MouseDoubleClick;
@@ -73,7 +100,6 @@ namespace WinSelfMachine
             resetDoubleClickTimer = new Timer();
             resetDoubleClickTimer.Interval = resetDoubleClickInterval;
             resetDoubleClickTimer.Tick += ResetDoubleClickTimer_Tick;
-            label3.Parent = roundedContainer1;
         }
 
         private async void Form1_Load(object sender, EventArgs e)
@@ -91,6 +117,8 @@ namespace WinSelfMachine
             {
                 await _apiCommon.UpdatePrinterStatus(SerUrl.TrimEnd('/'),PrinterId, 1);
             }
+
+            _IsOpen = _iniConfig.ReadInt("IsDisplay", "Display",1);
 
         }
         /// <summary>
@@ -274,6 +302,100 @@ namespace WinSelfMachine
 			_label1FontSize = label1.Font.Size;
 			_roundTextBox1FontSize = Txtbr.Font.Size;
 			_label2FontSize = label2.Font.Size;
+			// 红框区域
+			_roundedContainerBounds = roundedContainer1.Bounds;
+			_dataGridBounds = dataGridView1.Bounds;
+			_selectedLabelBounds = TxtSelect.Bounds;
+			_confirmButtonBounds = BtnConfirmPaint.Bounds;
+			_abortButtonBounds = BtnCancelPrint.Bounds;
+			_selectedLabelFontSize = TxtSelect.Font.Size;
+			_confirmButtonFontSize = BtnConfirmPaint.Font.Size;
+			_abortButtonFontSize = BtnCancelPrint.Font.Size;
+		}
+
+		private void SetupLargeCheckboxColumn()
+		{
+			// 生成大复选框位图
+			Bitmap Gen(bool isChecked, int size)
+			{
+				var bmp = new Bitmap(size, size);
+				using (var g = Graphics.FromImage(bmp))
+				{
+					g.Clear(Color.Transparent);
+					var rect = new Rectangle(0, 0, size - 1, size - 1);
+					ControlPaint.DrawCheckBox(g, rect, isChecked ? ButtonState.Checked : ButtonState.Normal);
+				}
+				return bmp;
+			}
+
+			_chkOnImg = Gen(true, 28);
+			_chkOffImg = Gen(false, 28);
+
+			// 找到原列索引
+			int oldIdx = -1;
+			for (int i = 0; i < dataGridView1.Columns.Count; i++)
+			{
+				if (dataGridView1.Columns[i].HeaderText == "是否打印") { oldIdx = i; break; }
+			}
+			if (oldIdx == -1) return;
+
+			// 添加隐藏布尔列保存真实值
+			var hiddenBoolCol = new DataGridViewCheckBoxColumn();
+			hiddenBoolCol.Name = "是否打印值";
+			hiddenBoolCol.HeaderText = "是否打印值";
+			hiddenBoolCol.Visible = false;
+			dataGridView1.Columns.Add(hiddenBoolCol);
+
+			// 创建图片列用于显示
+			var imgCol = new DataGridViewImageColumn();
+			imgCol.Name = "是否打印";
+			imgCol.HeaderText = "是否打印";
+			imgCol.ImageLayout = DataGridViewImageCellLayout.Zoom;
+            imgCol.Width = 130;
+            //imgCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			// 用图片列替换原列
+			dataGridView1.Columns.RemoveAt(oldIdx);
+			dataGridView1.Columns.Insert(oldIdx, imgCol);
+
+			// 点击切换
+			dataGridView1.CellClick += (s, e) =>
+			{
+				if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+				if (dataGridView1.Columns[e.ColumnIndex].Name != "是否打印") return;
+				var row = dataGridView1.Rows[e.RowIndex];
+				var valCell = row.Cells["是否打印值"] as DataGridViewCheckBoxCell;
+				bool current = false; try { current = Convert.ToBoolean(valCell.Value); } catch { }
+				valCell.Value = !current;
+				row.Cells["是否打印"].Value = (!current) ? (object)_chkOnImg : _chkOffImg;
+				// 触发选中变化后的处理
+				OnPrintCheckboxChanged(e.RowIndex, !current);
+			};
+		}
+
+		private void OnPrintCheckboxChanged(int rowIndex, bool isChecked)
+		{
+			try
+			{
+				int count = 0;
+				int repocount = 0;
+				foreach (DataGridViewRow r in dataGridView1.Rows)
+				{
+					if ( r.Cells["是否打印值"] is DataGridViewCheckBoxCell c)
+					{
+						bool v = false; try { v = Convert.ToBoolean(c.Value); } catch { }
+                        if (v) {
+                            count=count+Convert.ToInt32( r.Cells["胶片数量"].Value.ToString());
+                            repocount=repocount+Convert.ToInt32( r.Cells["报告数量"].Value.ToString());
+                        }
+
+					}
+				}
+				if (TxtSelect != null)
+				{
+					TxtSelect.Text = $"已选择：{count}张胶片 {repocount}张报告";
+				}
+			}
+			catch { }
 		}
 
 		private void ApplyResponsiveLayout()
@@ -325,6 +447,63 @@ namespace WinSelfMachine
 
 			// 始终水平居中
 			label2.Left = Math.Max(0, (this.ClientSize.Width - label2.Width) / 2);
+
+			// ===== 红框区域：容器 + 列表 + 操作按钮 =====
+			roundedContainer1.Location = new Point(
+				(int)Math.Round(_roundedContainerBounds.X * scaleX),
+				(int)Math.Round(_roundedContainerBounds.Y * scaleY));
+			roundedContainer1.Size = new Size(
+				(int)Math.Round(_roundedContainerBounds.Width * scaleX),
+				(int)Math.Round(_roundedContainerBounds.Height * scaleY));
+			// 标题字号随比例调整
+			roundedContainer1.TitleFont = new Font(roundedContainer1.TitleFont.FontFamily,
+				Math.Max(10f, roundedContainer1.TitleFont.Size * fontScale),
+				roundedContainer1.TitleFont.Style, roundedContainer1.TitleFont.Unit);
+
+			// 表格
+			dataGridView1.Location = new Point(
+				(int)Math.Round(_dataGridBounds.X * scaleX),
+				(int)Math.Round(_dataGridBounds.Y * scaleY));
+			dataGridView1.Size = new Size(
+				(int)Math.Round(_dataGridBounds.Width * scaleX),
+				(int)Math.Round(_dataGridBounds.Height * scaleY));
+			// 表头/单元格字体与行高（仅调整字号，不改变字体族与样式）
+			var baseHeaderFont = dataGridView1.ColumnHeadersDefaultCellStyle.Font ?? dataGridView1.Font;
+			var baseCellFont = dataGridView1.DefaultCellStyle.Font ?? dataGridView1.Font;
+			float headerSize = Math.Max(9f, baseHeaderFont.Size * fontScale);
+			float cellSize = Math.Max(9f, baseCellFont.Size * fontScale);
+			dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font(
+				baseHeaderFont.FontFamily, headerSize, baseHeaderFont.Style, baseHeaderFont.Unit);
+			dataGridView1.DefaultCellStyle.Font = new Font(
+				baseCellFont.FontFamily, cellSize, baseCellFont.Style, baseCellFont.Unit);
+			dataGridView1.RowTemplate.Height = Math.Max(23, (int)Math.Round(40 * fontScale));
+
+			// 选择标签
+			TxtSelect.Location = new Point(
+				(int)Math.Round(_selectedLabelBounds.X * scaleX),
+				(int)Math.Round(_selectedLabelBounds.Y * scaleY));
+			TxtSelect.Size = new Size(
+				(int)Math.Round(_selectedLabelBounds.Width * scaleX),
+				(int)Math.Round(_selectedLabelBounds.Height * scaleY));
+			TxtSelect.Font = new Font(TxtSelect.Font.FontFamily, Math.Max(8f, _selectedLabelFontSize * fontScale), TxtSelect.Font.Style, TxtSelect.Font.Unit);
+
+			// 确认按钮
+			BtnConfirmPaint.Location = new Point(
+				(int)Math.Round(_confirmButtonBounds.X * scaleX),
+				(int)Math.Round(_confirmButtonBounds.Y * scaleY));
+			BtnConfirmPaint.Size = new Size(
+				(int)Math.Round(_confirmButtonBounds.Width * scaleX),
+				(int)Math.Round(_confirmButtonBounds.Height * scaleY));
+			BtnConfirmPaint.Font = new Font(BtnConfirmPaint.Font.FontFamily, Math.Max(8f, _confirmButtonFontSize * fontScale), BtnConfirmPaint.Font.Style, BtnConfirmPaint.Font.Unit);
+
+			// 放弃打印按钮
+			BtnCancelPrint.Location = new Point(
+				(int)Math.Round(_abortButtonBounds.X * scaleX),
+				(int)Math.Round(_abortButtonBounds.Y * scaleY));
+			BtnCancelPrint.Size = new Size(
+				(int)Math.Round(_abortButtonBounds.Width * scaleX),
+				(int)Math.Round(_abortButtonBounds.Height * scaleY));
+			BtnCancelPrint.Font = new Font(BtnCancelPrint.Font.FontFamily, Math.Max(8f, _abortButtonFontSize * fontScale), BtnCancelPrint.Font.Style, BtnCancelPrint.Font.Unit);
 		}
 
         /// <summary>
@@ -341,6 +520,20 @@ namespace WinSelfMachine
 
             try
             {
+                if (_IsOpen == 1)
+                {
+                    roundedContainer1.Visible = true;
+                    dataGridView1.Visible = true;
+                    dataGridView1.BringToFront();
+                    TxtSelect.Visible = true;
+                    TxtSelect.BringToFront();
+                    BtnConfirmPaint.Visible = true;
+                    BtnConfirmPaint.BringToFront();
+                    BtnCancelPrint.Visible = true;
+                    BtnCancelPrint.BringToFront();
+                    GetTableData(examNo);
+                    return;
+                }
                 // 显示加载提示
                 this.Text = "正在查询检查数据...";
                 this.Refresh();
@@ -354,7 +547,7 @@ namespace WinSelfMachine
                     return;
                 }
 
-                var responseData = JsonConvert.DeserializeObject<ApiResponse<HolExamination>>(response);
+                var responseData = JsonConvert.DeserializeObject<ApiResponse<List<HolExamination>>>(response);
                 if (responseData?.Response == null)
                 {
                     MessageBox.Show("检查数据格式错误", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -364,28 +557,28 @@ namespace WinSelfMachine
 
                 var examination = responseData.Response;
                 
-                // 检查是否已打印
-                if (examination.is_printed == 1)
-                {
-                    var result = MessageBox.Show("该检查报告已打印过", "提示", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+                //// 检查是否已打印
+                //if (examination.is_printed == 1)
+                //{
+                //    var result = MessageBox.Show("该检查报告已打印过", "提示", 
+                //        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //    return;
+                //}
 
-                // 获取打印机配置
-                var printerConfig = await GetPrinterConfiguration();
-                if (printerConfig == null)
-                {
-                    MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    this.Text = "医院自助一体机";
-                    return;
-                }
+                //// 获取打印机配置
+                //var printerConfig = await GetPrinterConfiguration();
+                //if (printerConfig == null)
+                //{
+                //    MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //    this.Text = "医院自助一体机";
+                //    return;
+                //}
 
-                // 执行打印
-                await PrintReport(examination, printerConfig);
+                //// 执行打印
+                //await PrintReport(examination, printerConfig);
 
-                // 保存打印记录
-                await SavePrintRecord(examination);
+                //// 保存打印记录
+                //await SavePrintRecord(examination);
 
                 MessageBox.Show("打印完成！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -460,7 +653,7 @@ namespace WinSelfMachine
             try
             {
                 // 根据检查类型确定打印方式
-                if (examination.exam_type?.ToUpper() == "胶片" || !string.IsNullOrEmpty(examination.image_path))
+                if (!string.IsNullOrEmpty(examination.image_path))
                 {
                     // 胶片打印
                     await PrintFilm(examination, printerConfig);
@@ -1225,6 +1418,137 @@ namespace WinSelfMachine
                 Debug.WriteLine($"保存打印记录失败：{ex.Message}");
             }
         }
+        /// <summary>
+        /// 放弃打印
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnCancelPrint_Click(object sender, EventArgs e)
+        {
+            roundedContainer1.Visible = false;
+            dataGridView1.Visible = false;
+            TxtSelect.Visible = false;
+            BtnConfirmPaint.Visible = false;
+            BtnCancelPrint.Visible = false;
 
+        }
+        /// <summary>
+        /// 确认打印
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void BtnConfirmPaint_Click(object sender, EventArgs e)
+        {
+            BtnCancelPrint.Text = "返回";
+
+            foreach (DataGridViewRow item in dataGridView1.Rows)
+            {
+                if (item.Cells["是否已打印"].Value.ToString() == "1")
+                {
+                    MessageBox.Show("警告","已打印的不可重复打印",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                    return;
+                }
+                if (!Convert.ToBoolean(item.Cells["是否打印值"]))
+                {
+                    continue;
+                }
+                // 获取打印机配置
+                var printerConfig = await GetPrinterConfiguration();
+                if (printerConfig == null)
+                {
+                    MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Text = "医院自助一体机";
+                    return;
+                }
+                var Info = new HolExamination()
+                {
+                    id = Convert.ToInt64(item.Cells["id"].Value),
+                    image_path = item.Cells["胶片路径"].Value.ToString(),
+                    report_path = item.Cells["报告路径"].Value.ToString(),
+                    patient_id = Convert.ToInt64(item.Cells["patient_id"].Value),
+                };
+                // 执行打印
+                await PrintReport(Info, printerConfig);
+
+                // 保存打印记录
+                await SavePrintRecord(Info);
+            }
+
+        }
+
+        private async void GetTableData(string examNo)
+        {
+            // 获取检查数据
+            var response = await _apiCommon.GetExaminationByNo(examNo);
+            if (string.IsNullOrEmpty(response))
+            {
+                MessageBox.Show("未找到该检查号的数据", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Text = "医院自助一体机";
+                return;
+            }
+
+            var responseData = JsonConvert.DeserializeObject<ApiResponse<List<HolExamination>>>(response);
+            if (responseData?.Response == null)
+            {
+                MessageBox.Show("检查数据格式错误", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Text = "医院自助一体机";
+                return;
+            }
+            // 清空旧数据
+            dataGridView1.Rows.Clear();
+            foreach (var item in responseData.Response)
+            {
+                if (item == null) continue;
+                var patientName = item.patient?.name ?? "";
+                var examDateText = item.exam_date == default(DateTime)
+                    ? ""
+                    : item.exam_date.ToString("yyyy-MM-dd HH:mm");
+                var examType = item.exam_type ?? "";
+                var filmCount = string.IsNullOrEmpty(item.image_path) ? 0 : 1;
+                var reportCount = string.IsNullOrEmpty(item.report_path) ? 0 : 1;
+                var canPrint = false; // 默认不勾选，用户可手动勾选
+                var filmUrl = item.image_path;
+                var reportUrl = item.report_path;
+
+
+                try
+                {
+                    // 行数据：姓名/日期/类型/胶片数量/报告数量/是否打印(图片)
+                    int rowIndex = dataGridView1.Rows.Add(patientName, examDateText, examType, filmCount, reportCount, _chkOffImg,filmUrl,reportUrl,0,item.id,item.patient_id);
+                    // 设置隐藏值列
+                    var row = dataGridView1.Rows[rowIndex];
+                    if (dataGridView1.Columns.Contains("是否打印值"))
+                    {
+                        row.Cells["是否打印值"].Value = canPrint;
+                    }
+                }
+                catch { /* 忽略单行异常，继续渲染其他行 */ }
+            }
+            dataGridView1.ClearSelection();
+            // 重置选择计数
+            OnPrintCheckboxChanged(-1, false);
+
+
+        }
+
+        /// <summary>
+        /// Ai解析按钮点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnAiAnalysis_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 直接打印按钮点击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnDirect_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

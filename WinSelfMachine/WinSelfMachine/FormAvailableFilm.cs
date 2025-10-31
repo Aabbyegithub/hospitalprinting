@@ -78,7 +78,7 @@ namespace WinSelfMachine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void BtnDelete_Click(object sender, EventArgs e)
+        private void BtnDelete_Click(object sender, EventArgs e)
         {
             if (Table.CurrentRow == null || Table.CurrentRow.Index < 0)
             {
@@ -103,13 +103,6 @@ namespace WinSelfMachine
             {
                 FilmSizeList.Remove(item);
             }
-            var printerConfig =new HolPrinterConfig
-            {
-                printer_id = item?.Id ?? 0,
-                film_size = size,
-                available_count = item?.PageSum ?? 0
-            };
-            await _apiCommon.SavePrinterConfig(2, 3, printerConfig);
 
             Table.Rows.RemoveAt(idx);
             BtnDelete.Enabled = false;
@@ -122,7 +115,7 @@ namespace WinSelfMachine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void BtnEdit_Click(object sender, EventArgs e)
+        private void BtnEdit_Click(object sender, EventArgs e)
         {
             if (Table.CurrentRow == null || Table.CurrentRow.Index < 0)
             {
@@ -145,13 +138,17 @@ namespace WinSelfMachine
             var size = CbmFilmSize.SelectedItem.ToString();
 
             var item = FilmSizeList.FirstOrDefault(x => x.Size == size);
-            var printerConfig = new HolPrinterConfig
+            if (item != null)
             {
-                printer_id = item?.Id ?? 0,
-                film_size = size,
-                available_count =int.Parse(TxtSum.Text)
-            };
-            await _apiCommon.SavePrinterConfig(2, 2, printerConfig);
+                item.PageSum = count;
+            }
+            else
+            {
+                FilmSizeList.Add(new FilmList { Size = size, PageSum = count });
+            }
+
+            Table.Rows[idx].Cells[0].Value = size;
+            Table.Rows[idx].Cells[1].Value = count;
 
             BtnDelete.Enabled = false;
             BtnEdit.Enabled = false;
@@ -163,7 +160,7 @@ namespace WinSelfMachine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void BtnAdd_Click(object sender, EventArgs e)
+        private void BtnAdd_Click(object sender, EventArgs e)
         {
             try
             {
@@ -187,13 +184,8 @@ namespace WinSelfMachine
                     return;
                 }
 
-                var printerConfig =new HolPrinterConfig
-                {
-                    printer_id = 0,
-                    film_size = size,
-                    available_count = int.Parse(TxtSum.Text)
-                };
-                await _apiCommon.SavePrinterConfig(2, 1, printerConfig);
+                FilmSizeList.Add(new FilmList { Size = size, PageSum = count });
+                Table.Rows.Add(size, count);
 
                 BtnDelete.Enabled = false;
                 BtnEdit.Enabled = false;

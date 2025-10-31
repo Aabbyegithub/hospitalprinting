@@ -51,7 +51,7 @@ namespace WebIServices.IServices.EquipmentIServices
         /// </summary>
         /// <param name="examNo"></param>
         /// <returns></returns>
-        Task<ApiResponse<HolExamination>> GetByExamNoAsync(string examNo);
+         Task<ApiResponse<List<HolExamination>>> GetByExamNoAsync(string examNo);
 
         /// <summary>
         /// 保存打印记录

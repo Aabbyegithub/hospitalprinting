@@ -67,7 +67,7 @@ namespace WebProjectTest.Controllers.EquipmentController
             return await _equipmentServices.SavePrintConfigAsync(PrinterId,Type, Action, holPrinterConfigs);
         }
         [HttpGet]
-        public async Task<ApiResponse<HolExamination>> GetByExamNoAsync(string examNo)
+        public async  Task<ApiResponse<List<HolExamination>>> GetByExamNoAsync(string examNo)
         {
             return await _equipmentServices.GetByExamNoAsync(examNo);
         }

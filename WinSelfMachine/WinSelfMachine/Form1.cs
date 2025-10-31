@@ -58,6 +58,8 @@ namespace WinSelfMachine
         /// 是否显示报告具体面板
         /// </summary>
         private int _IsOpen = 0;
+        private int _IsShow = 0;
+        private List<HolExamination>_holExamination = new List<HolExamination>();
 
 
         public Form1()
@@ -119,6 +121,7 @@ namespace WinSelfMachine
             }
 
             _IsOpen = _iniConfig.ReadInt("IsDisplay", "Display",1);
+            _IsShow = _iniConfig.ReadInt("IsShow", "IsShow",1);
 
         }
         /// <summary>
@@ -1440,7 +1443,15 @@ namespace WinSelfMachine
         private async void BtnConfirmPaint_Click(object sender, EventArgs e)
         {
             BtnCancelPrint.Text = "返回";
-
+            _holExamination.Clear();
+            // 获取打印机配置
+            var printerConfig = await GetPrinterConfiguration();
+            if (printerConfig == null)
+            {
+                MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Text = "医院自助一体机";
+                return;
+            }
             foreach (DataGridViewRow item in dataGridView1.Rows)
             {
                 if (item.Cells["是否已打印"].Value.ToString() == "1")
@@ -1452,27 +1463,35 @@ namespace WinSelfMachine
                 {
                     continue;
                 }
-                // 获取打印机配置
-                var printerConfig = await GetPrinterConfiguration();
-                if (printerConfig == null)
-                {
-                    MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    this.Text = "医院自助一体机";
-                    return;
-                }
-                var Info = new HolExamination()
+                 var info = new HolExamination()
                 {
                     id = Convert.ToInt64(item.Cells["id"].Value),
                     image_path = item.Cells["胶片路径"].Value.ToString(),
                     report_path = item.Cells["报告路径"].Value.ToString(),
                     patient_id = Convert.ToInt64(item.Cells["patient_id"].Value),
                 };
+                _holExamination.Add(info);
+            }
+
+            if (_IsShow == 1)
+            {
+                roundedContainer2.Visible = true;
+                roundedContainer2.BringToFront();
+                BtnAiAnalysis.Visible = true;
+                BtnAiAnalysis.BringToFront();
+                BtnDirect.Visible = true;
+                BtnDirect.BringToFront();
+                return;
+            }
+            foreach (var item in _holExamination)
+            {
                 // 执行打印
-                await PrintReport(Info, printerConfig);
+                await PrintReport(item, printerConfig);
 
                 // 保存打印记录
-                await SavePrintRecord(Info);
+                await SavePrintRecord(item);
             }
+
 
         }
 
@@ -1536,9 +1555,29 @@ namespace WinSelfMachine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BtnAiAnalysis_Click(object sender, EventArgs e)
+        private async void BtnAiAnalysis_Click(object sender, EventArgs e)
         {
+            // 获取打印机配置
+            var printerConfig = await GetPrinterConfiguration();
+            if (printerConfig == null)
+            {
+                MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Text = "医院自助一体机";
+                return;
+            }
 
+            foreach (var item in _holExamination)
+            {
+                if (!string.IsNullOrEmpty(item.report_path))
+                {
+
+                }
+                // 执行打印
+                await PrintReport(item, printerConfig);
+
+                // 保存打印记录
+                await SavePrintRecord(item);
+            }
         }
 
         /// <summary>
@@ -1546,9 +1585,24 @@ namespace WinSelfMachine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BtnDirect_Click(object sender, EventArgs e)
+        private async void BtnDirect_Click(object sender, EventArgs e)
         {
+            // 获取打印机配置
+            var printerConfig = await GetPrinterConfiguration();
+            if (printerConfig == null)
+            {
+                MessageBox.Show("未找到可用的打印机配置", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Text = "医院自助一体机";
+                return;
+            }
+            foreach (var item in _holExamination)
+            {
+                // 执行打印
+                await PrintReport(item, printerConfig);
 
+                // 保存打印记录
+                await SavePrintRecord(item);
+            }
         }
     }
 }

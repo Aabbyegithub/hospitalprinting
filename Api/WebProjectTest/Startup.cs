@@ -18,6 +18,7 @@ using WebServiceClass.QuartzTask;
 using FellowOakDicom;
 using WebServiceClass.Services.DICOMServices;
 using ModelClassLibrary.Model;
+using ModelClassLibrary.Model.Dto.PayDto;
 
 
 
@@ -65,6 +66,9 @@ namespace WebProjectTest
 
             //注册获取配置文件
             services.AddScoped<IAppSettinghelper, WebAppConfig>();
+
+            // 绑定微信支付配置
+            services.Configure<WeChatPayConfig>(Configuration.GetSection("WeChatPay"));
 
             //注入Service
             services.Scan(scan =>

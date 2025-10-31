@@ -116,6 +116,11 @@ const routes = [
             name: 'PrintTemplateManagement',
             component: () => import('../views/Menu/BackendHome/Hospital/PrintTemplateManagement.vue') 
           },
+          { 
+            path: 'AiConfigManagement', 
+            name: 'AiConfigManagement',
+            component: () => import('../views/Menu/BackendHome/Hospital/AiConfigManagement.vue') 
+          },
         ]
        },
     ]
